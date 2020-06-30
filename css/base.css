@@ -1,0 +1,40 @@
+html {
+  font-size: 81.25%;
+  line-height: 1.23077em;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background-color: rgb(243, 242, 241);
+}
+
+@media print {
+  html {
+    font-size: 10px;
+  }
+}
+
+
+@media (min-width: 500px) {
+  body {
+    padding: 20px;
+  }
+}
+
+@media (min-width: 880px) {
+  body {
+    padding: 40px;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+    padding: 0;
+  }
+}
+

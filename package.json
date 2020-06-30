@@ -1,0 +1,38 @@
+{
+  "name": "richardwillis.info",
+  "version": "0.0.1",
+  "keywords": [],
+  "license": "MIT",
+  "author": "",
+  "description": "",
+  "scripts": {
+    "build": "parcel build index.html",
+    "dev": "parcel index.html --open",
+    "start": "npm run build && npm run dev"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "postcss-normalize": "^9.0.0",
+    "postcss-preset-env": "^6.7.0",
+    "postcss-reporter": "^6.0.1"
+  },
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "browserslist": "last 2 versions",
+  "postcss": {
+    "plugins": {
+      "postcss-preset-env": {
+        "stage": 1,
+        "importFrom": "css/variables.css"
+      },
+      "postcss-reporter": {
+        "clearReportedMessages": true
+      }
+    }
+  },
+  "dependencies": {
+    "base.css": "^1.0.0"
+  }
+}

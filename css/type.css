@@ -1,0 +1,39 @@
+
+body {
+  color: #444;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Droid Sans", "Helvetica Neue";
+  font-weight: 400;
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #333;
+  font-weight: normal;
+  margin: 0;
+}
+
+h1,
+h2 {
+  text-transform: uppercase;
+}
+
+a, a:visited {
+  color: rgb(0, 120, 212);;
+}
+
+@media print {
+  a[href] {
+    text-decoration: none;
+  }
+}
+
+p,
+li {
+  font-size: 1.2rem;
+  line-height: 1.47692rem;
+}
