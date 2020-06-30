@@ -1,40 +1,35 @@
 html {
-  font-size: 81.25%;
-  line-height: 1.23077em;
+  font-size: 81.25%; /* 13px */
+  line-height: 1.23077em; /* 16px */
+  @media print {
+    font-size: 10px;
+  }
 }
 
 html,
 body {
   min-height: 100%;
+  cursor: unset;
 }
 
 body {
   background-color: rgb(243, 242, 241);
-}
-
-@media print {
-  html {
-    font-size: 10px;
-  }
-}
-
-
-@media (min-width: 500px) {
-  body {
+  @media (--viewport-small) {
     padding: 20px;
   }
-}
-
-@media (min-width: 880px) {
-  body {
-    padding: 40px;
+  @media (--viewport-medium) {
+    body {
+      padding: 40px;
+    }
   }
-}
-
-@media print {
-  body {
+  @media print {
     background: #fff;
     padding: 0;
   }
 }
 
+@media print {
+  a::after {
+    content: " (" attr(href) ") ";
+  }
+}

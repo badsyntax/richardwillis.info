@@ -3,21 +3,6 @@
     Roboto, Oxygen, Ubuntu, Cantarell, "Droid Sans", "Helvetica Neue";
   --base-font-weight: 400;
   --base-font-color: #444;
-
-  --base-font-size: 13px;
-  --base-line-height: 16px;
-  --rhythm-unit: "rem";
-  --rem-with-px-fallback: false;
-
-  --h1-font-size: calc(3.7 * var(--base-font-size));
-  --h2-font-size: 1.5 * var(--base-font-size);
-  --h3-font-size: 1.2 * var(--base-font-size);
-  --h4-font-size: 1.2 * var(--base-font-size);
-  --h5-font-size: 1 * var(--base-font-size);
-
-
-  --font-size-large: 48px;
-  --font-size-medium: 20px;
 }
 
 @custom-media --viewport-small (min-width: 500px);

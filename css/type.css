@@ -1,8 +1,9 @@
+@import "./variables";
 
 body {
-  color: #444;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Droid Sans", "Helvetica Neue";
-  font-weight: 400;
+  color: var(--base-font-color);
+  font-family: var(--base-font-family);
+  font-weight: var(--base-font-weight);
   margin: 0;
 }
 
@@ -22,8 +23,9 @@ h2 {
   text-transform: uppercase;
 }
 
-a, a:visited {
-  color: rgb(0, 120, 212);;
+a,
+a:visited {
+  color: rgb(0, 120, 212);
 }
 
 @media print {

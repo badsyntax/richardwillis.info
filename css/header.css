@@ -1,67 +1,63 @@
+.header {
+  &.main {
+    padding-bottom: 1.23077rem;
+    margin: 0;
 
-.header.main {
-  padding-bottom: 1.23077rem;
-  margin: 0;
-  display: flex;
-}
+    @media (--viewport-medium) {
+      display: flex;
+      & > :not(:first-child) {
+        margin-left: 14px;
+      }
+    }
 
-@media (min-width: 500px) {
-  .header.main {
-    margin-top: 1.23077rem;
-    margin-bottom: 1.23077rem;
+    @media (--viewport-small) {
+      margin-top: 1.23077rem;
+      margin-bottom: 1.23077rem;
+    }
+
+    & .title {
+      flex-grow: 1;
+      & h1 {
+        letter-spacing: 0.23077rem;
+        font-size: 3rem;
+        line-height: 3.69231rem;
+
+        @media (--viewport-small) {
+          line-height: 4.92308rem;
+          font-size: 3.3rem;
+        }
+
+        @media (--viewport-medium) {
+          font-size: 3.7rem;
+        }
+
+        & a {
+          text-decoration: none;
+        }
+      }
+    }
+
+    & .contact {
+      margin-top: 0.98462rem;
+      list-style-type: none;
+      padding: 0;
+      & li {
+        text-align: left;
+        @media (--viewport-medium) {
+          text-align: right;
+        }
+      }
+    }
+
+    & p {
+      font-size: 1.5rem;
+      line-height: 2.46154rem;
+      margin-bottom: 0rem;
+      margin-top: 0rem;
+      color: #333;
+      font-weight: normal;
+      letter-spacing: 0.07692rem;
+      text-transform: uppercase;
+    }
   }
-}
-@media (min-width: 880px) {
-  .header.main .title,
-  .header.main .section.list.projects .description,
-  .section.list.projects .header.main .description,
-  .header.main .section.list.projects .repo,
-  .section.list.projects .header.main .repo {
-    width: 66.10169%;
-    float: left;
-    margin-right: 1.69492%;
-  }
-}
-.header.main .contact {
-  margin-top: 0.98462rem;
-  padding: 0;
-}
-@media (min-width: 880px) {
-  .header.main .contact {
-    width: 32.20339%;
-    float: right;
-    margin-right: 0;
-  }
-}
-.header.main .contact li {
-  list-style: none;
-}
-@media (min-width: 880px) {
-  .header.main .contact li {
-    text-align: right;
-  }
-}
-.header.main h1 {
-  letter-spacing: 0.23077rem;
-  font-size: 3.7rem;
-  line-height: 3.69231rem;
-}
-@media (min-width: 500px) {
-  .header.main h1 {
-    font-size: 3.7rem;
-    line-height: 4.92308rem;
-  }
-}
-.header.main h1 a {
-  text-decoration: none;
-}
-.header.main p {
-  font-size: 1.5rem;
-  line-height: 2.46154rem;
-  margin-bottom: 0rem;
-  margin-top: 0rem;
-  color: #333;
-  font-weight: normal;
-  letter-spacing: 0.07692rem;
-  text-transform: uppercase;
 }
