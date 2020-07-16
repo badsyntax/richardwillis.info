@@ -24,13 +24,33 @@
     width: auto;
   }
 
-  & p {
+  & p,
+  & details {
     font-size: 1.2rem;
+  }
+
+  & p {
     line-height: 1.4em;
     margin-bottom: 1.2rem;
     margin-top: 0;
     &:not(.date):last-child {
       margin-bottom: 0;
+    }
+  }
+
+  & details[open] {
+    & summary {
+      margin-bottom: 1.2rem;
+    }
+  }
+
+  & details {
+    cursor: pointer;
+    line-height: 1.4em;
+    &:not(:last-child)[open] {
+      padding-bottom: 1.2rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 1px 0 0 var(--border-color);
     }
   }
 }
