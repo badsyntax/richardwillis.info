@@ -28,8 +28,8 @@ body {
   }
 }
 
-@media print {
+/* @media print {
   a::after {
     content: " (" attr(href) ") ";
   }
-}
+} */
