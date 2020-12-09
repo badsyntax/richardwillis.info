@@ -1,4 +1,17 @@
-# Creating a skeleton Nextjs app with TypeScript & Prettier
+---
+title: 'Setting up a bare Next.js project with Typescript & Prettier'
+excerpt: 'This post outlines how I set up a new next.js project with some additional helpful features and guidelines.'
+coverImage: '/assets/blog/hello-world/cover.jpg'
+date: '2020-03-16T05:35:07.322Z'
+author:
+  name: Richard Willis
+  picture: '/assets/blog/authors/tim.jpeg'
+ogImage:
+  url: '/assets/blog/hello-world/cover.jpg'
+draft: false
+---
+
+# Creating a skeleton next.js app with TypeScript & Prettier
 
 This post outlines the steps I take to set up a new NextJS project, and covers the following features:
 
@@ -12,7 +25,7 @@ This post outlines the steps I take to set up a new NextJS project, and covers t
 Bootstrap a nextjs project with TypeScript support:
 
 ```sh
-npx create-next-app
+npx create-next-app app-name
 cd app-name
 touch tsconfig.json
 npm install --save-dev typescript @types/react @types/node
@@ -35,55 +48,48 @@ npm i --save-dev @typescript-eslint/eslint-plugin \
 Configure `eslint` and `prettier` by adding the following to your `package.json`:
 
 ```json
-"eslintConfig": {
-  "ignorePatterns": [
-    "**/*.js"
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:prettier/recommended"
-  ],
-  "env": {
-    "browser": true,
-    "node": true
-  },
-  "parserOptions": {
-    "ecmaVersion": 6
-  },
-  "overrides": [
-    {
-      "files": [
-        "*.{ts,tsx}"
-      ],
-      "parser": "@typescript-eslint/parser",
-      "plugins": [
-        "@typescript-eslint"
-      ],
-      "extends": [
-        "plugin:jsx-a11y/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier/@typescript-eslint"
-      ],
-      "parserOptions": {
-        "project": "./tsconfig.json"
+{
+  "eslintConfig": {
+    "ignorePatterns": ["**/*.js"],
+    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "overrides": [
+      {
+        "files": ["*.{ts,tsx}"],
+        "parser": "@typescript-eslint/parser",
+        "plugins": ["@typescript-eslint"],
+        "extends": [
+          "plugin:jsx-a11y/recommended",
+          "plugin:react-hooks/recommended",
+          "plugin:@typescript-eslint/recommended",
+          "prettier/@typescript-eslint"
+        ],
+        "parserOptions": {
+          "project": "./tsconfig.json"
+        }
       }
-    }
-  ]
-},
-"prettier": {
-  "trailingComma": "es5",
-  "tabWidth": 2,
-  "semi": true,
-  "singleQuote": true,
-  "overrides": [
-    {
-      "files": "*.svg",
-      "options": {
-        "parser": "html"
+    ]
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.svg",
+        "options": {
+          "parser": "html"
+        }
       }
-    }
-  ]
+    ]
+  }
 }
 ```
 
@@ -127,6 +133,7 @@ If you're using css modules then using a utility library like `classnames` can b
 
 ```sh
 npm i classnames --save
+npm i @types/classnames --save-dev
 ```
 
 Usage:
@@ -224,3 +231,26 @@ This is the contents of a route (eg `pages/index.tsx`):
 ```tsx
 export { HomePage as default } from '../features/pages/HomePage/HomePage';
 ```
+
+## Setting browserlist
+
+Setting the supported browsers affects how CSS features and Polyfills are generated.
+
+In package.json
+
+```json
+{
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
+```
+
+## Adding a Blog
+
+Refer to https://github.com/vercel/next.js/tree/canary/examples/blog-starter

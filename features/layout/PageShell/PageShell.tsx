@@ -7,11 +7,13 @@ const classes = classNames.bind(STYLES);
 
 export interface PageShellProps {
   title: string;
+  preview?: boolean;
 }
 
 export const PageShell: React.FunctionComponent<PageShellProps> = ({
   title,
   children,
+  preview,
 }) => {
   return (
     <Fragment>

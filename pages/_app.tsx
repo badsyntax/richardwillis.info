@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
-import Head from 'next/head';
 import '../styles/tokens.css';
 import '../styles/globals.css';
+import { Meta } from '../features/layout/Meta/Meta';
 
 export interface MyAppProps {
   Component: React.FunctionComponent | React.ComponentClass;
@@ -14,12 +14,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = ({
 }) => {
   return (
     <Fragment>
-      <Head>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-        />
-      </Head>
+      <Meta />
       <Component {...pageProps} />
     </Fragment>
   );
