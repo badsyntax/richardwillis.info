@@ -1,11 +1,9 @@
-import { getAllPosts } from '../api';
 import React from 'react';
 import { PageShell } from '../../layout/PageShell/PageShell';
 import { Post } from '../types';
 import { Intro } from '../Intro/Intro';
 import { HeroPost } from '../HeroPost/HeroPost';
 import { MoreStories } from '../MoreStories/MoreStories';
-import { GetStaticProps } from 'next';
 
 export interface BlogPageProps {
   allPosts: Post[];
