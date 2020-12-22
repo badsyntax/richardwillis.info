@@ -36,7 +36,7 @@ export const HomePage: React.FunctionComponent = () => {
       <nav className={classes('card-grid')}>
         <HomeCard href="/projects" title="Projects" />
         <HomeCard href="/blog" title="Blog" />
-        <HomeCard href="/cv" title="About" />
+        <HomeCard href="/about" title="About" />
         <HomeCard href="/contact" title="Contact" />
       </nav>
     </main>

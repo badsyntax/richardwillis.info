@@ -1,0 +1,15 @@
+.root {
+  @apply flex
+    flex-wrap
+    justify-center
+    pt-10
+    sm:pt-20
+    gap-10
+    sm:gap-20;
+}
+
+.item {
+  @apply shadow-xl
+    rounded-xl
+    overflow-hidden;
+}

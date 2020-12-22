@@ -1,15 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { useRouter } from 'next/router';
 import ErrorPage from 'next/error';
-import classNames from 'classnames/bind';
 
 import { PageShell } from '../../layout/PageShell/PageShell';
 import { PostBody } from '../PostBody/PostBody';
 import { PostHeader } from '../PostHeader/PostHeader';
 import { PostTitle } from '../PostTitle/PostTitle';
 import { Post } from '../types';
-import STYLES from './PostPage.module.css';
-const classes = classNames.bind(STYLES);
 
 export interface PostPagePros {
   post: Post;
@@ -31,7 +28,7 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({
       {router.isFallback ? (
         <PostTitle>Loading…</PostTitle>
       ) : (
-        <article className={classes('root')}>
+        <Fragment>
           <PostHeader
             title={post.title}
             coverImage={post.coverImage}
@@ -39,7 +36,7 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({
             author={post.author}
           />
           <PostBody content={post.content} />
-        </article>
+        </Fragment>
       )}
     </PageShell>
   );

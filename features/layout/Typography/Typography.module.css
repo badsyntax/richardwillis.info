@@ -11,5 +11,11 @@
 }
 
 .variant-p {
-  @apply text-base;
+  @apply text-lg;
+}
+
+.variant-prose {
+  @apply prose
+    lg:prose-xl
+    max-w-none;
 }

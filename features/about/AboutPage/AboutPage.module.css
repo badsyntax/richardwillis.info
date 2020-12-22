@@ -1,3 +1,5 @@
-.root {
-
+.content {
+  @apply max-w-5xl;
 }
+
+

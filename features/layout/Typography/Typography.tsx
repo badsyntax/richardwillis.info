@@ -1,11 +1,11 @@
 import React from 'react';
 import classNames from 'classnames/bind';
+import { Box } from '../Box/Box';
+
 import STYLES from './Typography.module.css';
 const classes = classNames.bind(STYLES);
 
-import { Box } from '../Box/Box';
-
-export type Variant = 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+export type Variant = 'p' | 'h1' | 'h2' | 'h3' | 'prose';
 
 export type TypographyProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLElement>,

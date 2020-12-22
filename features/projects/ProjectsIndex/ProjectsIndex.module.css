@@ -1,0 +1,11 @@
+.root {
+  @apply flex flex-col gap-8 mt-10;
+}
+
+.card {
+  @apply text-left gap-3;
+}
+
+.tags {
+  @apply text-gray-500;
+}

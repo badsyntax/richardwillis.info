@@ -1,5 +1,2 @@
 .root {
-  @apply prose
-    lg:prose-xl
-    max-w-none;
 }

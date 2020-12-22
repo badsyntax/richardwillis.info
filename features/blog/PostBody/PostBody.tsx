@@ -1,7 +1,7 @@
 import unified from 'unified';
 import classNames from 'classnames/bind';
-import STYLES from './PostBody.module.css';
 import { MarkdownContent } from '../MarkdownContent/MarkdownContent';
+import STYLES from './PostBody.module.css';
 const classes = classNames.bind(STYLES);
 
 export interface PostBodyProps {

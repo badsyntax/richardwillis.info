@@ -1,4 +1,5 @@
 import React from 'react';
+import { Typography } from '../../layout/Typography/Typography';
 
 export interface MarkdownContentProps {
   content: string;
@@ -10,6 +11,11 @@ export const MarkdownContent: React.FunctionComponent<MarkdownContentProps> = ({
   className,
 }) => {
   return (
-    <div className={className} dangerouslySetInnerHTML={{ __html: content }} />
+    <Typography
+      as="div"
+      variant="prose"
+      className={className}
+      dangerouslySetInnerHTML={{ __html: content }}
+    />
   );
 };

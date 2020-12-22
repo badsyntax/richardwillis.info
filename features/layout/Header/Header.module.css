@@ -1,5 +1,5 @@
 .root {
-  @apply border-b-2
+  @apply
     flex
     items-center
     justify-between
@@ -8,6 +8,7 @@
     top-0
     w-full
     bg-white
+    shadow
     z-10;
 }
 

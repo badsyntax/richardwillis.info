@@ -3,4 +3,10 @@
 }
 
 .main {
+  @apply max-w-5xl
+  mx-auto
+  px-6
+  py-8
+  sm:pt-10
+  sm:pb-20;
 }
