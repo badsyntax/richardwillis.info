@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "resize-photos": "./scripts/resize-images.sh public/photos/*.jpg"
   },
   "engines": {
     "node": "^15.3.0",
