@@ -1,0 +1,7 @@
+.root {
+  @apply flex flex-col gap-8;
+}
+
+.card {
+  @apply text-left gap-3;
+}

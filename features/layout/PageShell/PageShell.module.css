@@ -1,5 +1,5 @@
 .root {
-  min-height: 100vh;
+  @apply pt-12 sm:pt-16 min-h-screen;
 }
 
 .main {

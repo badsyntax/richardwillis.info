@@ -8,11 +8,13 @@ const classes = classNames.bind(STYLES);
 export interface PageShellProps {
   title: string;
   preview?: boolean;
+  mainClassName?: string;
 }
 
 export const PageShell: React.FunctionComponent<PageShellProps> = ({
   title,
   children,
+  mainClassName,
   preview,
 }) => {
   return (
@@ -22,7 +24,7 @@ export const PageShell: React.FunctionComponent<PageShellProps> = ({
       </Head>
       <div className={classes('root')}>
         <Header />
-        <main className={classes('main')}>{children}</main>
+        <main className={classes('main', mainClassName)}>{children}</main>
       </div>
     </Fragment>
   );

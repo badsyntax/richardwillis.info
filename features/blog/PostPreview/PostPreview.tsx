@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from '../../layout/Link/Link';
+import { Typography } from '../../layout/Typography/Typography';
 import { Avatar } from '../Avatar/Avatar';
 import { CoverImage } from '../CoverImage/CoverImage';
 import { Author } from '../types';
@@ -26,9 +27,9 @@ export const PostPreview: React.FunctionComponent<PostPreviewProps> = ({
       <div>
         <CoverImage slug={slug} title={title} src={coverImage} />
       </div>
-      <h3>
+      <Typography as="h3">
         <Link href={`/posts/${slug}`}>{title}</Link>
-      </h3>
+      </Typography>
       <div>{/* <DateFormatter dateString={date} /> */}</div>
       <p>{excerpt}</p>
       <Avatar name={author.name} picture={author.picture} />

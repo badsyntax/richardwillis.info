@@ -1,0 +1,5 @@
+.date {
+  @apply mb-10
+    text-lg
+    text-gray-500;
+}

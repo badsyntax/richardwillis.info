@@ -23,5 +23,10 @@
   },
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
-  "cSpell.language": "en-GB"
+  "cSpell.language": "en-GB",
+  "tailwindCSS.colorDecorators": "off",
+  "cSpell.words": [
+    "prismjs",
+    "vfile"
+  ]
 }

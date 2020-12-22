@@ -1,0 +1,6 @@
+.root {
+  @apply my-6
+    max-w-5xl
+    mx-auto
+    p-6;
+}

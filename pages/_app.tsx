@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
-import '../styles/tokens.css';
+// import '../styles/tokens.css';
 import '../styles/globals.css';
+import '../styles/prism-overrides.css';
 import { Meta } from '../features/layout/Meta/Meta';
 
 export interface MyAppProps {

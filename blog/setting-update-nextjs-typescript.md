@@ -11,8 +11,6 @@ ogImage:
 draft: false
 ---
 
-# Creating a skeleton next.js app with TypeScript & Prettier
-
 This post outlines the steps I take to set up a new NextJS project, and covers the following features:
 
 - TypeScript support
@@ -24,7 +22,7 @@ This post outlines the steps I take to set up a new NextJS project, and covers t
 
 Bootstrap a nextjs project with TypeScript support:
 
-```sh
+```bash
 npx create-next-app app-name
 cd app-name
 touch tsconfig.json
@@ -34,7 +32,7 @@ npm run dev
 
 Setup eslint and prettier:
 
-```sh
+```bash
 npm i --save-dev @typescript-eslint/eslint-plugin \
   @typescript-eslint/parser \
   eslint \
@@ -131,7 +129,7 @@ Update vscode settings within `.vscode/setting.json`:
 
 If you're using css modules then using a utility library like `classnames` can be handy.
 
-```sh
+```bash
 npm i classnames --save
 npm i @types/classnames --save-dev
 ```
@@ -196,7 +194,7 @@ I like to have my styles sitting next to my components, and organize my componen
 
 Here's a typical layout for a multi-page next.js app:
 
-```sh
+```console
 ├── features
 │   ├── layout
 │   │   ├── Header

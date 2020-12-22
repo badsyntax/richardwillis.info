@@ -1,2 +1,43 @@
 .root {
+  @apply border-b-2
+    flex
+    items-center
+    justify-between
+    h-16
+    fixed
+    top-0
+    w-full
+    bg-white
+    z-10;
+}
+
+.title {
+  @apply text-2xl;
+}
+
+.nav-container {
+  @apply max-w-5xl
+    mx-auto
+    flex-1
+    flex
+    items-center
+    justify-center
+    sm:items-stretch
+    sm:justify-between
+    px-6;
+}
+
+.open-menu-button {
+  @apply inline-flex
+    items-center
+    justify-center
+    p-2
+    rounded-md
+    text-gray-400
+    hover:text-white
+    hover:bg-gray-700
+    focus:outline-none
+    focus:ring-2
+    focus:ring-inset
+    focus:ring-white;
 }

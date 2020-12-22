@@ -1,41 +1,44 @@
 import React from 'react';
 import Head from 'next/head';
-import { Link } from '../../layout/Link/Link';
-import cn from 'classnames/bind';
+import classNames from 'classnames/bind';
 
+import { Typography } from '../../layout/Typography/Typography';
+import { Card, CardProps } from '../../layout/Card/Card';
 import STYLES from './HomePage.module.css';
-const classes = cn.bind(STYLES);
+const classes = classNames.bind(STYLES);
+
+interface HomeCardProps {
+  title: string;
+}
+const HomeCard: React.FunctionComponent<HomeCardProps & CardProps> = ({
+  title,
+  ...props
+}) => {
+  return (
+    <Card {...props} className={classes('card')}>
+      {title}&nbsp;&rarr;
+    </Card>
+  );
+};
 
 export const HomePage: React.FunctionComponent = () => {
   return (
-    <div className={classes('container')}>
+    <main className={classes('root')}>
       <Head>
         <title>Richard Willis</title>
       </Head>
-
-      <main className={classes('main')}>
-        <h1 className={classes('title')}>Richard Willis</h1>
-
-        <p className={classes('description')}>Software Engineer</p>
-
-        <div className={classes('grid')}>
-          <a href="/projects" className={classes('card')}>
-            <h3>Projects &rarr;</h3>
-          </a>
-
-          <Link href="/blog" className={classes('card')}>
-            <h3>Blog &rarr;</h3>
-          </Link>
-
-          <a href="/cv" className={classes('card')}>
-            <h3>About &rarr;</h3>
-          </a>
-
-          <a href="/contact" className={classes('card')}>
-            <h3>Contact &rarr;</h3>
-          </a>
-        </div>
-      </main>
-    </div>
+      <Typography as="h1" className={classes('title')}>
+        Richard Willis
+      </Typography>
+      <Typography as="p" className={classes('description')}>
+        Software Engineer
+      </Typography>
+      <nav className={classes('card-grid')}>
+        <HomeCard href="/projects" title="Projects" />
+        <HomeCard href="/blog" title="Blog" />
+        <HomeCard href="/cv" title="About" />
+        <HomeCard href="/contact" title="Contact" />
+      </nav>
+    </main>
   );
 };

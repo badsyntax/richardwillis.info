@@ -1,0 +1,7 @@
+.date {
+  @apply text-gray-800;
+}
+
+.excerpt {
+  @apply text-lg;
+}

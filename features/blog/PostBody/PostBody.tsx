@@ -1,4 +1,8 @@
-import styles from './PostBody.module.css';
+import unified from 'unified';
+import classNames from 'classnames/bind';
+import STYLES from './PostBody.module.css';
+import { MarkdownContent } from '../MarkdownContent/MarkdownContent';
+const classes = classNames.bind(STYLES);
 
 export interface PostBodyProps {
   content: string;
@@ -7,12 +11,5 @@ export interface PostBodyProps {
 export const PostBody: React.FunctionComponent<PostBodyProps> = ({
   content,
 }) => {
-  return (
-    <div>
-      <div
-        className={styles['markdown']}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-    </div>
-  );
+  return <MarkdownContent content={content} className={classes('root')} />;
 };

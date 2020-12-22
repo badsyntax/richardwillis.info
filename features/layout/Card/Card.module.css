@@ -1,0 +1,23 @@
+.card {
+  @apply p-4
+    flex
+    flex-col
+    justify-center
+    self-stretch
+    rounded-xl
+    border
+    border-gray-300
+    text-gray-800
+    transition-all
+    no-underline;
+}
+
+.card:hover {
+  @apply border-gray-400
+    shadow;
+}
+
+.card:active {
+  @apply border-gray-400
+    shadow-sm;
+}

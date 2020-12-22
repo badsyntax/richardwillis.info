@@ -1,0 +1,6 @@
+@import 'prism-themes/themes/prism-vsc-dark-plus.css';
+
+pre[class*='language-'],
+code[class*='language-'] {
+  @apply text-base sm:text-base !important;
+}

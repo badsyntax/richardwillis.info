@@ -1,9 +1,11 @@
 // import DateFormatter from '../components/date-formatter';
-import React from 'react';
-import { Avatar } from '../Avatar/Avatar';
-import { CoverImage } from '../CoverImage/CoverImage';
+import React, { Fragment } from 'react';
+import classNames from 'classnames/bind';
 import { PostTitle } from '../PostTitle/PostTitle';
 import { Author } from '../types';
+import STYLES from './PostHeader.module.css';
+import { Box } from '../../layout/Box/Box';
+const classes = classNames.bind(STYLES);
 
 interface PostHeaderProps {
   title: string;
@@ -14,25 +16,11 @@ interface PostHeaderProps {
 
 export const PostHeader: React.FunctionComponent<PostHeaderProps> = ({
   title,
-  coverImage,
-  date,
-  author,
 }) => {
   return (
-    <>
+    <Fragment>
       <PostTitle>{title}</PostTitle>
-      <div>
-        <Avatar name={author.name} picture={author.picture} />
-      </div>
-      <div>
-        <CoverImage title={title} src={coverImage} />
-      </div>
-      <div>
-        <div>
-          <Avatar name={author.name} picture={author.picture} />
-        </div>
-        <div>{/* <DateFormatter dateString={date} /> */}</div>
-      </div>
-    </>
+      <div className={classes('date')}>Posted on: 20 Dec 2020</div>
+    </Fragment>
   );
 };

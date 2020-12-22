@@ -11,8 +11,6 @@ ogImage:
 draft: true
 ---
 
-# Getting started with Kubernetes
-
 Some semi-random notes about getting up and running with kubernetes, covering the following topics:
 
 - kubernetes installation
@@ -41,14 +39,14 @@ Add DNS A records to point to the two different servers, eg:
 
 Kubernetes uses resource files to manage the cluster. Resources are created or deleted with `kubectl`, for example:
 
-```sh
+```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
 kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
 ```
 
 ### Setup Master node (control-plane)
 
-```sh
+```bash
 # ssh into master server
 ssh root@k8s-master.example.com
 
@@ -96,12 +94,9 @@ kubeadm init --apiserver-advertise-address PUBLIC_IP_ADDRESS --pod-network-cidr=
 
 Take note of the join commands in the output.
 
-kubeadm join 95.216.222.179:6443 --token ua3286.auq7zy60b9ws0awz \
-    --discovery-token-ca-cert-hash sha256:c7d5af16fb6349d29c10f24da04b1ec688c3e871e6ad6d78aed4511fe6f5a30c
-
 Now setup kubectl:
 
-```sh
+```bash
 # for root
 export KUBECONFIG=/etc/kubernetes/admin.conf
 echo "KUBECONFIG=/etc/kubernetes/admin.conf" >> /etc/environment
@@ -121,7 +116,7 @@ kubectl get nodes
 
 Install the flannel pod network:
 
-```sh
+```bash
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 # verify master is ready
@@ -130,7 +125,7 @@ kubectl get nodes
 
 ### Setup Worker Node
 
-```sh
+```bash
 # ssh into master server
 ssh root@k8s-worker-1.example.com
 
@@ -178,7 +173,7 @@ apt-get install -y kubelet kubeadm kubectl
 
 In your master node:
 
-```sh
+```bash
 kubectl get nodes
 
 # optionally label the worker node
@@ -190,7 +185,7 @@ kubectl get pods --all-namespaces
 
 ### Setup local access
 
-```sh
+```bash
 mkdir ~/.kube
 scp root@k8s-master.example.com:/etc/kubernetes/admin.conf ~/.kube/config
 
@@ -202,7 +197,7 @@ kubectl cluster-info
 
 On your desktop machine:
 
-```sh
+```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.5/aio/deploy/recommended.yaml
 kubectl proxy
 ```
@@ -215,7 +210,7 @@ TODO: dashboard access
 
 An ingress controller essentially allows external users to access containerized application using FQDN.
 
-```sh
+```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
 kubectl get pods -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx --watch
 kubectl get service --namespace=ingress-nginx
@@ -276,7 +271,7 @@ spec:
 
 Now setup the resources:
 
-```sh
+```bash
 kubectl create -f deploy.yaml
 kubectl get deployments.apps nginx-deployment
 kubectl get service nginx-service
@@ -301,7 +296,7 @@ kubectl describe ingress nginx-ingress
 
 The following describes how to setup kubernetes (via k3s) and rancher on a single master node, on a clean Ubuntu 20.04 server (CX12 Hetzner server)
 
-```sh
+```bash
 apt-get update
 apt-get upgrade -y
 curl -sfL https://get.k3s.io | sh -
@@ -380,7 +375,7 @@ Install multipass (install docs) via homebrew
 
 Create an Ubuntu VM with multipass:
 
-```sh
+```bash
 brew cask install multipass
 multipass launch --name k3s --cpus 4 --mem 4g --disk 20g
 multipass info k3s
@@ -388,14 +383,14 @@ multipass info k3s
 
 Add the VM IP to `/etc/hosts`:
 
-```sh
+```bash
 ❯ grep rancher /etc/hosts
 192.168.64.3 rancher.localdev
 ```
 
 Install kubectl on your host:
 
-```sh
+```bash
 brew install kubernetes-cli helm
 K3S_IP=$(multipass info k3s | grep IPv4 | awk '{print $2}')
 echo $K3S_IP
@@ -434,7 +429,7 @@ The following assumes you're using MacOS.
 
 Install microk8s:
 
-```sh
+```bash
 brew install ubuntu/microk8s/microk8s
 microk8s install
 ```
@@ -443,7 +438,7 @@ microk8s install
 
 Deploy an app:
 
-```sh
+```bash
 microk8s status --wait-ready
 microk8s kubectl get all --all-namespaces
 microk8s kubectl get nodes
@@ -461,7 +456,7 @@ microk8s kubectl get pods # monitor app deployment
 
 Enable the dashboard addon:
 
-```sh
+```bash
 microk8s enable dashboard
 ```
 
@@ -470,7 +465,7 @@ Access the dashboard:
 - (replace `microk8s-vm` with the VM name listed in `multipass list`)
 - (you might need to wait a bit for the dashboard pod to become ready)
 
-```sh
+```bash
 multipass exec microk8s-vm -- sudo /snap/bin/microk8s kubectl -n kube-system describe secret $(multipass exec microk8s-vm -- sudo /snap/bin/microk8s kubectl -n kube-system get secret | grep default-token | cut -d " " -f1)
 multipass exec microk8s-vm -- sudo /snap/bin/microk8s kubectl port-forward -n kube-system service/kubernetes-dashboard 10443:443 --address 0.0.0.0
 ```
