@@ -1,16 +1,21 @@
 # gRPC & TypeScript
 
-gRPC allows (and recommends) you to use Protocol Buffers as a data transport format. Protobuf is cool as it gives you a strict data transfer schema instead of passing "arbitrary" messages over HTTP that you hope the client and server will understand. There are of-course other ways to enforce HTTP message types but Protobuf is a generic solution that works across different languages and codebases as well as having other benefits. If you're using gRPC you'll likely be using Protobuf to define both your services (your rpc method calls) and your data models.
+If you're using gRPC you'd typically be using Protocol Buffers as a data transport format and schema to define both your services (your rpc method calls) and your data models.
 
 ## State of gRPC/Protobuf for Node.js
 
-Traditionally you'd use the Protobuf Compiler to compile the proto definitions into actual JavaScript code that you'd consume in your application. The generated code can be in the form of data models, gRPC service definitions and gRPC client definitions. The generated code uses the `grpc` package for providing the client and server implementations. The server is implemented as a custom c++ server and requires various build tools to allow it to be built and installed correctly. The `google-protobuf` package is used at runtime to create data model classes with getters, setters and (de)serialization methods.
+Traditionally you'd use the Protobuf Compiler to compile the proto definitions into actual JavaScript code that you'd consume in your application. The generated code can be in the form of data models, gRPC service definitions and gRPC client definitions. The generated code uses the `grpc` package at runtime for providing the client and server implementations. The `grpc` server is implemented as a custom c++ server and requires various build tools to allow it to be built and installed correctly. The `google-protobuf` package is used at runtime to construct and (de)serialise Protobuf models.
 
-While this traditional approach works, it's effectively deprecated in favour of a pure JavaScript implementation of gRPC. This new package is called `@grpc/grpc-js`. The [protobuf.js](https://www.npmjs.com/package/protobufjs) package is used for runtime consumption of Protobuf files so there's no compile step required, but it's also with compatible `google-protobuf` if you prefer to compile your models. It uses the standard Node.js http2 libraries for providing the server implementation, so it's a WHOLE lot more portable than `grpc`. One huge benefit of this approach is works without any headaches in embedded Node.js environments like Electron.
+While this traditional approach works, there are some [portability and maintenance issues](https://github.com/denoland/deno/issues/3326#issuecomment-674428001) with it, and it's effectively deprecated in favour of a pure JavaScript implementation of gRPC. This new package is called `@grpc/grpc-js` and it doesn't require a build/compile step. It loads protobuf files at runtime using the [protobuf.js](https://www.npmjs.com/package/protobufjs) package. (It's also with compatible `google-protobuf` if you prefer to compile your models.) It uses the standard Node.js http2 library for providing the server implementation, so it's a WHOLE lot more portable than `grpc`. One huge benefit of this approach is works without any headaches in embedded Node.js environments like Electron.
 
-No matter which approach you take, if you're using TypeScript you'd ideally want to have TypeScript types that describe your Protobuf definitions.
+No matter which approach you take, if you're using TypeScript and gRPC you'd ideally want to have TypeScript types that describe your Protobuf definitions.
 
-You can use the Proto compiler and 3rd party plugins to generate the types, or you can use the `grpc-proto-loader` package (as part of `@grpc/grpc-js`) to generate the types.
+There's two main approaches to achieve this:
+
+1. Use the Proto compiler and 3rd party plugins to generate the types, or
+2. Use the `grpc-proto-loader` package (as part of `@grpc/grpc-js`) to generate the types
+
+## Generating TypeScript Types from Protocol Buffer definitions
 
 ## Using the Proto compiler
 
