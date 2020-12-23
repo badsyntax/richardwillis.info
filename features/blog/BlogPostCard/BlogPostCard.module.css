@@ -1,7 +1,9 @@
-.date {
-  @apply text-gray-500 text-sm;
-}
+@layer components {
+  .date {
+    @apply text-gray-500 text-sm;
+  }
 
-.excerpt {
-  @apply text-lg;
+  .excerpt {
+    @apply text-lg;
+  }
 }

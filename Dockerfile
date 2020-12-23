@@ -1,32 +1,45 @@
-# See https://github.com/bbachi/nextjs-nginx-docker
+FROM node:14.15.3-alpine AS builder
 
-# stage1 as builder
-FROM node:10-alpine as builder
+LABEL maintainer=willis.rh@gmail.com
 
-# copy the package.json to install dependencies
+WORKDIR /app
+
+ENV NPM_CONFIG_LOGLEVEL warn
+ENV NPM_CONFIG_FUND false
+ENV NPM_CONFIG_AUDIT false
+ENV CI true
+
 COPY package.json package-lock.json ./
 
-# Install the dependencies and make the folder
-RUN npm install && mkdir /nextjs-ui && mv ./node_modules ./nextjs-ui
-
-WORKDIR /nextjs-ui
-
+RUN npm ci
 COPY . .
-
-# Build the project and copy the files
 RUN npm run build
+RUN npm prune --production
 
+FROM node:14.15.3-alpine
 
-FROM nginx:alpine
+LABEL maintainer=willis.rh@gmail.com
 
-COPY ./.nginx/nginx.conf /etc/nginx/nginx.conf
+LABEL org.label-schema.name="richardwillis.info" \
+  org.label-schema.description="Personal site of Richard Willis" \
+  org.label-schema.vcs-url="https://github.com/badsyntax/richardwillis.info" \
+  org.label-schema.usage="README.md" \
+  org.label-schema.vendor="badsyntax"
 
-## Remove default nginx index page
-RUN rm -rf /usr/share/nginx/html/*
+ENV NPM_CONFIG_LOGLEVEL warn
+ENV NODE_ENV production
+ENV PORT 3000
 
-# Copy from the stahg 1
-COPY --from=builder /nextjs-ui/out /usr/share/nginx/html
+WORKDIR /app
 
-EXPOSE 3000 80
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY public public
 
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+RUN npm install pm2 -g
+
+EXPOSE 3000
+
+USER node
+
+CMD ["pm2-runtime", "./node_modules/.bin/next", "--", "start"]

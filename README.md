@@ -23,3 +23,20 @@ Add photos to the [public/photos/](./public/photos) directory and resize them by
 ## Adding Blog Entries
 
 Add new entries as markdown files to [blog/](./blog).
+
+## Docker
+
+See https://steveholgado.com/nginx-for-nextjs/ & https://github.com/steveholgado/nextjs-docker-pm2-nginx
+
+Build & run the Node.js image:
+
+```bash
+docker build -t badsyntax/richardwillis .
+docker run --publish 3000:3000 --name richardwillis badsyntax/richardwillis
+```
+
+Build & run the Node.js & Nginx images:
+
+```bash
+docker-compose up
+```

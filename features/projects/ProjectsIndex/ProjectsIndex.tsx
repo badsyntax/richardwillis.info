@@ -15,9 +15,9 @@ export const ProjectsIndex: React.FunctionComponent<ProjectsIndexProps> = ({
 }) => {
   return (
     <nav className={classes('root')}>
-      {projects.map((project) => {
+      {projects.map((project, i) => {
         return (
-          <Card href={project.repoUrl} className={classes('card')}>
+          <Card href={project.repoUrl} className={classes('card')} key={i}>
             <Typography as="h3">{project.title}&nbsp;&rarr;</Typography>
             <Typography as="p">{project.description}</Typography>
             <Typography as="p" className={classes('tags')}>

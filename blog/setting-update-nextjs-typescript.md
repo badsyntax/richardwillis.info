@@ -251,3 +251,7 @@ In package.json
 ## Adding a Blog
 
 Refer to https://github.com/vercel/next.js/tree/canary/examples/blog-starter
+
+## Adding Tailwind.css
+
+See https://actionauta.com/notes/integrating-tailwind-css-modules-sass-stylelint-nextjs

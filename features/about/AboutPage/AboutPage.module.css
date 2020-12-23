@@ -1,5 +1,6 @@
-.content {
-  @apply max-w-5xl;
+@layer components {
+  .content {
+    @apply max-w-5xl;
+  }
 }
-
 

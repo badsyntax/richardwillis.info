@@ -1,8 +1,10 @@
-.root {
+@layer components {
+  .root {
 
-}
+  }
 
-.social-link {
-  @apply inline-flex items-center gap-2;
-  @apply m-0 !important;
+  .social-link {
+    @apply inline-flex items-center gap-2;
+    @apply m-0 !important;
+  }
 }

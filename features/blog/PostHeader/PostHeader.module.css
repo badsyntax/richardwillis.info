@@ -1,5 +1,7 @@
-.date {
-  @apply mb-10
-    text-lg
-    text-gray-500;
+@layer components {
+  .date {
+    @apply mb-10
+      text-lg
+      text-gray-500;
+  }
 }

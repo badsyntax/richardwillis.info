@@ -7,9 +7,13 @@ const classes = classNames.bind(STYLES);
 
 export interface NavProps {
   className?: string;
+  itemClassName?: string;
 }
 
-export const Nav: React.FunctionComponent<NavProps> = ({ className }) => {
+export const Nav: React.FunctionComponent<NavProps> = ({
+  className,
+  itemClassName,
+}) => {
   const classNames = {
     className: classes('nav-item'),
     activeClassName: classes('active'),
