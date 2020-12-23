@@ -2,12 +2,10 @@ import React from 'react';
 import { Link } from '../../layout/Link/Link';
 import { Typography } from '../../layout/Typography/Typography';
 import { Avatar } from '../Avatar/Avatar';
-import { CoverImage } from '../CoverImage/CoverImage';
 import { Author } from '../types';
 
 export interface PostPreviewProps {
   title: string;
-  coverImage: string;
   date: string;
   excerpt: string;
   author: Author;
@@ -16,7 +14,6 @@ export interface PostPreviewProps {
 
 export const PostPreview: React.FunctionComponent<PostPreviewProps> = ({
   title,
-  coverImage,
   date,
   excerpt,
   author,
@@ -24,9 +21,6 @@ export const PostPreview: React.FunctionComponent<PostPreviewProps> = ({
 }) => {
   return (
     <div>
-      <div>
-        <CoverImage slug={slug} title={title} src={coverImage} />
-      </div>
       <Typography as="h3">
         <Link href={`/posts/${slug}`}>{title}</Link>
       </Typography>

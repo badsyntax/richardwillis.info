@@ -16,13 +16,11 @@
 }
 
 .header {
-  @apply
-  /* bg-gray-50 */
-  absolute
-  z-10
-  right-2
-  top-4
-  px-4
+  @apply absolute
+    z-10
+    right-2
+    top-4
+    px-4
     py-3
     sm:px-6
     sm:flex

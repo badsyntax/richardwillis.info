@@ -1,11 +1,10 @@
 ---
 title: 'Setting up a bare Next.js project with Typescript & Prettier'
 excerpt: 'This post outlines how I set up a new next.js project with some additional helpful features and guidelines.'
-coverImage: '/assets/blog/hello-world/cover.jpg'
 date: '2020-03-16T05:35:07.322Z'
 author:
   name: Richard Willis
-  picture: '/assets/blog/authors/tim.jpeg'
+  picture: '/assets/blog/authors/richard.jpg'
 ogImage:
   url: '/assets/blog/hello-world/cover.jpg'
 draft: false

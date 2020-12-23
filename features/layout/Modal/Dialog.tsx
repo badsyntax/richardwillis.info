@@ -13,12 +13,7 @@ export const Dialog: React.FunctionComponent<DialogProps> = ({
   children,
 }) => {
   return (
-    <div
-      className={classes('root')}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-headline"
-    >
+    <div className={classes('root')} role="dialog" aria-modal="true">
       <div className={classes('header')}>
         <button
           type="button"

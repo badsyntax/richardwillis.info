@@ -1,11 +1,10 @@
 ---
 title: 'Getting started with Kubernetes'
 excerpt: 'Some semi-random notes about getting up and running with kubernetes'
-coverImage: '/assets/blog/hello-world/cover.jpg'
 date: '2020-03-16T05:35:07.322Z'
 author:
   name: Richard Willis
-  picture: '/assets/blog/authors/tim.jpeg'
+  picture: '/assets/blog/authors/richard.jpg'
 ogImage:
   url: '/assets/blog/hello-world/cover.jpg'
 draft: true

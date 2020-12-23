@@ -9,7 +9,6 @@ const classes = classNames.bind(STYLES);
 
 interface PostHeaderProps {
   title: string;
-  coverImage: string;
   date: string;
   author: Author;
 }

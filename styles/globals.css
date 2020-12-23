@@ -13,3 +13,11 @@
     @apply text-gray-900;
   }
 }
+
+@layer components {
+  /* add custom components here, eg
+  .btn-blue {
+    @apply text-white hover:bg-blue-700;
+  }
+  */
+}
