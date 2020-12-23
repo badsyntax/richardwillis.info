@@ -1,9 +1,10 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import STYLES from './ProjectsIndex.module.css';
 import { Project } from '../types';
 import { Card } from '../../layout/Card/Card';
 import { Typography } from '../../layout/Typography/Typography';
+
+import STYLES from './ProjectsIndex.module.css';
 const classes = classNames.bind(STYLES);
 
 export interface ProjectsIndexProps {

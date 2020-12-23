@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import classNames from 'classnames/bind';
-import { FaBars } from 'react-icons/fa';
 import { MdClose, MdMenu } from 'react-icons/md';
 import { Link } from '../Link/Link';
 import { Nav } from '../Nav/Nav';
