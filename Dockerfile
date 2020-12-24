@@ -39,6 +39,10 @@ COPY public /app/public
 
 EXPOSE 3000
 
+RUN ls
+
+RUN ls .next.
+
 USER node
 
 CMD ["node_modules/.bin/pm2-runtime", "node_modules/.bin/next", "--", "start"]
