@@ -17,7 +17,7 @@
 }
 
 .variant-p {
-  @apply text-lg;
+  @apply text-base sm:text-lg;
 }
 
 .variant-prose {

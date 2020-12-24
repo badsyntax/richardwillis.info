@@ -1,14 +1,12 @@
 .root {
   @apply fixed
+  flex
+  flex-wrap
     top-0
     w-full
     bg-white
     shadow
-    z-10;
-}
-
-.inner {
-  @apply flex
+    z-10
     items-center
     h-16
     justify-between;
@@ -25,35 +23,13 @@
     mx-auto
     flex-1
     flex
+    h-16
     items-center
     justify-center
-    sm:items-stretch
     sm:justify-between
     px-6;
 }
 
-.menu-button {
-  @apply absolute
-    left-2
-    sm:hidden
-    inline-flex
-    items-center
-    justify-center
-    p-2
-    rounded-md
-    text-2xl
-    text-gray-600
-    border
-    hover:border-gray-400
-    focus:outline-none
-    focus:ring-2
-    focus:ring-inset
-    focus:ring-white;
-}
-
-.menu-button-label {
-  @apply sr-only;
-}
 
 .nav {
   @apply hidden
@@ -61,18 +37,3 @@
     sm:ml-6;
 }
 
-.mobile-nav {
-  @apply hidden
-    sm:hidden
-    flex-col
-    px-2
-    pt-2
-    pb-3
-    space-y-1
-    space-x-0
-    shadow-lg;
-}
-
-.mobile-nav-visible {
-  @apply flex sm:hidden;
-}

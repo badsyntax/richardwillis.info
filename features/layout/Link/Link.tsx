@@ -1,6 +1,11 @@
 import { default as NextLink, LinkProps as NextLinkProps } from 'next/link';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 import { useRouter } from 'next/router';
+
+import STYLES from './Link.module.css';
+const classes = classNames.bind(STYLES);
+
+export type LinkVariant = 'button' | 'normal';
 
 export type LinkProps = React.DetailedHTMLProps<
   React.AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -8,6 +13,7 @@ export type LinkProps = React.DetailedHTMLProps<
 > &
   NextLinkProps & {
     activeClassName?: string;
+    variant?: LinkVariant;
   };
 
 const hrefInPath = (pathname, href): boolean => {
@@ -19,6 +25,7 @@ export const Link: React.FunctionComponent<LinkProps> = ({
   href,
   className,
   activeClassName,
+  variant,
   ...props
 }) => {
   const router = useRouter();
@@ -27,9 +34,10 @@ export const Link: React.FunctionComponent<LinkProps> = ({
     <NextLink href={href}>
       <a
         {...props}
-        className={classNames(
+        className={classes(
           className,
-          hrefInPath(router.asPath, href) && activeClassName
+          hrefInPath(router.asPath, href) && activeClassName,
+          variant && `variant-${variant}`
         )}
       />
     </NextLink>

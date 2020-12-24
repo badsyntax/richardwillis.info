@@ -3,21 +3,23 @@ import Head from 'next/head';
 import classNames from 'classnames/bind';
 
 import { Typography } from '../../layout/Typography/Typography';
-import { Card, CardProps } from '../../layout/Card/Card';
+import { Link, LinkProps } from '../../layout/Link/Link';
+
 import STYLES from './HomePage.module.css';
 const classes = classNames.bind(STYLES);
 
-interface HomeCardProps {
+interface HomeNavLinkProps {
   title: string;
 }
-const HomeCard: React.FunctionComponent<HomeCardProps & CardProps> = ({
+
+const HomeNavLink: React.FunctionComponent<HomeNavLinkProps & LinkProps> = ({
   title,
   ...props
 }) => {
   return (
-    <Card {...props} className={classes('card')}>
+    <Link {...props} variant="button" className={classes('nav-item')}>
       {title}&nbsp;&rarr;
-    </Card>
+    </Link>
   );
 };
 
@@ -33,11 +35,11 @@ export const HomePage: React.FunctionComponent = () => {
       <Typography as="p" className={classes('description')}>
         Software Engineer
       </Typography>
-      <nav className={classes('card-grid')}>
-        <HomeCard href="/projects" title="Projects" />
-        <HomeCard href="/blog" title="Blog" />
-        <HomeCard href="/about" title="About" />
-        <HomeCard href="/contact" title="Contact" />
+      <nav className={classes('nav-grid')}>
+        <HomeNavLink href="/projects" title="Projects" />
+        <HomeNavLink href="/blog" title="Blog" />
+        <HomeNavLink href="/about" title="About" />
+        <HomeNavLink href="/contact" title="Contact" />
       </nav>
     </main>
   );

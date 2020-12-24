@@ -1,0 +1,23 @@
+.root {
+  @apply text-center
+    text-2xl
+    font-normal
+    p-4
+    rounded-xl
+    border
+    border-gray-300
+    text-gray-800
+    transition-all
+    inline-block
+    no-underline;
+}
+
+.root:hover {
+  @apply border-gray-400
+    shadow;
+}
+
+.root:active {
+  @apply border-gray-400
+    shadow-sm;
+}

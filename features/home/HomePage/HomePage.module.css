@@ -4,21 +4,22 @@
     justify-center
     items-center
     min-h-screen
-    px-4;
+    px-8;
 }
 
 .title,
 .description {
   @apply opacity-0
-  duration-200
+    duration-200
     motion-safe:animate-fade-in;
 }
 
 .description {
-  @apply text-2xl mt-2;
+  @apply text-2xl
+    mt-2;
 }
 
-.card-grid {
+.nav-grid {
   @apply flex
     flex-wrap
     flex-col
@@ -27,25 +28,22 @@
     sm:flex-row
     items-center
     justify-center
-    gap-8
+    gap-4
+    sm:gap-8
     mt-12
     opacity-0
     motion-safe:animate-fade-in;
   animation-delay: 1s;
 }
 
-.card {
-  @apply text-center text-2xl;
+.nav-item {
+  @apply w-full;
 }
 
 @screen sm {
-  .card {
+  .nav-item {
     flex-basis: 45%;
   }
-}
-
-.card-title {
-  @apply font-normal;
 }
 
 @keyframes fadeIn {

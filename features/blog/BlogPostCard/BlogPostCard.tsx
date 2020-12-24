@@ -34,11 +34,7 @@ export const BlogPostCard: React.FunctionComponent<
       <Typography as="p" className={classes('date')}>
         Posted on 20<sup>th</sup> Dec 2020
       </Typography>
-      {excerpt && (
-        <Typography as="p" className={classes('excerpt')}>
-          {excerpt}
-        </Typography>
-      )}
+      {excerpt && <Typography as="p">{excerpt}</Typography>}
       {children}
     </Card>
   );
