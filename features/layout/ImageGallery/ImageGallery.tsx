@@ -45,7 +45,7 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
       </Modal>
       <ul className={classes('root')}>
         {images.map((image, i) => (
-          <li className={classes('item')} style={{ height }} key={i}>
+          <li className={classes('item')} key={i}>
             <Link href={image.src} target="_blank" onClick={onItemClick(image)}>
               <Image
                 src={image.src}

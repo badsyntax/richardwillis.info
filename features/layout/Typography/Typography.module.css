@@ -1,13 +1,19 @@
 .variant-h1 {
-  @apply text-6xl font-bold;
+  @apply text-5xl
+    sm:text-6xl
+    font-bold;
 }
 
 .variant-h2 {
-  @apply text-4xl font-bold;
+  @apply text-4xl
+    sm:text-5xl
+    font-bold;
 }
 
 .variant-h3 {
-  @apply text-2xl font-bold;
+  @apply text-xl
+    sm:text-4xl
+    font-bold;
 }
 
 .variant-p {

@@ -32,11 +32,26 @@ Build & run the Node.js image:
 
 ```bash
 docker build -t badsyntax/richardwillis .
-docker run --publish 3000:3000 --name richardwillis badsyntax/richardwillis
+docker run --publish 3000:3000 badsyntax/richardwillis
 ```
 
 Build & run the Node.js & Nginx images:
 
 ```bash
 docker-compose up
+```
+
+## Dokku
+
+```bash
+# on dokku server
+dokku apps:create richardwillis
+dokku proxy:ports-add richardwillis http:80:3000
+
+# on local host
+git remote add dokku dokku@dokku.proxima-web.com:richardwillis
+git push dokku
+
+# on dokku server
+dokku letsencrypt richardwillis
 ```

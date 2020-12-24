@@ -11,5 +11,9 @@
 .item {
   @apply shadow-xl
     rounded-xl
+    border
+    border-gray-800
     overflow-hidden;
+    line-height: 0;
+
 }

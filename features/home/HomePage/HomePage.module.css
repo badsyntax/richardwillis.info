@@ -10,8 +10,8 @@
 .title,
 .description {
   @apply opacity-0
-    duration-200
-    animate-fade-in;
+  duration-200
+    motion-safe:animate-fade-in;
 }
 
 .description {
@@ -21,18 +21,27 @@
 .card-grid {
   @apply flex
     flex-wrap
+    flex-col
+    w-full
+    sm:w-auto
+    sm:flex-row
     items-center
     justify-center
     gap-8
     mt-12
     opacity-0
-    animate-fade-in;
+    motion-safe:animate-fade-in;
   animation-delay: 1s;
 }
 
 .card {
-  flex-basis: 45%;
   @apply text-center text-2xl;
+}
+
+@screen sm {
+  .card {
+    flex-basis: 45%;
+  }
 }
 
 .card-title {

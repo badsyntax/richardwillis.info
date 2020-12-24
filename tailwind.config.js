@@ -23,6 +23,7 @@ module.exports = {
     },
   },
   variants: {
+    animation: ['responsive', 'motion-safe', 'motion-reduce'],
     extend: {},
   },
   plugins: [typography],
