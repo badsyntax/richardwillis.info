@@ -41,7 +41,7 @@ EXPOSE 3000
 
 RUN ls
 
-RUN ls .next.
+RUN ls .next/
 
 USER node
 
