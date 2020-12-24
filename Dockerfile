@@ -16,7 +16,8 @@ COPY . .
 RUN npm run build
 RUN npm prune --production
 
-FROM gcr.io/distroless/nodejs:14
+
+FROM node:14.15.3-alpine
 
 LABEL maintainer=willis.rh@gmail.com
 
@@ -36,10 +37,8 @@ COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/.next /app/.next
 COPY public /app/public
 
-RUN npm install pm2 -g
-
 EXPOSE 3000
 
 USER node
 
-CMD ["pm2-runtime", "./node_modules/.bin/next", "--", "start"]
+CMD ["node_modules/.bin/pm2-runtime", "node_modules/.bin/next", "--", "start"]
