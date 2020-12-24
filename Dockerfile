@@ -16,7 +16,7 @@ COPY . .
 RUN npm run build
 RUN npm prune --production
 
-FROM node:14.15.3-alpine
+FROM gcr.io/distroless/nodejs:14
 
 LABEL maintainer=willis.rh@gmail.com
 
@@ -32,9 +32,9 @@ ENV PORT 3000
 
 WORKDIR /app
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
-COPY public public
+COPY --from=builder /app/node_modules /app/node_modules
+COPY --from=builder /app/.next /app/.next
+COPY public /app/public
 
 RUN npm install pm2 -g
 
