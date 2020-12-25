@@ -42,6 +42,7 @@
 
 @screen sm {
   .nav-item {
+    @apply w-auto;
     flex-basis: 45%;
   }
 }

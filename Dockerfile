@@ -21,7 +21,8 @@ FROM node:14.15.3-alpine
 
 LABEL maintainer=willis.rh@gmail.com
 
-LABEL org.label-schema.name="richardwillis.info" \
+LABEL org.opencontainers.image.source https://github.com/badsyntax/richardwillis.info \
+  org.label-schema.name="richardwillis.info" \
   org.label-schema.description="Personal site of Richard Willis" \
   org.label-schema.vcs-url="https://github.com/badsyntax/richardwillis.info" \
   org.label-schema.usage="README.md" \
