@@ -4,3 +4,8 @@ npm-debug.log
 .vscode
 .git
 .gitignore
+.github
+cloudformation
+nginx
+scripts
+docker-compose.yml

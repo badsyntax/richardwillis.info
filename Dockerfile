@@ -4,6 +4,8 @@ LABEL maintainer=willis.rh@gmail.com
 
 WORKDIR /app
 
+ARG APP_VERSION
+ENV APP_VERSION=$APP_VERSION
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
@@ -20,31 +22,28 @@ RUN npm prune --production
 FROM node:14.15.3-alpine
 
 LABEL maintainer=willis.rh@gmail.com
-
-LABEL org.opencontainers.image.source https://github.com/badsyntax/richardwillis.info \
-  org.label-schema.name="richardwillis.info" \
-  org.label-schema.description="Personal site of Richard Willis" \
-  org.label-schema.vcs-url="https://github.com/badsyntax/richardwillis.info" \
-  org.label-schema.usage="README.md" \
-  org.label-schema.vendor="badsyntax"
+LABEL org.opencontainers.image.source https://github.com/badsyntax/richardwillis.info
+LABEL org.label-schema.name="richardwillis.info"
+LABEL org.label-schema.description="Personal site of Richard Willis"
+LABEL org.label-schema.vcs-url="https://github.com/badsyntax/richardwillis.info"
+LABEL org.label-schema.usage="README.md"
+LABEL org.label-schema.vendor="badsyntax"
 
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NODE_ENV production
 ENV PORT 3000
+ENV APP_HOME /app
 
-WORKDIR /app
+RUN mkdir -p $APP_HOME && chown -R node:node $APP_HOME
+WORKDIR $APP_HOME
 
-COPY --from=builder /app/package.json /app/package.json
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/.next /app/.next
-COPY --from=builder /app/next.config.js /app/next.config.js
-COPY --from=builder /app/public /app/public
+COPY --from=builder --chown=node:node $APP_HOME/package.json $APP_HOME/package.json
+COPY --from=builder --chown=node:node $APP_HOME/node_modules $APP_HOME/node_modules
+COPY --from=builder --chown=node:node $APP_HOME/.next $APP_HOME/.next
+COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.config.js
+COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
 
 EXPOSE 3000
-
-RUN ls
-
-RUN ls .next/
 
 USER node
 

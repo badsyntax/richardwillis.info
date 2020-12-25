@@ -51,7 +51,6 @@ $PROTOC \
     "$IN_DIR"/*.proto
 ```
 
-
 ## Background
 
 My journey to exploring how to use gRPC with TypeScript started when I wanted to use `grpc` in my VS Code extension. The `grpc` implementation uses a custom c++ runtime which has to built against a specific environment, and each time VS Code is updated it potentially changes the electron version making the extension incompatible with the updated version of VS Code. It was a huge headache. I outlined the journey in more detail [in this gist](https://gist.github.com/badsyntax/9827722afcb33a4b0e03c809f1aede98), but to summaize `@grpc/grpc-js` was the solution to my problems. It only uses standard Node.js modules (http2)! I discovered some minor bugs before the package came out of beta and the lead grpc-node developer murgatoid was responsive and very willing to accept contributions and engage in discussions. Eventually `@grpc/grpc-js` came out of BETA and `grpc` was deprecated, for these reasons. From my personal experience this was a great move and it's been interesting to follow the development. `@grpc/grpc-js` is entirely written in TypeScript and the code is nice and readable.

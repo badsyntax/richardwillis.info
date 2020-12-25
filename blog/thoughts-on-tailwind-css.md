@@ -164,7 +164,6 @@ and:
 
 Not easy right? Ok let's try it with a GitHub diff:
 
-
 ## How I use tailwind.css
 
 Although the main selling point of Tailwind.css is the utiltiy classes, tailwind provides much more. I'm using tailwind as a style system that providing themes and utitilities for generating consistent styles. That's all I use tailwind for. I still build semantic classes, but I use tailwind to do so.

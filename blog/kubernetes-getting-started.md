@@ -112,7 +112,6 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl get nodes
 ```
 
-
 Install the flannel pod network:
 
 ```bash
@@ -233,8 +232,8 @@ spec:
         run: nginx-deployment
     spec:
       containers:
-      - image: nginx
-        name: nginx-webserver
+        - image: nginx
+          name: nginx-webserver
 
 ---
 apiVersion: v1
@@ -255,17 +254,16 @@ metadata:
   name: nginx-ingress
 spec:
   rules:
-  - host: nginx-k8s.proxima-web.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: nginx-service
-            port:
-              number: 80
-
+    - host: nginx-k8s.proxima-web.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
 ```
 
 Now setup the resources:
@@ -278,12 +276,10 @@ kubectl get ingress nginx-ingress
 kubectl describe ingress nginx-ingress
 ```
 
-
 #### Supporting Resources
 
 - https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/#deploying-the-dashboard-ui
 - Authorizatoion docs: https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/README.md
-
 
 ### Supporting Resources
 
@@ -472,4 +468,3 @@ multipass exec microk8s-vm -- sudo /snap/bin/microk8s kubectl port-forward -n ku
 ### Supporting resources
 
 - https://microk8s.io/docs/addon-dashboard
-

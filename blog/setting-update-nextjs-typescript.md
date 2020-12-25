@@ -47,7 +47,7 @@ Configure `eslint` and `prettier` by adding the following to your `package.json`
 ```json
 {
   "eslintConfig": {
-    "ignorePatterns": ["**/*.js"],
+    "ignorePatterns": ["**/*.js", ".next"],
     "extends": ["eslint:recommended", "plugin:prettier/recommended"],
     "env": {
       "browser": true,
@@ -88,6 +88,27 @@ Configure `eslint` and `prettier` by adding the following to your `package.json`
     ]
   }
 }
+```
+
+Add linting scripts to `package.json`:
+
+```json
+{
+  "scripts": {
+    "lint": "npm run lint:prettier && npm run lint:eslint",
+    "lint:fix": "npm run lint:fix:prettier && npm run lint:eslint -- --fix",
+    "lint:prettier": "prettier --check \"**/*.{ts,js,json,svg,md,yml}\"",
+    "lint:fix:prettier": "prettier --write '**/*.{ts,js,json,svg,md,yml}'",
+    "lint:eslint": "eslint . --ext .js,.ts"
+  }
+}
+```
+
+Add the following to `.prettierignore`:
+
+```sh
+.next
+package-lock.json
 ```
 
 Update vscode settings within `.vscode/setting.json`:

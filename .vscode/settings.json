@@ -26,8 +26,10 @@
   "cSpell.language": "en-GB",
   "tailwindCSS.colorDecorators": "off",
   "cSpell.words": [
+    "DOKKU",
     "Linkedin",
     "badsyntax",
+    "ghcr",
     "richardwillis",
     "tailwindcss",
     "vfile"
