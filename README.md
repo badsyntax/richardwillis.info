@@ -43,31 +43,18 @@ docker-compose up
 
 ## Dokku
 
-```bash
-# on local host
-docker build -t dokku/richardwillis:latest .
-docker run --publish 3000:3000 dokku/richardwillis:latest
-# This does not work as per the docs!
-docker save dokku/richardwillis:latest | ssh dokku.proxima-web.com "docker load | dokku tags:deploy richardwillis latest"
 
+
+```bash
 # on local host (build and publish the image)
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin
 docker build -t ghcr.io/badsyntax/richardwillis:latest .
 docker push ghcr.io/badsyntax/richardwillis:latest
+docker run --publish 3000:3000 ghcr.io/badsyntax/richardwillis:latest
 
 # on dokku server
-# dokku apps:create richardwillis
-# dokku plugin:install https://github.com/dokku/dokku-registry.git registry
-# dokku registry:login ghcr.io badsyntax $CR_PAT
-# dokku registry:set richardwillis server ghcr.io
-# dokku registry:set richardwillis image-repo badsyntax/richardwillis
-# dokku registry:pull richardwillis latest
-# docker tag badsyntax/richardwillis:latest dokku/richardwillis:latest
-# dokku tags:deploy richardwillis latest
-# dokku proxy:ports-add richardwillis http:80:3000
-# dokku letsencrypt richardwillis
-
 dokku apps:create richardwillis
+dokku proxy:ports-add richardwillis http:80:3000
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin
 docker pull ghcr.io/badsyntax/richardwillis:latest
 docker tag ghcr.io/badsyntax/richardwillis:latest dokku/richardwillis:latest
@@ -75,18 +62,26 @@ dokku tags:deploy richardwillis latest
 dokku proxy:ports-add richardwillis http:80:3000
 dokku letsencrypt richardwillis
 
-# on dokku server
-dokku apps:create richardwillis
-dokku proxy:ports-add richardwillis http:80:3000
-
 # on local host
 git remote add dokku dokku@dokku.proxima-web.com:richardwillis
 git push dokku
-
-# on dokku server
-dokku letsencrypt richardwillis
 ```
 
 # Images
 
-https://d1kawhui9ewore.cloudfront.net/photos/beetle-montserrat.jpg
+## Setting up S3 & CloudFront
+
+Create a new AWS stack by uploading one of the files in [cloudformation/](./cloudformation).
+
+The stack includes an s3 bucket for storage and a cloudfront distribution for global distribution of static assets (CDN).
+
+Once the stack is created, it can take some time before Cloudfront can serve assets. You might get `307` redirects. In this case you just need to wait longer, or try disabling and re-enabling the distribution in the AWS UI.
+
+## Setting correct cache headers
+
+```console
+Cache-Control: public,max-age=31536000,immutable
+```
+
+https://d38u3zebjo2rjn.cloudfront.net/photos/beetle-montserrat.jpg
+https://assets.richardwillis.info/photos/beetle-montserrat.jpg
