@@ -19,7 +19,9 @@ This posts describes how to:
 
 It can be a little complex to get CloudFront and S3 configured correctly. The correct CORS configuration is required as you'll be serving your assets on a different domain to your main site, and the assets need to be "given permission" to work on specified origin domains.
 
-My initial attempt at this resulted in my assets being too aggressively cached, and they would not load via `fetch` as the CORS headers (or lack thereof) were cached by CloudFront. It's thus important to configure the caching policy correctly.
+My initial attempt at this resulted in my assets being too aggressively cached, and they would not load via `fetch` as the CORS headers (or lack thereof) were cached by CloudFront. It's thus important to configure the caching policy correctly to ensure cache is invalidated when changing the Origin header.
+
+The second caching issue I had was browser cache. When the browser first requests an asset, it won't add the Origin header as it's using a link/script element. The browser will cache the response, and use the cache for subsequent requests. This is because CloudFront and S3 [doesn't send the `Vary: Origin` header](https://stackoverflow.com/questions/31732533/s3-cors-always-send-vary-origin). If you're using `cURL` to test this, you won't see the issue. The issue is only obvious in the browser due to how it caches responses. This results in a AJAX/fetch failing when attempting to access the asset the second time.
 
 After a lot trial and error I managed to create a working cloudformation template.
 
