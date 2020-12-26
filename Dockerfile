@@ -9,6 +9,7 @@ ENV APP_VERSION=$APP_VERSION
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
+ENV NODE_ENV production
 ENV CI true
 
 COPY package.json package-lock.json ./
