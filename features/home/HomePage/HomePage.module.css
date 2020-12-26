@@ -25,7 +25,9 @@
 }
 
 .nav-item {
-  @apply w-full m-2;
+  @apply w-full
+    m-2
+    text-center;
 }
 
 @screen sm {

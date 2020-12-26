@@ -21,7 +21,7 @@ module.exports = {
         delete use.options.modules.getLocalIdent;
         use.options.modules.localIdentName = isProd
           ? '[sha1:hash:hex:4]'
-          : '[local]--[sha1:hash:hex:4]';
+          : '[name]__[local]--[sha1:hash:hex:4]';
       }
     };
 

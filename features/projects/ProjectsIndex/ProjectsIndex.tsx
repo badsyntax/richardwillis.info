@@ -23,7 +23,7 @@ export const ProjectsIndex: React.FunctionComponent<ProjectsIndexProps> = ({
             <Typography as="p">{project.description}</Typography>
             <Typography as="p" className={classes('tags')}>
               {project.tags.map((tag, i) => (
-                <span>
+                <span key={tag}>
                   {tag}
                   {i < project.tags.length - 1 ? ', ' : ''}
                 </span>
