@@ -1,18 +1,12 @@
 name: Publish
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-# on:
-#   release:
-#     types: [published]
+  release:
+    types: [published]
 
 jobs:
   publish-docker:
     name: Publish docker image
     runs-on: ubuntu-20.04
-    # if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/checkout@v2
       - name: Set up QEMU
