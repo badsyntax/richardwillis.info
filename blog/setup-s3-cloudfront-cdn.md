@@ -237,3 +237,9 @@ Typically you'd use the `aws s3 sync` command to upload assets, and this command
     SOURCE_DIR: '.next/static'
     DEST_DIR: '_next/static'
 ```
+
+## Conclusion
+
+While this setup is somewhat complicated, it's a good approach for offloading file serving to the Edge where it will be quicker to download for all users across all locations. This also keeps the runtime server focusing on runtime request handling instead of file serving.
+
+The pricing is also somewhat complicated to figure out, but based on what others have mentioned, I don't expect to pay more than a few cents a month.

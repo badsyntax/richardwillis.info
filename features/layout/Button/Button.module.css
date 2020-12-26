@@ -1,20 +1,21 @@
 .root {
-  @apply text-center
-    text-2xl
+  @apply text-2xl
     font-normal
     p-4
     rounded-xl
     border
     border-gray-300
     text-gray-800
-    transition-all
+    transform-gpu
+    duration-200
     inline-block
     no-underline;
+  transition-property: box-shadow, border-color;
 }
 
 .root:hover {
   @apply border-gray-400
-    shadow;
+    shadow-md;
 }
 
 .root:active {

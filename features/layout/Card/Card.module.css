@@ -4,26 +4,10 @@
       flex
       flex-col
       justify-center
-      self-stretch
-      rounded-xl
-      border
-      border-gray-300
-      text-gray-800
-      transition-all
-      no-underline;
+      self-stretch;
   }
 
   .card > * {
     @apply my-1;
-  }
-
-  .card:hover {
-    @apply border-gray-400
-      shadow;
-  }
-
-  .card:active {
-    @apply border-gray-400
-      shadow-sm;
   }
 }

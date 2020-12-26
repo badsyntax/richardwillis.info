@@ -15,7 +15,7 @@ export const Card: React.FunctionComponent<CardProps> = ({
   ...props
 }) => {
   return (
-    <Link className={classes('card', className)} {...props}>
+    <Link className={classes('card', className)} variant="button" {...props}>
       {children}
     </Link>
   );
