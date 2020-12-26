@@ -28,6 +28,7 @@ export const HomePage: React.FunctionComponent = () => {
     <main className={classes('root')}>
       <Head>
         <title>Richard Willis</title>
+        <meta name="description" content="Personal website of Richard Willis" />
       </Head>
       <Typography as="h1" className={classes('title')}>
         Richard Willis

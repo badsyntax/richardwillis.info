@@ -43,8 +43,6 @@ docker-compose up
 
 ## Dokku
 
-
-
 ```bash
 # on local host (build and publish the image)
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin

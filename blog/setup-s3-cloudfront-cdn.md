@@ -1,12 +1,24 @@
-# Setup Cloudfront & S3 for your Next.js app
+---
+title: 'Setup Cloudfront & S3 for your Next.js app'
+excerpt: 'Setup Cloudfront & S3 for your Next.js app'
+date: '2020-03-16T05:35:07.322Z'
+author:
+  name: Richard Willis
+  picture: '/assets/blog/authors/richard.jpg'
+ogImage:
+  url: '/assets/blog/hello-world/cover.jpg'
+draft: true
+---
 
 This posts describes how to:
 
 - Setup Cloudfront & S3 in AWS
 - Setup a alternative domain with TLS
-- Automatically deploy static files with CI/CD
+- Deploy static files to S3 with CI/CD (Github Action)
 
 ## Setup Cloudfront & S3
+
+TODO: should the bucket be crated in the `ue-east-1` region?
 
 We'll use Cloudformation to create the S3 bucket and to create the Cloudfront distribution:
 
@@ -17,8 +29,12 @@ Description: 'CloudFront distribution with an S3 origin'
 Parameters:
   S3BucketName:
     Type: String
-    Default: cdn.richardwillis.info
+    Default: assets.richardwillis.info
     Description: Name of S3 bucket to create
+  S3AllowedOrigins:
+    Type: CommaDelimitedList
+    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com
+    Description: A list of allowed domains to request resources from Cloudfront
 
 Resources:
   S3Bucket:
@@ -29,6 +45,14 @@ Resources:
     Properties:
       AccessControl: 'Private'
       BucketName: !Ref S3BucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: !Ref S3AllowedOrigins
+            AllowedMethods:
+              - GET
+              - HEAD
+            AllowedHeaders:
+              - '*'
 
   S3BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
@@ -46,13 +70,58 @@ Resources:
             Resource:
               - !Sub 'arn:aws:s3:::${S3BucketName}/*'
 
+  CfStaticCachePolicy:
+    Type: 'AWS::CloudFront::CachePolicy'
+    Metadata:
+      Comment: 'The cache policy for Next.js static assets'
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 31536000
+        MaxTTL: 31536000
+        MinTTL: 31536000
+        Name: 'static-assets-cache-policy'
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          CookiesConfig:
+            CookieBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Access-Control-Request-Headers
+              - Access-Control-Request-Method
+              - Origin
+
   CfDistribution:
     Type: 'AWS::CloudFront::Distribution'
     Metadata:
       Comment: 'A CloudFront distribution with an S3 origin'
     Properties:
       DistributionConfig:
-        Comment: 'A distribution with an S3 origin'
+        Comment: 'CDN for all static assets'
+        CacheBehaviors:
+          - CachePolicyId: !Ref CfStaticCachePolicy
+            PathPattern: '/_next/*'
+            AllowedMethods:
+              - 'HEAD'
+              - 'GET'
+            CachedMethods:
+              - 'HEAD'
+              - 'GET'
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: 'none'
+              Headers:
+                - 'Origin'
+              QueryString: false
+            DefaultTTL: 31536000
+            MaxTTL: 31536000
+            MinTTL: 31536000
+            TargetOriginId: !Sub 's3-origin-${S3Bucket}'
+            ViewerProtocolPolicy: 'redirect-to-https'
         DefaultCacheBehavior:
           AllowedMethods:
             - 'HEAD'
@@ -61,15 +130,15 @@ Resources:
             - 'HEAD'
             - 'GET'
           Compress: false
-          DefaultTTL: 86400
           ForwardedValues:
             Cookies:
               Forward: 'none'
             Headers:
               - 'Origin'
             QueryString: false
+          DefaultTTL: 31536000
           MaxTTL: 31536000
-          MinTTL: 86400
+          MinTTL: 31536000
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
         DefaultRootObject: 'index.html'
@@ -104,27 +173,44 @@ Outputs:
     Value: !GetAtt CfDistribution.DomainName
 ```
 
-Note that after the stack is created, you might be seeing `HTTP/1.1 307 Temporary Redirect` when attempting to GET the cloudfront URL. This is due to domain propagation when the bucket is created in any region that isn't `eu-west-1`.
+Note the following:
 
-To resolve the redirects, edit the Cloudfront distribution origin to include the S3 bucket region, for example:
-
-```console
-assets.example.com.s3-eu-west-2.amazonaws.com
-```
+- The SSL certificate and Alternate domain name are not automatically set (see below)
+- The bucket is created in the region you used when creating the cloudformation stack.
 
 ## Allowing access to S3 bucket from Cloudfront
 
 By default the S3 bucket will not be public, and we want to keep it that way, but we need to explicitly allow Cloudfront to access the files.
 
-An "Origin Access Identity" resource is created as part of the above stack, but you need to edit the distribution to assign the identity. You can do this by editing the Origin for the distribution in the AWS UI. For "Grant Read Permissions on Bucket", I set "No, I Will Update Permissions" (but I didn't need to adjust the permissions).
+An "Origin Access Identity" resource is created as part of the above stack, but you need to manually edit the distribution to assign the identity. You can do this by editing the Origin for the distribution in the AWS UI.
 
-## Using a alternative domain
+1. Edit the cloudfront distribution
+2. Select "Restrict Bucket Access"
+3. Select "Use an Existing Identity"
+4. Select the "Access S3 bucket content only through Cloudfront" identity
+5. For "Grant Read Permissions on Bucket", I set "No, I Will Update Permissions" (but I didn't need to adjust the permissions).
 
-You first need to create a certificate for the domain in AWS ACM. Note, public certificates are free.
+## Setting the root domain and certificate
 
-Edit the distribution then click on "Request or Import a Certificate with ACM" to create a new certificate.
+1. Edit the cloudfront distribution and add your root domain to the Alternate Domain Names (CNAMEs) field.
+2. Select "Custom SSL Certificate (example.com):".
+3. Click on "Request or Import a Certificate with ACM"
+4. Check your AWS console region is `us-east-1` . This is important as cloudfront can only use certificates from `us-east-1`.
+5. Follow the wizard to create a new certificate and edit your domain DNS to point a CNAME entry to your cloudfront domain
+6. Wait for the verification to complete
+7. Copy the certficate ARN.
+8. Return to editing the cloudfront distribution and paste the certificate ARN.
+9. Click save
 
-**You have to create the certificate in the us-east-1 region, this is important as cloudfront can only use images from us-east-1.**
+Now you should be able to send a request to your CDN url:
+
+```bash
+curl -I https://assets.example.com/image.jpg
+```
+
+You might be `HTTP/1.1 307 Temporary Redirect` when attempting to GET the cloudfront URL. This is due to domain propagation when the bucket is created in any region that isn't `us-east-1`. To resolve the redirects, manually edit the Cloudfront distribution origin to include the S3 bucket region, for example: `assets.example.com.s3-eu-west-2.amazonaws.com`
+
+## Setting up the bucket
 
 Don't forget to add your domain to the CNAME section.
 
@@ -161,3 +247,29 @@ The cache headers should be:
 ```
 Cache-Control: public,max-age=31536000,immutable
 ```
+
+## Setting CORS headers
+
+### Update S3 bucket CORS
+
+We need to update the S3 CORs policy to allow for cross domain requests:
+
+```json
+[
+  {
+    "AllowedHeaders": [],
+    "AllowedMethods": ["GET"],
+    "AllowedOrigins": [
+      "https://richardwillis.info",
+      "https://assets.richardwillis.info"
+    ],
+    "ExposeHeaders": []
+  }
+]
+```
+
+### Update cloudfront to forward the correct headers
+
+## Uploading static Next.js files
+
+We need to upload the contents of `.next/static` to the s3 bucket at location `/_next`.

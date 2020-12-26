@@ -7,6 +7,7 @@ const classes = classNames.bind(STYLES);
 
 export interface PageShellProps {
   title: string;
+  description: string;
   preview?: boolean;
   mainClassName?: string;
 }
@@ -15,12 +16,14 @@ export const PageShell: React.FunctionComponent<PageShellProps> = ({
   title,
   children,
   mainClassName,
+  description,
   preview,
 }) => {
   return (
     <Fragment>
       <Head>
         <title>Richard Willis - {title}</title>
+        <meta name="description" content={description} />
       </Head>
       <div className={classes('root')}>
         <Header />

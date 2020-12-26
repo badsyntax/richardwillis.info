@@ -4,8 +4,12 @@ Description: 'CloudFront distribution with an S3 origin'
 Parameters:
   S3BucketName:
     Type: String
-    Default: cdn.richardwillis.info
+    Default: assets.richardwillis.info
     Description: Name of S3 bucket to create
+  S3AllowedOrigins:
+    Type: CommaDelimitedList
+    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com
+    Description: A list of allowed domains to request resources from Cloudfront
 
 Resources:
   S3Bucket:
@@ -16,6 +20,14 @@ Resources:
     Properties:
       AccessControl: 'Private'
       BucketName: !Ref S3BucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: !Ref S3AllowedOrigins
+            AllowedMethods:
+              - GET
+              - HEAD
+            AllowedHeaders:
+              - "*"
 
   S3BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
@@ -33,13 +45,58 @@ Resources:
             Resource:
               - !Sub 'arn:aws:s3:::${S3BucketName}/*'
 
+  CfStaticCachePolicy:
+    Type: 'AWS::CloudFront::CachePolicy'
+    Metadata:
+      Comment: 'The cache policy for Next.js static assets'
+    Properties:
+      CachePolicyConfig:
+        DefaultTTL: 31536000
+        MaxTTL: 31536000
+        MinTTL: 31536000
+        Name: 'static-assets-cache-policy'
+        ParametersInCacheKeyAndForwardedToOrigin:
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+          CookiesConfig:
+            CookieBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          HeadersConfig:
+            HeaderBehavior: whitelist
+            Headers:
+              - Access-Control-Request-Headers
+              - Access-Control-Request-Method
+              - Origin
+
   CfDistribution:
     Type: 'AWS::CloudFront::Distribution'
     Metadata:
       Comment: 'A CloudFront distribution with an S3 origin'
     Properties:
       DistributionConfig:
-        Comment: 'A distribution with an S3 origin'
+        Comment: 'CDN for all static assets'
+        CacheBehaviors:
+          - CachePolicyId: !Ref CfStaticCachePolicy
+            PathPattern: '/_next/*'
+            AllowedMethods:
+              - 'HEAD'
+              - 'GET'
+            CachedMethods:
+              - 'HEAD'
+              - 'GET'
+            Compress: true
+            ForwardedValues:
+              Cookies:
+                Forward: 'none'
+              Headers:
+                - 'Origin'
+              QueryString: false
+            DefaultTTL: 31536000
+            MaxTTL: 31536000
+            MinTTL: 31536000
+            TargetOriginId: !Sub 's3-origin-${S3Bucket}'
+            ViewerProtocolPolicy: 'redirect-to-https'
         DefaultCacheBehavior:
           AllowedMethods:
             - 'HEAD'
@@ -48,15 +105,15 @@ Resources:
             - 'HEAD'
             - 'GET'
           Compress: false
-          DefaultTTL: 86400
           ForwardedValues:
             Cookies:
               Forward: 'none'
             Headers:
               - 'Origin'
             QueryString: false
+          DefaultTTL: 31536000
           MaxTTL: 31536000
-          MinTTL: 86400
+          MinTTL: 31536000
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
         DefaultRootObject: 'index.html'

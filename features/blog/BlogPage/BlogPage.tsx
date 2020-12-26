@@ -20,7 +20,7 @@ export const BlogPage: React.FunctionComponent<BlogPageProps> = ({
     return null;
   }
   return (
-    <PageShell title="Blog">
+    <PageShell title="Blog" description="Blog posts by Richard Wilis">
       <Typography as="div" variant="prose">
         <h1>Blog</h1>
         <p>General ramblings about code and stuff...</p>

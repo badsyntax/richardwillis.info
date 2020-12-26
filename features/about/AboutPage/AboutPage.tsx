@@ -13,7 +13,7 @@ const classes = classNames.bind(STYLES);
 
 export const AboutPage: React.FunctionComponent = () => {
   return (
-    <PageShell title="About">
+    <PageShell title="About" description="About Richard Willis">
       <Typography as="div" variant="prose" className={classes('content')}>
         <h1>About</h1>
         <p>

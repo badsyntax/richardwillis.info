@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "resize-photos": "./scripts/resize-images.sh public/photos/*.jpg"
+    "lint": "npm run lint:prettier && npm run lint:eslint",
+    "lint:fix": "npm run lint:fix:prettier && npm run lint:eslint -- --fix",
+    "lint:prettier": "prettier --check \"**/*.{js,json,svg,md,yml}\"",
+    "lint:fix:prettier": "prettier --write '**/*.{js,json,svg,md,yml}'",
+    "lint:eslint": "eslint . --ext .ts,.tsx"
   },
   "engines": {
     "node": "^14.15.3",
@@ -45,7 +49,8 @@
   },
   "eslintConfig": {
     "ignorePatterns": [
-      "**/*.js"
+      "**/*.js",
+      ".next"
     ],
     "extends": [
       "eslint:recommended",

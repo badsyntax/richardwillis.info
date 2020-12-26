@@ -24,7 +24,11 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <PageShell preview={preview} title={`Blog - ${post.title}`}>
+    <PageShell
+      preview={preview}
+      title={`Blog - ${post.title}`}
+      description={post.excerpt}
+    >
       {router.isFallback ? (
         <PostTitle>Loading…</PostTitle>
       ) : (
