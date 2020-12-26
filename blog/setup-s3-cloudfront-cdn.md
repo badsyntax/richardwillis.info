@@ -1,26 +1,34 @@
 ---
-title: 'Setup Cloudfront & S3 for your Next.js app'
-excerpt: 'Setup Cloudfront & S3 for your Next.js app'
+title: 'Setup CloudFront & S3'
+excerpt: 'An overview of how to setup S3 & CloudFront'
 date: '2020-03-16T05:35:07.322Z'
 author:
   name: Richard Willis
   picture: '/assets/blog/authors/richard.jpg'
 ogImage:
   url: '/assets/blog/hello-world/cover.jpg'
-draft: true
+draft: false
 ---
 
 This posts describes how to:
 
-- Setup Cloudfront & S3 in AWS
-- Setup a alternative domain with TLS
-- Deploy static files to S3 with CI/CD (Github Action)
+- Setup CloudFront & S3 in AWS
+- Setup an Alternate domain with TLS
 
-## Setup Cloudfront & S3
+## Setup CloudFront & S3
 
-TODO: should the bucket be crated in the `ue-east-1` region?
+It can be a little complex to get CloudFront and S3 configured correctly. The correct CORS configuration is required as you'll be serving your assets on a different domain to your main site, and the assets need to be "given permission" to work on specified origin domains.
 
-We'll use Cloudformation to create the S3 bucket and to create the Cloudfront distribution:
+My initial attempt at this resulted in my assets being too aggressively cached, and they would not load via `fetch` as the CORS headers (or lack thereof) were cached by CloudFront. It's thus important to configure the caching policy correctly.
+
+After a lot trial and error I managed to create a working cloudformation template.
+
+The following template creates the following resources:
+
+- An S3 bucket with CORS configured for a list of allowed origins.
+- a CloudFront OriginAccessIdentity that allows CloudFront to read from S3.
+- A CloudFront caching policy with the correct CORS configuration.
+- A CloudFront distribution that uses the S3 bucket as origin source.
 
 ```yml
 AWSTemplateFormatVersion: '2010-09-09'
@@ -29,12 +37,12 @@ Description: 'CloudFront distribution with an S3 origin'
 Parameters:
   S3BucketName:
     Type: String
-    Default: assets.richardwillis.info
+    Default: assets.example.com
     Description: Name of S3 bucket to create
   S3AllowedOrigins:
     Type: CommaDelimitedList
-    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com
-    Description: A list of allowed domains to request resources from Cloudfront
+    Default: https://example.com, https://assets.example.com
+    Description: A list of allowed domains to request resources from CloudFront
 
 Resources:
   S3Bucket:
@@ -175,31 +183,31 @@ Outputs:
 
 Note the following:
 
-- The SSL certificate and Alternate domain name are not automatically set (see below)
+- The SSL certificate and Alternate domain name are not automatically set (see below).
 - The bucket is created in the region you used when creating the cloudformation stack.
 
-## Allowing access to S3 bucket from Cloudfront
+## Allowing access to S3 bucket from CloudFront
 
-By default the S3 bucket will not be public, and we want to keep it that way, but we need to explicitly allow Cloudfront to access the files.
+By default the S3 bucket will not be public, and we want to keep it that way, but we need to explicitly allow CloudFront to access the files.
 
 An "Origin Access Identity" resource is created as part of the above stack, but you need to manually edit the distribution to assign the identity. You can do this by editing the Origin for the distribution in the AWS UI.
 
-1. Edit the cloudfront distribution
+1. Edit the CloudFront distribution
 2. Select "Restrict Bucket Access"
 3. Select "Use an Existing Identity"
-4. Select the "Access S3 bucket content only through Cloudfront" identity
+4. Select the "Access S3 bucket content only through CloudFront" identity
 5. For "Grant Read Permissions on Bucket", I set "No, I Will Update Permissions" (but I didn't need to adjust the permissions).
 
 ## Setting the root domain and certificate
 
-1. Edit the cloudfront distribution and add your root domain to the Alternate Domain Names (CNAMEs) field.
+1. Edit the CloudFront distribution and add your root domain to the Alternate Domain Names (CNAMEs) field.
 2. Select "Custom SSL Certificate (example.com):".
 3. Click on "Request or Import a Certificate with ACM"
-4. Check your AWS console region is `us-east-1` . This is important as cloudfront can only use certificates from `us-east-1`.
-5. Follow the wizard to create a new certificate and edit your domain DNS to point a CNAME entry to your cloudfront domain
+4. Check your AWS console region is `us-east-1` . This is important as CloudFront can only use certificates from `us-east-1`.
+5. Follow the wizard to create a new certificate and edit your domain DNS to point a CNAME entry to your CloudFront domain
 6. Wait for the verification to complete
 7. Copy the certficate ARN.
-8. Return to editing the cloudfront distribution and paste the certificate ARN.
+8. Return to editing the CloudFront distribution and paste the certificate ARN.
 9. Click save
 
 Now you should be able to send a request to your CDN url:
@@ -208,68 +216,24 @@ Now you should be able to send a request to your CDN url:
 curl -I https://assets.example.com/image.jpg
 ```
 
-You might be `HTTP/1.1 307 Temporary Redirect` when attempting to GET the cloudfront URL. This is due to domain propagation when the bucket is created in any region that isn't `us-east-1`. To resolve the redirects, manually edit the Cloudfront distribution origin to include the S3 bucket region, for example: `assets.example.com.s3-eu-west-2.amazonaws.com`
-
-## Setting up the bucket
-
-Don't forget to add your domain to the CNAME section.
-
-Now add a CNAME entry to your domain that points to your cloudfront root URL.
-
-And that should be all!
-
-Test everything works correctly. The first request will result in a cache miss:
-
-```console
-curl -I https://assets.example.com/photo.jpg
-HTTP/1.1 200 OK
-X-Cache: Miss from cloudfront
-...etc
-```
-
-The second request should show the asset is cached by cloudfront:
-
-```console
-curl -I https://assets.example.com/photo.jpg
-HTTP/1.1 200 OK
-X-Cache: Hit from cloudfront
-...etc
-```
+You might be `HTTP/1.1 307 Temporary Redirect` when attempting to GET the CloudFront URL. This is due to domain propagation when the bucket is created in any region that isn't `us-east-1`. To resolve the redirects, manually edit the CloudFront distribution origin to include the S3 bucket region, for example: `assets.example.com.s3-eu-west-2.amazonaws.com`
 
 ## Setting cache headers
 
-CDN assets should be immutable and have long-cache headers (at least a year). Cache headers are set at an object level in S3, meaning you need to set headers when uploading assets to S3. (More on that below in the CI/CD section.)
+CDN assets should be immutable and have long-cache headers (at least a year). Cache headers are set at an object level in S3, meaning you need to set headers when uploading assets to S3.
 
-You can however set headers for multiple assets in the S3 console UI by selecting multiple assets then choosing "Edit metadata", then "Add metadata", then "System defined" and finally "Cache-Control".
+Typically you'd use the `aws s3 sync` command to upload assets, and this command accepts a `cache-control` header value. Here's an example of how it can work in GitHub Actions:
 
-The cache headers should be:
-
+```yaml
+- name: Sync static assets to S3
+  uses: jakejarvis/s3-sync-action@master
+  with:
+    args: --cache-control public,max-age=31536000,immutable
+  env:
+    AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    AWS_REGION: 'eu-west-2'
+    SOURCE_DIR: '.next/static'
+    DEST_DIR: '_next/static'
 ```
-Cache-Control: public,max-age=31536000,immutable
-```
-
-## Setting CORS headers
-
-### Update S3 bucket CORS
-
-We need to update the S3 CORs policy to allow for cross domain requests:
-
-```json
-[
-  {
-    "AllowedHeaders": [],
-    "AllowedMethods": ["GET"],
-    "AllowedOrigins": [
-      "https://richardwillis.info",
-      "https://assets.richardwillis.info"
-    ],
-    "ExposeHeaders": []
-  }
-]
-```
-
-### Update cloudfront to forward the correct headers
-
-## Uploading static Next.js files
-
-We need to upload the contents of `.next/static` to the s3 bucket at location `/_next`.
