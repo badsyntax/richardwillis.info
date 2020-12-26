@@ -9,14 +9,14 @@ ENV APP_VERSION=$APP_VERSION
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
-ENV NODE_ENV production
 ENV CI true
 
 COPY package.json package-lock.json ./
 
 RUN npm ci
 COPY . .
-RUN npm run build
+
+RUN NODE_ENV=production npm run build
 RUN npm prune --production
 
 
