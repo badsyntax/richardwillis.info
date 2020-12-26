@@ -37,7 +37,7 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
-            APP_VERSION=${{ github.sha }}
+            APP_VERSION=${{ github.event.release.tag_name }}
   publish-s3:
     name: Publish to S3
     needs: [publish-docker]
@@ -82,6 +82,6 @@ jobs:
           ssh root@${{ secrets.DOKKU_HOST }} "\\
             docker pull ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest && \\
             docker tag ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest dokku/${{ secrets.DOKKU_APP_NAME }}:latest && \\
-            dokku config:set --no-restart ${{ secrets.DOKKU_APP_NAME }} APP_VERSION=\"${{ github.sha }}\" && \\
+            dokku config:set --no-restart ${{ secrets.DOKKU_APP_NAME }} APP_VERSION=\"${{ github.event.release.tag_name }}\" && \\
             dokku tags:deploy ${{ secrets.DOKKU_APP_NAME }} latest && \\
             dokku cleanup"
