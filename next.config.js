@@ -12,6 +12,7 @@ module.exports = {
   images: {
     domains: ['assets.richardwillis.info'],
   },
+  crossOrigin: 'anonymous',
   generateBuildId: async () => {
     return process.env.APP_VERSION || 'unknown-app-version';
   },
