@@ -1,9 +1,11 @@
 @layer components {
   .root {
-    @apply flex flex-col gap-8 mt-10;
+    @apply flex
+      flex-col
+      mt-6;
   }
 
-  .card {
-    @apply text-left gap-3;
+  .post {
+    @apply my-4;
   }
 }

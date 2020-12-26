@@ -7,13 +7,6 @@
     px-8;
 }
 
-.title,
-.description {
-  @apply opacity-0
-    duration-200
-    motion-safe:animate-fade-in;
-}
-
 .description {
   @apply text-2xl
     mt-2;
@@ -28,30 +21,17 @@
     sm:flex-row
     items-center
     justify-center
-    gap-4
-    sm:gap-8
-    mt-12
-    opacity-0
-    motion-safe:animate-fade-in;
-  animation-delay: 1s;
+    mt-12;
 }
 
 .nav-item {
-  @apply w-full;
+  @apply w-full m-2;
 }
 
 @screen sm {
   .nav-item {
-    @apply w-auto;
+    @apply w-auto
+      m-4;
     flex-basis: 45%;
-  }
-}
-
-@keyframes fadeIn {
-  0% {
-    @apply opacity-0;
-  }
-  100% {
-    @apply opacity-100;
   }
 }

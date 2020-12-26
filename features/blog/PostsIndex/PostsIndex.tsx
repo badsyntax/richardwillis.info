@@ -23,7 +23,7 @@ export const PostsIndex: React.FunctionComponent<PostsIndexProps> = ({
             date={post.date}
             href={`/blog/${post.slug}`}
             key={post.slug}
-            className={classes('card')}
+            className={classes('post')}
           ></BlogPostCard>
         );
       })}

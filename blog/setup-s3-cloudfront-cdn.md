@@ -26,7 +26,7 @@ After a lot trial and error I managed to create a working cloudformation templat
 The following template creates the following resources:
 
 - An S3 bucket with CORS configured for a list of allowed origins.
-- a CloudFront OriginAccessIdentity that allows CloudFront to read from S3.
+- A CloudFront OriginAccessIdentity that allows CloudFront to read from S3.
 - A CloudFront caching policy with the correct CORS configuration.
 - A CloudFront distribution that uses the S3 bucket as origin source.
 

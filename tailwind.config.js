@@ -5,9 +5,6 @@ module.exports = {
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
-      animation: {
-        'fade-in': 'fadeIn 1s ease-in-out forwards',
-      },
       typography: {
         DEFAULT: {
           css: {

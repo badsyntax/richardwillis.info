@@ -1,11 +1,16 @@
-.root {
-  @apply flex flex-col gap-8 mt-10;
-}
+@layer components {
+  .root {
+    @apply flex
+      flex-col
+      mt-6;
+  }
 
-.card {
-  @apply text-left gap-3;
-}
+  .card {
+    @apply text-left
+      my-4;
+  }
 
-.tags {
-  @apply text-gray-500;
+  .tags {
+    @apply text-gray-500;
+  }
 }
