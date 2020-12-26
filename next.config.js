@@ -18,8 +18,10 @@ module.exports = {
   webpack(config, options) {
     const adjustCssModulesConfig = (use) => {
       if (use.loader.indexOf('css-loader') >= 0 && use.options.modules) {
-        delete use.options.modules.getLocalIdent
-        use.options.modules.localIdentName = isProd ? "[sha1:hash:hex:4]" : "[local]--[sha1:hash:hex:4]"
+        delete use.options.modules.getLocalIdent;
+        use.options.modules.localIdentName = isProd
+          ? '[sha1:hash:hex:4]'
+          : '[local]--[sha1:hash:hex:4]';
       }
     };
 
