@@ -24,7 +24,7 @@ export const ContactPage: React.FunctionComponent = () => {
               rel="nofollow"
               className={classes('social-link')}
             >
-              <FaGithub /> GitHub
+              <FaGithub className={classes('icon')} /> GitHub
             </a>
           </li>
           <li>
@@ -33,7 +33,7 @@ export const ContactPage: React.FunctionComponent = () => {
               rel="nofollow"
               className={classes('social-link')}
             >
-              <FaStackOverflow /> StackOverflow
+              <FaStackOverflow className={classes('icon')} /> StackOverflow
             </a>
           </li>
           <li>
@@ -42,7 +42,7 @@ export const ContactPage: React.FunctionComponent = () => {
               rel="nofollow"
               className={classes('social-link')}
             >
-              <FaLinkedin /> LinkedIn
+              <FaLinkedin className={classes('icon')} /> LinkedIn
             </a>
           </li>
         </ul>
