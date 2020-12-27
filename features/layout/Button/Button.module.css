@@ -1,24 +1,26 @@
-.root {
-  @apply text-2xl
-    font-normal
-    p-4
-    rounded-xl
-    border
-    border-gray-300
-    text-gray-800
-    transform-gpu
-    duration-200
-    inline-block
-    no-underline;
-  transition-property: box-shadow, border-color;
-}
+@layer components {
+  .root {
+    @apply text-2xl
+      font-normal
+      p-4
+      rounded-xl
+      border
+      border-gray-300
+      text-gray-800
+      transform-gpu
+      duration-200
+      inline-block
+      no-underline;
+    transition-property: box-shadow, border-color;
+  }
 
-.root:hover {
-  @apply border-gray-400
-    shadow-md;
-}
+  .root:hover {
+    @apply border-gray-400
+      shadow-md;
+  }
 
-.root:active {
-  @apply border-gray-400
-    shadow-sm;
+  .root:active {
+    @apply border-gray-400
+      shadow-sm;
+  }
 }

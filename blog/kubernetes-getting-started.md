@@ -43,7 +43,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/mast
 kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml
 ```
 
-### Setup Master node (control-plane)
+### Set up Master node (control-plane)
 
 ```bash
 # ssh into master server
@@ -121,7 +121,7 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documen
 kubectl get nodes
 ```
 
-### Setup Worker Node
+### Set up Worker Node
 
 ```bash
 # ssh into master server
@@ -181,7 +181,7 @@ kubectl label nodes <NODE_NAME> kubernetes.io/role=worker
 kubectl get pods --all-namespaces
 ```
 
-### Setup local access
+### Set up local access
 
 ```bash
 mkdir ~/.kube

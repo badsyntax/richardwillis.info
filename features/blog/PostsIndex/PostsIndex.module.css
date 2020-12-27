@@ -6,6 +6,7 @@
   }
 
   .post {
-    @apply my-4;
+    @apply my-3
+      sm:my-4;
   }
 }

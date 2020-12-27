@@ -6,8 +6,8 @@
   }
 
   .card {
-    @apply text-left
-      my-4;
+    @apply my-3
+      sm:my-4;
   }
 
   .tags {
