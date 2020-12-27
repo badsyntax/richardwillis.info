@@ -2,9 +2,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFront distribution with an S3 origin'
 
 Parameters:
+  ProjectName:
+    Type: String
+    Default: richard-willis-assets
+    Description: Use for creating resource names
+  Version:
+    Type: String
+    Default: '1-0-0'
+    Description: A unique identifier to allow multiple deployments of the cloudformation
   S3BucketName:
     Type: String
-    Default: assets.richardwillis.info
+    Default: assets.richardwillis.info-us-east-1
     Description: Name of S3 bucket to create
   S3AllowedOrigins:
     Type: CommaDelimitedList
@@ -27,7 +35,7 @@ Resources:
               - GET
               - HEAD
             AllowedHeaders:
-              - "*"
+              - '*'
 
   S3BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
@@ -38,23 +46,23 @@ Resources:
       PolicyDocument:
         Statement:
           - Action:
-              - 's3:GetObject'
+              - 's3:*'
             Effect: 'Allow'
             Principal:
-              CanonicalUser: !GetAtt CfOriginAccessIdentity.S3CanonicalUserId
+              CanonicalUser: !GetAtt CFOriginAccessIdentity.S3CanonicalUserId
             Resource:
               - !Sub 'arn:aws:s3:::${S3BucketName}/*'
 
-  CfStaticCachePolicy:
+  CFStaticCachePolicy:
     Type: 'AWS::CloudFront::CachePolicy'
     Metadata:
       Comment: 'The cache policy for Next.js static assets'
     Properties:
       CachePolicyConfig:
-        DefaultTTL: 31536000
+        DefaultTTL: 86400
         MaxTTL: 31536000
-        MinTTL: 31536000
-        Name: 'static-assets-cache-policy'
+        MinTTL: 0
+        Name: !Sub '${ProjectName}-cf-static-cache-policy'
         ParametersInCacheKeyAndForwardedToOrigin:
           EnableAcceptEncodingGzip: true
           EnableAcceptEncodingBrotli: true
@@ -69,7 +77,7 @@ Resources:
               - Access-Control-Request-Method
               - Origin
 
-  CfDistribution:
+  CFDistribution:
     Type: 'AWS::CloudFront::Distribution'
     Metadata:
       Comment: 'A CloudFront distribution with an S3 origin'
@@ -77,7 +85,7 @@ Resources:
       DistributionConfig:
         Comment: 'CDN for all static assets'
         CacheBehaviors:
-          - CachePolicyId: !Ref CfStaticCachePolicy
+          - CachePolicyId: !Ref CFStaticCachePolicy
             PathPattern: '/_next/*'
             AllowedMethods:
               - 'HEAD'
@@ -92,9 +100,6 @@ Resources:
               Headers:
                 - 'Origin'
               QueryString: false
-            DefaultTTL: 31536000
-            MaxTTL: 31536000
-            MinTTL: 31536000
             TargetOriginId: !Sub 's3-origin-${S3Bucket}'
             ViewerProtocolPolicy: 'redirect-to-https'
         DefaultCacheBehavior:
@@ -111,11 +116,14 @@ Resources:
             Headers:
               - 'Origin'
             QueryString: false
-          DefaultTTL: 31536000
+          DefaultTTL: 86400
           MaxTTL: 31536000
-          MinTTL: 31536000
+          MinTTL: 0
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
+          LambdaFunctionAssociations:
+            - EventType: origin-response
+              LambdaFunctionARN: !GetAtt CFLambdaVersion.FunctionArn
         DefaultRootObject: 'index.html'
         Enabled: true
         HttpVersion: 'http1.1'
@@ -125,10 +133,10 @@ Resources:
             Id: !Sub 's3-origin-${S3Bucket}'
             OriginPath: ''
             S3OriginConfig:
-              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CfOriginAccessIdentity}'
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
         PriceClass: 'PriceClass_All'
 
-  CfOriginAccessIdentity:
+  CFOriginAccessIdentity:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
     Metadata:
       Comment: 'Access S3 bucket content only through CloudFront'
@@ -136,13 +144,101 @@ Resources:
       CloudFrontOriginAccessIdentityConfig:
         Comment: 'Access S3 bucket content only through CloudFront'
 
+  CFLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt CFLambdaRole.Arn
+      Runtime: nodejs12.x
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          exports.handler = (event, context, callback) => {
+            const response = event.Records[0].cf.response;
+            const headers = response.headers;
+
+            if (!headers['vary'])
+            {
+                headers['vary'] = [
+                    { key: 'Vary', value: 'Access-Control-Request-Headers' },
+                    { key: 'Vary', value: 'Access-Control-Request-Method' },
+                    { key: 'Vary', value: 'Origin' },
+                ];
+            }
+            console.log('response', response);
+            callback(null, response);
+          };
+
+  CFLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  CFLambdaVersion:
+    Type: Custom::LatestLambdaVersion
+    Properties:
+      ServiceToken: !GetAtt PublishLambdaVersion.Arn
+      FunctionName: !Ref CFLambda
+      Version: !Ref Version
+
+  PublishLambdaVersion:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs12.x
+      Role: !GetAtt PublishLambdaVersionRole.Arn
+      Code:
+        ZipFile: |
+          const {Lambda} = require('aws-sdk')
+          const {send, SUCCESS, FAILED} = require('cfn-response')
+          const lambda = new Lambda()
+          exports.handler = (event, context) => {
+            const {RequestType, ResourceProperties: {FunctionName}} = event
+            if (RequestType == 'Delete') return send(event, context, SUCCESS)
+            lambda.publishVersion({FunctionName}, (err, {FunctionArn}) => {
+              err
+                ? send(event, context, FAILED, err)
+                : send(event, context, SUCCESS, {FunctionArn})
+            })
+          }
+
+  PublishLambdaVersionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: PublishVersion
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:PublishVersion
+                Resource: '*'
+
 Outputs:
   S3BucketName:
     Description: 'Bucket name'
     Value: !Ref S3Bucket
-  CfDistributionId:
+  CFDistributionId:
     Description: 'Id for our cloudfront distribution'
-    Value: !Ref CfDistribution
-  CfDistributionDomainName:
+    Value: !Ref CFDistribution
+  CFDistributionDomainName:
     Description: 'Domain name for our cloudfront distribution'
-    Value: !GetAtt CfDistribution.DomainName
+    Value: !GetAtt CFDistribution.DomainName

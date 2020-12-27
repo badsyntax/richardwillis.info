@@ -19,9 +19,15 @@ This posts describes how to:
 
 It can be a little complex to get CloudFront and S3 configured correctly. The correct CORS configuration is required as you'll be serving your assets on a different domain to your main site, and the assets need to be "given permission" to work on specified origin domains.
 
-My initial attempt at this resulted in my assets being too aggressively cached, and they would not load via `fetch` as the CORS headers (or lack thereof) were cached by CloudFront. It's thus important to configure the caching policy correctly to ensure cache is invalidated when changing the Origin header.
+My initial attempt at this resulted in my assets being too aggressively cached, and would not load via `fetch` as the CORS headers (or lack thereof) were cached by CloudFront.
 
-The second caching issue I had was browser cache. When the browser first requests an asset, it won't add the Origin header as it's using a link/script element. The browser will cache the response, and use the cache for subsequent requests. This is because CloudFront and S3 [doesn't send the `Vary: Origin` header](https://stackoverflow.com/questions/31732533/s3-cors-always-send-vary-origin). If you're using `cURL` to test this, you won't see the issue. The issue is only obvious in the browser due to how it caches responses. This results in a AJAX/fetch failing when attempting to access the asset the second time.
+The second caching issue I had was browser cache. When the browser first requests an asset, it won't add the Origin request header as it's using a link/script element. The browser will cache the response, and use the cache for subsequent requests. This is because CloudFront and S3 doesn't send the `Vary: Origin` header.
+
+- [Issue with CloudFront not returning correct Vary header](https://stackoverflow.com/questions/31732533/s3-cors-always-send-vary-origin)
+- [Not able to set Vary response header in S3](https://stackoverflow.com/a/21371500/492325)
+- [Overview of the caching issue in Chrome](https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req/856948#856948)
+
+If you're using `cURL` to test this, you won't see the issue. The issue is only obvious in the browser due to how it caches responses. This results in a AJAX/fetch failing when attempting to access the asset the second time.
 
 After a lot trial and error I managed to create a working cloudformation template.
 
@@ -31,6 +37,8 @@ The following template creates the following resources:
 - A CloudFront OriginAccessIdentity that allows CloudFront to read from S3.
 - A CloudFront caching policy with the correct CORS configuration.
 - A CloudFront distribution that uses the S3 bucket as origin source.
+
+**You have to create the stack in region `us-east-1`**
 
 ```yml
 AWSTemplateFormatVersion: '2010-09-09'
@@ -187,6 +195,7 @@ Note the following:
 
 - The SSL certificate and Alternate domain name are not automatically set (see below).
 - The bucket is created in the region you used when creating the cloudformation stack.
+- The Cloudfront distribution should be using the "Origin Access Identity" created in the stack to access S3.
 
 ## Allowing access to S3 bucket from CloudFront
 
@@ -240,7 +249,13 @@ Typically you'd use the `aws s3 sync` command to upload assets, and this command
     DEST_DIR: '_next/static'
 ```
 
+## Debugging Lambda errors
+
+You might be getting 502 "LambdaValidationError from cloudfront" or 503 "LambdaExecutionError from cloudfront" errors when attempting to request your assets. The underlying errors are displayed in Cloudwatch, but you *need to be in the correct region (closest to you) to find the correct logs*.
+
 ## Conclusion
+
+Goddamn this was a frustrating process. I originally assumed it would be easy to connect Cloudfront to S3 and everything should "just work" as these services are built to work well together. How wrong I was, and the devil is always in the details. I spent a long time getting this to work, much longer than I initially thought it'd take.
 
 While this setup is somewhat complicated, it's a good approach for offloading file serving to the Edge where it will be quicker to download for all users across all locations. This also keeps the runtime server focusing on runtime request handling instead of file serving.
 
