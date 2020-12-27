@@ -58,7 +58,7 @@ After a _lot_ of trial and error I managed to create a working CloudFormation te
 
 This is a manual step as it requires domain verification.
 
-Head on over to [AWS Certificate Manager](https://console.aws.amazon.com/acm/home?region=us-east-1) to create a certificate for your domain. (Note that AWS certificates are *free*.)
+Head on over to [AWS Certificate Manager](https://console.aws.amazon.com/acm/home?region=us-east-1) to create a certificate for your domain. (Note that AWS certificates are _free_.)
 
 Once the certificate is created and domain verified, take note of the certificate ARN and move onto the next step.
 
@@ -414,7 +414,7 @@ X-Amz-Cf-Id: _I8Z_Q5yEnxGtMHHTs7P3OP9GoD-GxlZjgLmXcPfEt96WiiUiBBQ7A==
 Age: 58
 ```
 
-----
+---
 
 ### HTTP "Ajax" GET
 
@@ -444,7 +444,7 @@ X-Amz-Cf-Id: NgcvOmQhdW0cYYeEPJ2cy3w0grvVGlTgt7Mxt7w658IXMzs7tC7uCw==
 Age: 218
 ```
 
-----
+---
 
 ### HTTP GET accepting compressed contents
 

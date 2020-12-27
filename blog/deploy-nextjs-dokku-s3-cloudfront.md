@@ -37,7 +37,7 @@ module.exports = {
   generateBuildId: () => {
     return process.env.APP_VERSION || 'unknown-app-version';
   },
-}
+};
 ```
 
 ## Creating the Dockerfile
