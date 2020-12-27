@@ -1,41 +1,42 @@
+@layer components {
+  .mobile-nav {
+    @apply hidden
+      sm:hidden
+      flex-col
+      px-2
+      pt-2
+      pb-3
+      space-y-1
+      space-x-0
+      shadow-lg
+      bg-white;
+    flex-basis: 100%;
+  }
 
-.mobile-nav {
-  @apply hidden
-    sm:hidden
-    flex-col
-    px-2
-    pt-2
-    pb-3
-    space-y-1
-    space-x-0
-    shadow-lg
-    bg-white;
-  flex-basis: 100%;
-}
+  .mobile-nav-visible {
+    @apply flex sm:hidden;
+  }
 
-.mobile-nav-visible {
-  @apply flex sm:hidden;
-}
+  .menu-button {
+    @apply absolute
+      left-2
+      sm:hidden
+      inline-flex
+      items-center
+      justify-center
+      p-2
+      rounded-md
+      text-2xl
+      text-gray-600
+      border
+      hover:border-gray-400
+      focus:outline-none
+      focus:ring-2
+      focus:ring-inset
+      focus:ring-white;
+  }
 
-.menu-button {
-  @apply absolute
-    left-2
-    sm:hidden
-    inline-flex
-    items-center
-    justify-center
-    p-2
-    rounded-md
-    text-2xl
-    text-gray-600
-    border
-    hover:border-gray-400
-    focus:outline-none
-    focus:ring-2
-    focus:ring-inset
-    focus:ring-white;
-}
-
-.menu-button-label {
-  @apply sr-only;
+  .menu-button-label {
+    @apply sr-only;
+  }
 }

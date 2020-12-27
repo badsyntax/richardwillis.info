@@ -1,5 +1,5 @@
 ---
-title: 'Setting up a bare Next.js project with Typescript & Prettier'
+title: 'Set up a bare Next.js project with Typescript & Prettier'
 excerpt: 'This post outlines how I set up a new next.js project with some additional helpful features and guidelines.'
 date: '2020-03-16T05:35:07.322Z'
 author:
@@ -29,7 +29,7 @@ npm install --save-dev typescript @types/react @types/node
 npm run dev
 ```
 
-Setup eslint and prettier:
+Set up eslint and prettier:
 
 ```bash
 npm i --save-dev @typescript-eslint/eslint-plugin \
@@ -106,7 +106,7 @@ Add linting scripts to `package.json`:
 
 Add the following to `.prettierignore`:
 
-```sh
+```bash
 .next
 package-lock.json
 ```

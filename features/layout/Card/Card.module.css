@@ -6,8 +6,10 @@
       justify-center
       self-stretch;
   }
-
-  .card > * {
+  .title {
+    @apply mb-1;
+  }
+  .content {
     @apply my-1;
   }
 }

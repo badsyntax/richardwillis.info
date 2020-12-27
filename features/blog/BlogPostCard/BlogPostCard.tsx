@@ -28,13 +28,11 @@ export const BlogPostCard: React.FunctionComponent<
 }) => {
   return (
     <Card className={className} {...props}>
-      <Typography as="h3" className={classes(titleClassName)}>
-        {title}&nbsp;&rarr;
-      </Typography>
-      <Typography as="p" className={classes('date')}>
+      <Card.Title className={classes(titleClassName)}>{title}</Card.Title>
+      <Card.Content className={classes('date')}>
         Posted on 20<sup>th</sup> Dec 2020
-      </Typography>
-      {excerpt && <Typography as="p">{excerpt}</Typography>}
+      </Card.Content>
+      {excerpt && <Card.Content>{excerpt}</Card.Content>}
       {children}
     </Card>
   );

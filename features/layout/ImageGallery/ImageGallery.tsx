@@ -1,9 +1,9 @@
 import React, { Fragment, useState } from 'react';
 import classNames from 'classnames/bind';
-import Image from 'next/image';
 
 import { Link } from '../Link/Link';
 import { Modal } from '../Modal/Modal';
+import { Image } from '../Image/Image';
 
 import STYLES from './ImageGallery.module.css';
 import { ImageLoader } from '../ImageLoader/ImageLoader';
@@ -44,19 +44,25 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
         />
       </Modal>
       <ul className={classes('root')}>
-        {images.map((image, i) => (
-          <li className={classes('item')} key={i}>
-            <Link href={image.src} target="_blank" onClick={onItemClick(image)}>
-              <Image
-                src={image.src}
-                alt={image.alt}
-                width={width}
-                height={height}
-                className={classes('image')}
-              />
-            </Link>
-          </li>
-        ))}
+        {images.map((image, i) => {
+          return (
+            <li className={classes('item')} key={i}>
+              <Link
+                href={image.src}
+                target="_blank"
+                onClick={onItemClick(image)}
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  width={width}
+                  height={height}
+                  className={classes('image')}
+                />
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </Fragment>
   );

@@ -1,39 +1,41 @@
-.root {
-  @apply flex
-    flex-col
-    justify-center
-    items-center
-    min-h-screen
-    px-8;
-}
+@layer components {
+  .root {
+    @apply flex
+      flex-col
+      justify-center
+      items-center
+      min-h-screen
+      px-8;
+  }
 
-.description {
-  @apply text-2xl
-    mt-2;
-}
+  .description {
+    @apply text-2xl
+      mt-2;
+  }
 
-.nav-grid {
-  @apply flex
-    flex-wrap
-    flex-col
-    w-full
-    sm:w-auto
-    sm:flex-row
-    items-center
-    justify-center
-    mt-12;
-}
+  .nav-grid {
+    @apply flex
+      flex-wrap
+      flex-col
+      w-full
+      sm:w-auto
+      sm:flex-row
+      items-center
+      justify-center
+      mt-12;
+  }
 
-.nav-item {
-  @apply w-full
-    m-2
-    text-center;
-}
-
-@screen sm {
   .nav-item {
-    @apply w-auto
-      m-4;
-    flex-basis: 45%;
+    @apply w-full
+      m-2
+      text-center;
+  }
+
+  @screen sm {
+    .nav-item {
+      @apply w-auto
+        m-4;
+      flex-basis: 45%;
+    }
   }
 }

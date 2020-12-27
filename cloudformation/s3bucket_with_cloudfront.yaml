@@ -5,23 +5,27 @@ Parameters:
   ProjectName:
     Type: String
     Default: richard-willis-assets
-    Description: Use for creating resource names
+    Description: Used for creating resource names
   Version:
     Type: String
     Default: '1-0-0'
-    Description: A unique identifier to allow multiple deployments of the cloudformation
+    Description: A unique identifier to allow multiple deployments of the CloudFormation stack
   S3BucketName:
     Type: String
     Default: assets.richardwillis.info-us-east-1
-    Description: Name of S3 bucket to create
+    Description: Name of S3 bucket to create (ending with the region name)
   S3AllowedOrigins:
     Type: CommaDelimitedList
     Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com
-    Description: A list of allowed domains to request resources from Cloudfront
+    Description: A list of allowed domains to request resources from CloudFront
   RootDomain:
     Type: CommaDelimitedList
     Default: assets.richardwillis.info
-    Description: A list of root hosts assigned to the cloudfront distribution
+    Description: A list of root hosts assigned to the CloudFront distribution
+  CachePathPattern:
+    Type: String
+    Default: '/_next/*'
+    Description: The path pattern for which you want to apply the caching & CORS policy (cannot be root)
   CertificateARN:
     Type: String
     Description: ARN of the certificate for the root domain
@@ -47,7 +51,7 @@ Resources:
   S3BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Metadata:
-      Comment: 'Bucket policy to allow cloudfront to access the data'
+      Comment: 'Bucket policy to allow CloudFront to access the data'
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
@@ -63,7 +67,7 @@ Resources:
   CFStaticCachePolicy:
     Type: 'AWS::CloudFront::CachePolicy'
     Metadata:
-      Comment: 'The cache policy for Next.js static assets'
+      Comment: 'Cache policy for the cache path'
     Properties:
       CachePolicyConfig:
         DefaultTTL: 86400
@@ -93,7 +97,7 @@ Resources:
         Comment: 'CDN for all static assets'
         CacheBehaviors:
           - CachePolicyId: !Ref CFStaticCachePolicy
-            PathPattern: '/_next/*'
+            PathPattern: !Ref CachePathPattern
             AllowedMethods:
               - 'HEAD'
               - 'GET'
@@ -281,8 +285,8 @@ Outputs:
     Description: 'Bucket name'
     Value: !Ref S3Bucket
   CFDistributionId:
-    Description: 'Id for our cloudfront distribution'
+    Description: 'Id of the CloudFront distribution'
     Value: !Ref CFDistribution
   CFDistributionDomainName:
-    Description: 'Domain name for our cloudfront distribution'
+    Description: 'Domain of the CloudFront distribution'
     Value: !GetAtt CFDistribution.DomainName

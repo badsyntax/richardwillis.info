@@ -1,20 +1,22 @@
-.root {
-  @apply flex
-    space-x-4;
-}
+@layer components {
+  .root {
+    @apply flex
+      space-x-4;
+  }
 
-.nav-item {
-  @apply text-gray-900
-    hover:bg-gray-800
-    hover:text-white
-    px-3
-    py-2
-    rounded-md
-    text-sm
-    font-medium;
-}
+  .nav-item {
+    @apply text-gray-900
+      hover:bg-gray-800
+      hover:text-white
+      px-3
+      py-2
+      rounded-md
+      text-sm
+      font-medium;
+  }
 
-.active {
-  @apply bg-gray-800
-    text-white;
+  .active {
+    @apply bg-gray-800
+      text-white;
+  }
 }
