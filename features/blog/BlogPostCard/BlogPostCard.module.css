@@ -1,7 +1,5 @@
-@layer components {
-  .date {
-    @apply text-gray-500
-      text-sm
-      leading-loose;
-  }
+.date {
+  @apply text-gray-500
+    text-sm
+    leading-loose;
 }

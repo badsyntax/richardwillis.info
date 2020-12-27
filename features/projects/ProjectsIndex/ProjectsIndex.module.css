@@ -1,16 +1,14 @@
-@layer components {
-  .root {
-    @apply flex
-      flex-col
-      mt-6;
-  }
+.root {
+  @apply flex
+    flex-col
+    mt-6;
+}
 
-  .card {
-    @apply my-3
-      sm:my-4;
-  }
+.card {
+  @apply my-3
+    sm:my-4;
+}
 
-  .tags {
-    @apply text-gray-500;
-  }
+.tags {
+  @apply text-gray-500;
 }

@@ -1,12 +1,10 @@
-@layer components {
-  .root {
-    @apply fixed
-      z-10
-      inset-0
-      overflow-y-auto;
-  }
+.root {
+  @apply fixed
+    z-10
+    inset-0
+    overflow-y-auto;
+}
 
-  .no-scroll {
-    @apply overflow-hidden;
-  }
+.no-scroll {
+  @apply overflow-hidden;
 }

@@ -1,5 +1,3 @@
-@layer components {
-  .root {
-    @apply mb-8;
-  }
+.root {
+  @apply mb-8;
 }

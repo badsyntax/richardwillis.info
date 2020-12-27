@@ -1,12 +1,10 @@
-@layer components {
-  .root {
-    @apply flex
-      flex-col
-      mt-6;
-  }
+.root {
+  @apply flex
+    flex-col
+    mt-6;
+}
 
-  .post {
-    @apply my-3
-      sm:my-4;
-  }
+.post {
+  @apply my-3
+    sm:my-4;
 }
