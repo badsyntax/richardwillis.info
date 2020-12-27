@@ -67,7 +67,9 @@ Once the certificate is created and domain verified, take note of the certificat
 Note the following before continuing:
 
 - When you update the stack you'll need to bump the version to allow proper deployment of the lambda function
-- You have to create the stack in region **`us-east-1`**, as this is where the CloudFront control pane sits and requires resources (eg certificates & buckets) to be created in the same region
+- You must create the stack in the **`us-east-1`** region for the following reasons:
+  - `us-east-1` is where the CloudFront control pane sits and requires resources (eg certificates & buckets) to be created in the same region
+  - There would be additional S3 data transfer charges if the `Lambda@Edge` executions are happening in a different AWS Region from where your source S3 bucket is located
 
 CloudFormation template:
 

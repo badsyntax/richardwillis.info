@@ -1,5 +1,18 @@
 import React from 'react';
 
+const MAX_WIDTH = 1280;
+const SIZE_SM = 200;
+const SIZE_MD = 725;
+const SIZE_LG = 1075;
+const SIZE_XL = MAX_WIDTH;
+const SIZE_BREAKPOINTS = [SIZE_SM, SIZE_MD, SIZE_LG, SIZE_XL];
+
+const imgSizes = `(max-width: 300px) ${SIZE_SM}px,
+  (max-width: 768px) ${SIZE_MD}px,
+  (max-width: 1024px) ${SIZE_LG}px,
+  (max-width: ${MAX_WIDTH}px) 100vw,
+  ${SIZE_XL}px`;
+
 function getResizedUrl(
   src: string,
   width: string,
@@ -9,7 +22,6 @@ function getResizedUrl(
   const filename = urlParts.pop();
   const filenameParts = filename.split('.');
   const filenameExtension = filenameParts.pop();
-  // filenameParts.push(width, filenameExtension);
   const filenameWithWidth = `${filenameParts.join('.')}-${width}`;
   const newFilename = `${filenameWithWidth}.${filenameExtension}`;
   urlParts.push(pathPrefix);
@@ -28,18 +40,25 @@ function getSrcSet(src: string, sizes: number[]): string {
 export type ImageProps = React.DetailedHTMLProps<
   React.ImgHTMLAttributes<HTMLImageElement>,
   HTMLImageElement
-> & {
-  sizes?: number[];
-  alt: string;
-};
+>;
 
 export const Image: React.FunctionComponent<ImageProps> = ({
   src,
+  width,
   alt,
-  sizes = [300, 768, 1280],
   ...props
 }) => {
-  const smallSrc = getResizedUrl(src, String(sizes[0]));
-  const srcSet = getSrcSet(src, sizes);
-  return <img {...props} alt={alt} src={smallSrc} srcSet={srcSet} />;
+  const smallSrc = getResizedUrl(src, String(SIZE_SM));
+  const srcSet = getSrcSet(src, SIZE_BREAKPOINTS);
+  return (
+    <img
+      {...props}
+      width={width}
+      alt={alt}
+      src={smallSrc}
+      sizes={imgSizes}
+      srcSet={srcSet}
+      loading="lazy"
+    />
+  );
 };
