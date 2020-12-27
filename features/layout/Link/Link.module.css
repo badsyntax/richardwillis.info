@@ -1,5 +1,3 @@
-@layer components {
-  .variant-button {
-    composes: root from '../Button/Button.module.css';
-  }
+.variant-button {
+  composes: root from '../Button/Button.module.css';
 }

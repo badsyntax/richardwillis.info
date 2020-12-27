@@ -1,5 +1,3 @@
-@layer components {
-  .title {
-    @apply mb-4;
-  }
+.title {
+  @apply mb-4;
 }

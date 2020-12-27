@@ -1,15 +1,13 @@
-@layer components {
-  .card {
-    @apply p-4
-      flex
-      flex-col
-      justify-center
-      self-stretch;
-  }
-  .title {
-    @apply mb-1;
-  }
-  .content {
-    @apply my-1;
-  }
+.card {
+  @apply p-4
+    flex
+    flex-col
+    justify-center
+    self-stretch;
+}
+.title {
+  @apply mb-1;
+}
+.content {
+  @apply my-1;
 }

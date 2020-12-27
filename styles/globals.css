@@ -1,10 +1,2 @@
 @tailwind base;
 @tailwind screens;
-
-@layer components {
-  /* add custom components here, eg
-  .btn-blue {
-    @apply text-white hover:bg-blue-700;
-  }
-  */
-}

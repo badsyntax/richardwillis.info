@@ -1,29 +1,27 @@
-@layer components {
-  .variant-h1 {
-    @apply text-5xl
-      sm:text-6xl
-      font-bold;
-  }
+.variant-h1 {
+  @apply text-5xl
+    sm:text-6xl
+    font-bold;
+}
 
-  .variant-h2 {
-    @apply text-4xl
-      sm:text-5xl
-      font-bold;
-  }
+.variant-h2 {
+  @apply text-4xl
+    sm:text-5xl
+    font-bold;
+}
 
-  .variant-h3 {
-    @apply text-xl
-      sm:text-4xl
-      font-bold;
-  }
+.variant-h3 {
+  @apply text-xl
+    sm:text-4xl
+    font-bold;
+}
 
-  .variant-p {
-    @apply text-base sm:text-lg;
-  }
+.variant-p {
+  @apply text-base sm:text-lg;
+}
 
-  .variant-prose {
-    @apply prose
-      lg:prose-xl
-      max-w-none;
-  }
+.variant-prose {
+  @apply prose
+    lg:prose-xl
+    max-w-none;
 }
