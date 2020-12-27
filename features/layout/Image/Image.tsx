@@ -1,21 +1,40 @@
 import React from 'react';
 
-const MAX_WIDTH = 1280;
-const SIZE_SM = 200;
-const SIZE_MD = 725;
-const SIZE_LG = 1075;
-const SIZE_XL = MAX_WIDTH;
-const SIZE_BREAKPOINTS = [SIZE_SM, SIZE_MD, SIZE_LG, SIZE_XL];
+enum SIZES {
+  SM = 200,
+  MD = 725,
+  LG = 1075,
+  XL = 1280,
+}
 
-const imgSizes = `(max-width: 300px) ${SIZE_SM}px,
-  (max-width: 768px) ${SIZE_MD}px,
-  (max-width: 1024px) ${SIZE_LG}px,
-  (max-width: ${MAX_WIDTH}px) 100vw,
-  ${SIZE_XL}px`;
+const SIZE_BREAKPOINTS = [SIZES.SM, SIZES.MD, SIZES.LG, SIZES.XL];
+
+function getImageSizes(size: SIZES) {
+  if (size <= SIZES.SM) {
+    return `(max-width: 300px) ${SIZES.SM}px,
+      ${SIZES.SM}px`;
+  }
+  if (size <= SIZES.MD) {
+    return `(max-width: 300px) ${SIZES.SM}px,
+      (max-width: 768px) ${SIZES.MD}px,
+      ${SIZES.MD}px`;
+  }
+  if (size <= SIZES.LG) {
+    return `(max-width: 300px) ${SIZES.SM}px,
+      (max-width: 768px) ${SIZES.MD}px,
+      (max-width: 1024px) ${SIZES.LG}px,
+      ${SIZES.LG}px`;
+  }
+  return `(max-width: 300px) ${SIZES.SM}px,
+    (max-width: 768px) ${SIZES.MD}px,
+    (max-width: 1024px) ${SIZES.LG}px,
+    (max-width: ${SIZES.XL}px) 100vw,
+    ${SIZES.XL}px`;
+}
 
 function getResizedUrl(
   src: string,
-  width: string,
+  width: SIZES = SIZES.XL,
   pathPrefix = 'resized'
 ): string {
   const urlParts = src.split('/');
@@ -31,10 +50,26 @@ function getResizedUrl(
 function getSrcSet(src: string, sizes: number[]): string {
   return sizes
     .map((size) => {
-      const resizedSrc = getResizedUrl(src, String(size));
+      const resizedSrc = getResizedUrl(src, size);
       return `${resizedSrc} ${size}w`;
     })
     .join(', ');
+}
+
+function getImageSize(width: number): SIZES {
+  if (!width) {
+    return undefined;
+  }
+  if (width <= SIZES.SM) {
+    return SIZES.SM;
+  }
+  if (width <= SIZES.MD) {
+    return SIZES.MD;
+  }
+  if (width <= SIZES.LG) {
+    return SIZES.LG;
+  }
+  return SIZES.LG;
 }
 
 export type ImageProps = React.DetailedHTMLProps<
@@ -48,16 +83,17 @@ export const Image: React.FunctionComponent<ImageProps> = ({
   alt,
   ...props
 }) => {
-  const smallSrc = getResizedUrl(src, String(SIZE_SM));
-  const srcSet = getSrcSet(src, SIZE_BREAKPOINTS);
+  const imageSize = getImageSize(Number(width));
+  const resizedSrc = getResizedUrl(src, imageSize);
+  const imgSizes = getImageSizes(imageSize);
   return (
     <img
       {...props}
       width={width}
       alt={alt}
-      src={smallSrc}
+      src={resizedSrc}
       sizes={imgSizes}
-      srcSet={srcSet}
+      srcSet={getSrcSet(src, SIZE_BREAKPOINTS)}
       loading="lazy"
     />
   );
