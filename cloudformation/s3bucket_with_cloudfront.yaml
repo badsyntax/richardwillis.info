@@ -18,6 +18,13 @@ Parameters:
     Type: CommaDelimitedList
     Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com
     Description: A list of allowed domains to request resources from Cloudfront
+  RootDomain:
+    Type: CommaDelimitedList
+    Default: assets.richardwillis.info
+    Description: A list of root hosts assigned to the cloudfront distribution
+  CertificateARN:
+    Type: String
+    Description: ARN of the certificate for the root domain
 
 Resources:
   S3Bucket:
@@ -102,6 +109,10 @@ Resources:
               QueryString: false
             TargetOriginId: !Sub 's3-origin-${S3Bucket}'
             ViewerProtocolPolicy: 'redirect-to-https'
+            LambdaFunctionAssociations:
+              - EventType: origin-response
+                LambdaFunctionARN: !GetAtt CFLambdaVersion.FunctionArn
+                IncludeBody: false
         DefaultCacheBehavior:
           AllowedMethods:
             - 'HEAD'
@@ -124,6 +135,7 @@ Resources:
           LambdaFunctionAssociations:
             - EventType: origin-response
               LambdaFunctionARN: !GetAtt CFLambdaVersion.FunctionArn
+              IncludeBody: false
         DefaultRootObject: 'index.html'
         Enabled: true
         HttpVersion: 'http1.1'
@@ -135,6 +147,11 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
         PriceClass: 'PriceClass_All'
+        Aliases: !Ref RootDomain
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateARN
+          MinimumProtocolVersion: 'TLSv1.2_2019'
+          SslSupportMethod: 'sni-only'
 
   CFOriginAccessIdentity:
     Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
@@ -152,19 +169,46 @@ Resources:
       Handler: index.handler
       Code:
         ZipFile: |
+          // response headers *should* be key value pairs but can also contain comma delimited values,
+          // so we normalise them into a consistent key/value structure.
+          function getNormalisedHeaders(headers = []) {
+            return headers.reduce((previousValue, currentValue) => {
+              const values = currentValue.value.split(",");
+              values.forEach((value) => {
+                previousValue.push({
+                  key: currentValue.key,
+                  value: value.trim(),
+                });
+              });
+              return previousValue;
+            }, []);
+          }
+
+          function addHeaders(existingHeaders, newHeaders) {
+            newHeaders.forEach((newHeader) => {
+              const hasExistingHeader = !!existingHeaders.find((existingHeader) => {
+                return (
+                  existingHeader.key.toLowerCase() === newHeader.key.toLowerCase() &&
+                  existingHeader.value.toLowerCase() === newHeader.value.toLowerCase()
+                );
+              });
+              if (!hasExistingHeader) {
+                existingHeaders.push(newHeader);
+              }
+            });
+          }
+
+          // Always return 'Vary' headers to prevent browsers caching response
+          // headers when 'Origin' changes.
           exports.handler = (event, context, callback) => {
             const response = event.Records[0].cf.response;
             const headers = response.headers;
-
-            if (!headers['vary'])
-            {
-                headers['vary'] = [
-                    { key: 'Vary', value: 'Access-Control-Request-Headers' },
-                    { key: 'Vary', value: 'Access-Control-Request-Method' },
-                    { key: 'Vary', value: 'Origin' },
-                ];
-            }
-            console.log('response', response);
+            headers["vary"] = getNormalisedHeaders(headers["vary"]);
+            addHeaders(headers["vary"], [
+              { key: "Vary", value: "Access-Control-Request-Headers" },
+              { key: "Vary", value: "Access-Control-Request-Method" },
+              { key: "Vary", value: "Origin" },
+            ]);
             callback(null, response);
           };
 
