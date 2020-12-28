@@ -58,7 +58,10 @@ After a _lot_ of trial and error I managed to create a working CloudFormation te
 
 This is a manual step as it requires domain verification.
 
-Head on over to [AWS Certificate Manager](https://console.aws.amazon.com/acm/home?region=us-east-1) to create a certificate for your domain. (Note that AWS certificates are _free_.)
+- Note that AWS certificates are _free_
+- You **must** create the certificate in region `us-east-1`
+
+Head on over to [AWS Certificate Manager](https://console.aws.amazon.com/acm/home?region=us-east-1) to create a certificate for your domain.
 
 Once the certificate is created and domain verified, take note of the certificate ARN and move onto the next step.
 
