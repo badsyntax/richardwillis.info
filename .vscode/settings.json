@@ -26,11 +26,17 @@
   "cSpell.language": "en-GB",
   "tailwindCSS.colorDecorators": "off",
   "cSpell.words": [
+    "Buildx",
     "DOKKU",
     "Linkedin",
+    "QEMU",
     "badsyntax",
+    "browserslist",
     "ghcr",
+    "mapbox",
+    "rehype",
     "richardwillis",
+    "srcset",
     "tailwindcss",
     "vfile",
     "webp"

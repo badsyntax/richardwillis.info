@@ -77,7 +77,7 @@ Once the stack is created, it can take some time before Cloudfront can serve ass
 
 ## Setting correct cache headers
 
-```console
+```shell-session
 Cache-Control: public,max-age=31536000,immutable
 ```
 

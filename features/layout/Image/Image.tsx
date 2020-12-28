@@ -1,13 +1,6 @@
 import React from 'react';
-import { SIZE_BREAKPOINTS } from './constants';
 import { SourceFormats } from './SourceFormats';
-import {
-  getImageType,
-  getImageSize,
-  getResizedUrl,
-  getImageSizes,
-  getSrcSet,
-} from './util';
+import { getImageType, getImageSize, getResizedUrl } from './util';
 
 export type ImageProps = Omit<
   React.DetailedHTMLProps<
@@ -24,22 +17,12 @@ export const Image: React.FunctionComponent<ImageProps> = ({
   ...props
 }) => {
   const type = getImageType(src);
-  const imageSize = getImageSize(width && Number(width));
-  const resizedSrc = getResizedUrl(src, type, imageSize);
-  const imgSizes = getImageSizes(imageSize);
-
+  const size = getImageSize(width && Number(width));
+  const resizedSrc = getResizedUrl(src, type, size);
   return (
     <picture>
-      <SourceFormats src={src} size={imageSize} origType={type} />
-      <img
-        {...props}
-        width={width}
-        alt={alt}
-        src={resizedSrc}
-        sizes={imgSizes}
-        srcSet={getSrcSet(src, SIZE_BREAKPOINTS, type)}
-        loading="lazy"
-      />
+      <SourceFormats src={src} size={size} origType={type} />
+      <img {...props} width={width} alt={alt} src={resizedSrc} loading="lazy" />
     </picture>
   );
 };

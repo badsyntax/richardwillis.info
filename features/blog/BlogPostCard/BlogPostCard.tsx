@@ -1,10 +1,11 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import { Typography } from '../../layout/Typography/Typography';
 
 import { LinkProps } from '../../layout/Link/Link';
-import STYLES from './BlogPostCard.module.css';
 import { Card } from '../../layout/Card/Card';
+import { getFormattedDateMedium } from '../../dates/getFormattedDate';
+
+import STYLES from './BlogPostCard.module.css';
 const classes = classNames.bind(STYLES);
 
 export interface BlogPostCardProps {
@@ -30,7 +31,7 @@ export const BlogPostCard: React.FunctionComponent<
     <Card className={className} {...props}>
       <Card.Title className={classes(titleClassName)}>{title}</Card.Title>
       <Card.Content className={classes('date')}>
-        Posted on 20<sup>th</sup> Dec 2020
+        Posted on {getFormattedDateMedium(new Date(date))}
       </Card.Content>
       {excerpt && <Card.Content>{excerpt}</Card.Content>}
       {children}

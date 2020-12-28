@@ -1,6 +1,6 @@
 ---
-title: 'Deploy a Next.js docker app to dokku'
-excerpt: 'An overview of how to package and deploy & Next.js app to your dokku server.'
+title: 'Deploy a Next.js docker app to dokku & S3'
+excerpt: 'How to package and deploy & Next.js app to your dokku server and the cloud.'
 date: '2020-12-27T05:35:07.322Z'
 author:
   name: Richard Willis
@@ -117,7 +117,9 @@ We'll use GitHub Actions to:
 
 ### Setting up S3 & CloudFront
 
-Refer to [Set up CloudFront & S3](/blog/setup-s3-cloudfront-cdn).
+An S3 bucket is used to host all static assets for all app versions.
+
+Refer to [Set up CloudFront & S3](/blog/setup-s3-cloudfront-cdn) to set this up.
 
 ### Setting up Remote Dokku access
 
@@ -249,5 +251,5 @@ jobs:
 
 Some interesting points about this approach:
 
-- Static assets are copied out of the docker image, instead of running two separate builds, as the Next.js static file hashes don't match when building in different OS environments (even when setting the Next.js build ID).
-- `APP_VERSION` is used as the build ID and is set from the release tag
+- Static assets are copied out of the docker image as the file hashes don't match when building in different OS environments (even when setting the Next.js build ID).
+- `APP_VERSION` is used as the build ID and is set from the GitHub Release tag value

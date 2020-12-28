@@ -1,6 +1,6 @@
 ---
 title: 'Set up CloudFront & S3'
-excerpt: 'An overview of how to setup S3 & CloudFront.'
+excerpt: 'How to set up S3 & CloudFront to host & distribute immutable static assets.'
 date: '2020-12-27T05:35:07.322Z'
 author:
   name: Richard Willis
@@ -252,6 +252,7 @@ Resources:
       Handler: index.handler
       Code:
         ZipFile: |
+
           // response headers *should* be key value pairs but can also contain comma delimited values,
           // so we normalise them into a consistent key/value structure.
           function getNormalisedHeaders(headers = []) {
@@ -325,6 +326,7 @@ Resources:
       Role: !GetAtt PublishLambdaVersionRole.Arn
       Code:
         ZipFile: |
+
           const {Lambda} = require('aws-sdk')
           const {send, SUCCESS, FAILED} = require('cfn-response')
           const lambda = new Lambda()
@@ -393,13 +395,11 @@ Typically you'd use the `aws s3 sync` command to upload assets, and this command
 
 ## Testing
 
-### Normal HTTP GET
+### HTTP GET
 
-- `Vary` must include `Origin`
-- `X-Cache: Hit from cloudfront`
-- `Cache-Control: public,max-age=31536000,immutable`
+A typical `GET` request on the same origin:
 
-```console
+```shell-session
 ❯ curl -I https://assets.example.com/example.css
 HTTP/1.1 200 OK
 Content-Type: text/css
@@ -419,14 +419,19 @@ X-Amz-Cf-Id: _I8Z_Q5yEnxGtMHHTs7P3OP9GoD-GxlZjgLmXcPfEt96WiiUiBBQ7A==
 Age: 58
 ```
 
+Response headers:
+
+- `Vary` must include `Origin`
+- `X-Cache` must include `Hit from cloudfront`
+- `Cache-Control` must include `public,max-age=31536000,immutable`
+
 ---
 
-### HTTP "Ajax" GET
+### HTTP Cross-Origin GET
 
-- `Access-Control-Allow-Origin` must include the origin domain
-- `Access-Control-Allow-Methods` must include GET & HEAD
+A typical `GET` request from a different origin:
 
-```console
+```shell-session
 ❯ curl -H "Origin: https://example.com" -I https://assets.example.com/example.css
 HTTP/1.1 200 OK
 Content-Type: text/css
@@ -449,13 +454,20 @@ X-Amz-Cf-Id: NgcvOmQhdW0cYYeEPJ2cy3w0grvVGlTgt7Mxt7w658IXMzs7tC7uCw==
 Age: 218
 ```
 
+Response headers:
+
+- `Access-Control-Allow-Origin` must include the origin domain
+- `Access-Control-Allow-Methods` must include GET & HEAD
+- `X-Cache` must include `Hit from cloudfront`
+- `Cache-Control` must include `public,max-age=31536000,immutable`
+
 ---
 
-### HTTP GET accepting compressed contents
+### HTTP GET Accept-Encoding
 
-- `Content-Encoding` must include either `gzip` or `br`
+A typical `GET` request with compression:
 
-```console
+```shell-session
 ❯ curl -H "Accept-Encoding: gzip, deflate, br" -I https://assets.example.com/example.css
 HTTP/1.1 200 OK
 Content-Type: text/css
@@ -473,6 +485,12 @@ X-Amz-Cf-Pop: MAN50-C1
 X-Amz-Cf-Id: 3k3RkOOpWUyJpsSUx_vOxbjf7q4o0nXtpgCkB92E7HKpu-4bh8awOg==
 Age: 18
 ```
+
+Response headers:
+
+- `Content-Encoding` must include either `gzip` or `br`
+- `X-Cache` must include `Hit from cloudfront`
+- `Cache-Control` must include `public,max-age=31536000,immutable`
 
 ## Debugging Lambda Errors
 

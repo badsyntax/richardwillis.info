@@ -14,6 +14,12 @@ module.exports = {
             'code::after': {
               content: '""',
             },
+            code: {
+              fontWeight: 500,
+              borderRadius: '0.2rem',
+              backgroundColor: '#eee',
+              padding: '1px 4px',
+            },
           },
         },
       },
