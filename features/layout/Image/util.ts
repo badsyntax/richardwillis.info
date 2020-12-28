@@ -1,7 +1,11 @@
-import { SIZE, SourceFormatType } from './constants';
+import { SIZE, SIZE_BREAKPOINTS, SourceFormatType } from './constants';
+
+export function getSizes(size: SIZE): SIZE[] {
+  return SIZE_BREAKPOINTS.filter((breakpoint) => size >= breakpoint);
+}
 
 export function getImageSizes(size: SIZE): string {
-  const sizes = getSourceFormatSizes(size);
+  const sizes = getSizes(size);
   const lastSize = sizes.pop();
   return sizes
     .map((sourceSize) => {
@@ -9,6 +13,16 @@ export function getImageSizes(size: SIZE): string {
     })
     .concat([`${lastSize}px`])
     .join(',\n');
+}
+
+export function getImageSrcSet(
+  src: string,
+  size: SIZE,
+  type: SourceFormatType
+): string {
+  return getSizes(size)
+    .map((size) => `${getResizedUrl(src, type, size)} ${size}w`)
+    .join(', ');
 }
 
 export function getResizedUrl(
@@ -27,33 +41,14 @@ export function getResizedUrl(
   return urlParts.concat([newFilename]).join('/');
 }
 
-export function getSrcSet(
-  src: string,
-  sizes: SIZE[],
-  type: SourceFormatType
-): string {
-  return sizes
-    .map((size) => {
-      const resizedSrc = getResizedUrl(src, type, size);
-      return `${resizedSrc} ${size}w`;
-    })
-    .join(', ');
-}
-
 export function getImageSize(width: number): SIZE {
+  const defaultSize = SIZE.XL;
   if (!width) {
-    return SIZE.XL;
+    return defaultSize;
   }
-  if (width <= SIZE.SM) {
-    return SIZE.SM;
-  }
-  if (width <= SIZE.MD) {
-    return SIZE.MD;
-  }
-  if (width <= SIZE.LG) {
-    return SIZE.LG;
-  }
-  return SIZE.XL;
+  return (
+    SIZE_BREAKPOINTS.find((breakpoint) => width <= breakpoint) || defaultSize
+  );
 }
 
 export function getImageType(src: string): SourceFormatType {
@@ -61,7 +56,7 @@ export function getImageType(src: string): SourceFormatType {
   return SourceFormatType[extension];
 }
 
-export function getContentType(type: SourceFormatType): string {
+export function getImageContentType(type: SourceFormatType): string {
   switch (type) {
     case 'jpg':
       return `image/jpg`;
@@ -75,27 +70,13 @@ export function getSourceFormatValues(
   type: SourceFormatType,
   size: SIZE
 ): {
-  media?: string;
-  srcSet: string;
   contentType: string;
+  srcSet: string;
+  sizes: string;
 } {
   return {
-    srcSet: getResizedUrl(src, type, size),
-    contentType: getContentType(type),
-    media: `(max-width: ${size}px)`,
+    srcSet: getImageSrcSet(src, size, type),
+    contentType: getImageContentType(type),
+    sizes: getImageSizes(size),
   };
-}
-
-export function getSourceFormatSizes(size: SIZE): SIZE[] {
-  const defaultSizes = [SIZE.SM, SIZE.MD, SIZE.LG, SIZE.XL];
-  if (size <= SIZE.SM) {
-    return [SIZE.SM];
-  }
-  if (size <= SIZE.MD) {
-    return [SIZE.SM, SIZE.MD];
-  }
-  if (size <= SIZE.LG) {
-    return [SIZE.SM, SIZE.MD, SIZE.LG];
-  }
-  return defaultSizes;
 }

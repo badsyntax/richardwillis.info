@@ -5,6 +5,7 @@ import { PostTitle } from '../PostTitle/PostTitle';
 import { Author } from '../types';
 import STYLES from './PostHeader.module.css';
 import { Box } from '../../layout/Box/Box';
+import { getFormattedDateLong } from '../../dates/getFormattedDate';
 const classes = classNames.bind(STYLES);
 
 interface PostHeaderProps {
@@ -15,11 +16,14 @@ interface PostHeaderProps {
 
 export const PostHeader: React.FunctionComponent<PostHeaderProps> = ({
   title,
+  date,
 }) => {
   return (
     <Fragment>
       <PostTitle>{title}</PostTitle>
-      <div className={classes('date')}>Posted on: 20 Dec 2020</div>
+      <div className={classes('date')}>
+        Posted on: {getFormattedDateLong(new Date(date))}
+      </div>
     </Fragment>
   );
 };

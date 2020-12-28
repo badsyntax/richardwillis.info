@@ -11,7 +11,7 @@ export type CardTitleType = React.FunctionComponent<TypographyProps>;
 export const CardTitle: CardTitleType = ({ children, className, ...props }) => {
   return (
     <Typography as="h3" {...props} className={classes('title', className)}>
-      {children}&nbsp;&rarr;
+      {children}
     </Typography>
   );
 };
