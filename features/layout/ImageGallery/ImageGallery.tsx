@@ -50,6 +50,7 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
               <Link
                 href={image.src}
                 target="_blank"
+                rel="noopener"
                 onClick={onItemClick(image)}
               >
                 <Image

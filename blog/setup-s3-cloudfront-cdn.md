@@ -1,7 +1,7 @@
 ---
 title: 'Set up CloudFront & S3'
 excerpt: 'How to set up S3 & CloudFront to host & distribute immutable static assets.'
-date: '2020-12-27T05:35:07.322Z'
+date: '2020-12-24T05:35:07.322Z'
 author:
   name: Richard Willis
   picture: '/assets/blog/authors/richard.jpg'
@@ -35,7 +35,7 @@ Initially my response headers were being too aggressively cached by CloudFront, 
 
 The second caching issue I had was browser cache. The issue is fairly complex but boils down to S3 not sending a `Vary: Origin` header which results in the browser caching the CORS headers and not allowing cross domain `fetch`/`xhr` requests. (If you're using `cURL` to test this, you won't see the issue as it's only obvious in the browser due to how it caches responses.)
 
-Here are some resources covering the issue in more detail.
+Here are some resources covering the issue in more detail:
 
 - [Issue with CloudFront not returning correct Vary header](https://stackoverflow.com/questions/31732533/s3-cors-always-send-vary-origin)
 - [Not able to set Vary response header in S3](https://stackoverflow.com/a/21371500/492325)

@@ -21,25 +21,24 @@ export const AboutPage: React.FunctionComponent = () => {
           <span role="img" aria-label="wave">
             👋
           </span>
-          . I'm an experienced software engineer specializing in Web
-          Development. I enjoy coding as a day job and as a hobby. Check out my{' '}
-          <Link href="/projects">open-source projects</Link>. When not coding I
-          enjoy being outdoors hiking or cycling. Sometimes I do a bit of indoor
-          bouldering too.
+          . I'm a front-end leaning full-stack developer with more than 10 years
+          of professional web development experience. I enjoy coding as a day
+          job and as a hobby (check out my{' '}
+          <Link href="/projects">open-source projects</Link>). When not coding I
+          enjoy being outdoors and love hiking and cycling. Sometimes I do a bit
+          of indoor bouldering too.
         </p>
         <p>
-          I grew up in South Africa before moving to London for about 9 years.
-          London is a great place for work but I did not enjoy the quality of
-          life, and moved to Barcelona for about 4 years. Recently I moved back
-          to the UK, to beautiful rural North Yorkshire, which is where I'm
-          currently based.
+          I grew up in South Africa before moving to London for a few years, and
+          then to Barcelona for a few years. Recently I moved back to the UK, to
+          beautiful rural North Yorkshire, which is where I'm currently based.
         </p>
-        <h2>Professional Experience</h2>
+        {/* <h2>Professional Experience</h2>
         <p>
           I'm a front-end leaning full-stack developer with more than 10 years
           of professional web development experience. View my cv here:{' '}
           <a href="/cv">richardwillis.info/cv</a>
-        </p>
+        </p> */}
         <h2>Photos</h2>
         <p>
           I don't consider myself a very good photographer but I do really enjoy

@@ -101,7 +101,7 @@ If we want to combine image sizes with image formats, we have to use the `<sourc
 </picture>
 ```
 
-As you can see `<source>` also supports `sizes` and `srcset` attributes. The browser reads the `<source>`'s top down and will pick the first supported format.
+As you can see `<source>` also supports `sizes` and `srcset` attributes.
 
 ## Hosting the Images
 
@@ -112,7 +112,7 @@ Amazon S3 (Simple Storage Service) is a good place to host them and gives you so
 - It's really quite cheap. You can store a lot of images without massive financial risk.
 - It can be connected to the CloudFront CDN to cache your images on the Edge.
 
-Refer to [Set up S3 & CloudFront](/setup-s3-cloudfront-cdn) for more information on setting this up.
+Refer to [Set up S3 & CloudFront](/blog/setup-s3-cloudfront-cdn) for more information on setting this up.
 
 ## Generating the Images
 
