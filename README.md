@@ -32,7 +32,7 @@ docker run --publish 3000:3000 badsyntax/richardwillis
 docker-compose up
 ```
 
-## Deploy
+## Manual Deploy
 
 First build & push the docker image:
 
