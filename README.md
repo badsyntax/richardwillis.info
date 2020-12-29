@@ -53,4 +53,5 @@ docker tag ghcr.io/badsyntax/richardwillis:latest dokku/richardwillis:latest
 dokku tags:deploy richardwillis latest
 dokku proxy:ports-add richardwillis http:80:3000
 dokku letsencrypt richardwillis
+dokku domains:add richardwillis richardwillis.info
 ```
