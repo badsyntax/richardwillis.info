@@ -1,5 +1,16 @@
 .date {
-  @apply mb-10
-    text-lg
+  @apply text-base
+    sm:text-lg
+    mb-3
+    sm:mb-5
     text-gray-500;
+}
+
+.back-link {
+  @apply text-sm
+    sm:text-base
+    mb-6
+    sm:mb-8
+    inline-block
+    font-medium;
 }

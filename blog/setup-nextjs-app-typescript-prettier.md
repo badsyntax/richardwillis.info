@@ -1,7 +1,7 @@
 ---
 title: 'Set up a Next.js app with Typescript, ESLint & Prettier'
 excerpt: 'Bootstrap a new Next.js app with additional tooling.'
-date: '2020-03-16T05:35:07.322Z'
+date: '2020-12-12T05:35:07.322Z'
 author:
   name: Richard Willis
   picture: '/assets/blog/authors/richard.jpg'
@@ -10,7 +10,7 @@ ogImage:
 draft: false
 ---
 
-This post outlines the steps I take to set up a new NextJS project and covers the following features:
+This post outlines the steps I take to set up a new `Next.js` project and covers the following features:
 
 - TypeScript support
 - Prettier for formatting
@@ -19,7 +19,7 @@ This post outlines the steps I take to set up a new NextJS project and covers th
 
 ## Getting Started
 
-Bootstrap a nextjs project with TypeScript support:
+Bootstrap a `Next.js` project with TypeScript support:
 
 ```bash
 npx create-next-app app-name
@@ -29,7 +29,7 @@ npm install --save-dev typescript @types/react @types/node
 npm run dev
 ```
 
-Set up eslint and prettier:
+Set up `eslint` and `prettier`:
 
 ```bash
 npm i --save-dev @typescript-eslint/eslint-plugin \
@@ -111,7 +111,7 @@ Add the following to `.prettierignore`:
 package-lock.json
 ```
 
-Update vscode settings within `.vscode/setting.json`:
+Update vscode settings within `.vscode/settings.json`:
 
 ```json
 {
@@ -142,6 +142,8 @@ Update vscode settings within `.vscode/setting.json`:
   "cSpell.language": "en-GB"
 }
 ```
+
+----
 
 ## Runtime helpers
 

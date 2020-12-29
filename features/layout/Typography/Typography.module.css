@@ -27,7 +27,9 @@
 }
 
 .variant-prose :global(.anchor) {
-  @apply -ml-6
+  @apply hidden
+    sm:block
+    -ml-6
     pr-2
     float-left
     leading-7;
@@ -45,10 +47,9 @@
 .variant-prose :global(h3):hover :global(.anchor) :global(.icon),
 .variant-prose :global(h4):hover :global(.anchor) :global(.icon),
 .variant-prose :global(h5):hover :global(.anchor) :global(.icon),
-.variant-prose :global(.anchor):focus :global(.icon)  {
-  @apply visible;
+.variant-prose :global(.anchor):focus :global(.icon) {
+  @apply sm:visible;
 }
-
 
 .variant-prose :global(h1),
 .variant-prose :global(h2),
