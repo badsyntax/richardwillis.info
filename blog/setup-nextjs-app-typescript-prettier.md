@@ -143,7 +143,7 @@ Update vscode settings within `.vscode/settings.json`:
 }
 ```
 
-----
+---
 
 ## Runtime helpers
 
