@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { LOCALE } from '../../constants/constants';
+import { LOCALE } from '../../config/config';
 
 export function getFormattedDate(
   date: Date,

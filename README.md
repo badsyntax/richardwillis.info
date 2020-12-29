@@ -29,7 +29,7 @@ docker build -t badsyntax/richardwillis .
 docker run --publish 3000:3000 badsyntax/richardwillis
 
 # or
-docker-compose up
+docker-compose up --remove-orphans
 ```
 
 ## Manual Deploy
@@ -42,7 +42,7 @@ docker build -t ghcr.io/badsyntax/richardwillis:latest .
 docker push ghcr.io/badsyntax/richardwillis:latest
 ```
 
-Now deploy the image on the dokku server:
+Now pull & deploy the image on the dokku server:
 
 ```bash
 dokku apps:create richardwillis

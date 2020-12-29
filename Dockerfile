@@ -23,7 +23,7 @@ RUN npm prune --production
 FROM node:14.15.3-alpine
 
 LABEL maintainer=willis.rh@gmail.com
-LABEL org.opencontainers.image.source https://github.com/badsyntax/richardwillis.info
+LABEL org.opencontainers.image.source=https://github.com/badsyntax/richardwillis.info
 LABEL org.label-schema.name="richardwillis.info"
 LABEL org.label-schema.description="Personal site of Richard Willis"
 LABEL org.label-schema.vcs-url="https://github.com/badsyntax/richardwillis.info"
@@ -43,9 +43,11 @@ COPY --from=builder --chown=node:node $APP_HOME/node_modules $APP_HOME/node_modu
 COPY --from=builder --chown=node:node $APP_HOME/.next $APP_HOME/.next
 COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.config.js
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
+COPY --from=builder --chown=node:node $APP_HOME/server $APP_HOME/server
+COPY --from=builder --chown=node:node $APP_HOME/config $APP_HOME/config
 
-EXPOSE 3000
+EXPOSE $PORT
 
 USER node
 
-CMD ["node_modules/.bin/pm2-runtime", "node_modules/.bin/next", "--", "start"]
+CMD ["node_modules/.bin/pm2-runtime", "server"]
