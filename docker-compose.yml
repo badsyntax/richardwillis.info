@@ -1,12 +1,12 @@
 version: '3'
 services:
   richardwillis:
-    container_name: "richardwillis"
+    container_name: 'richardwillis'
     build: ./
     ports:
       - 3000:3000
   prometheus:
-    container_name: "prometheus"
+    container_name: 'prometheus'
     image: prom/prometheus
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -15,7 +15,7 @@ services:
     ports:
       - 9090:9090
   grafana:
-    container_name: "grafana"
+    container_name: 'grafana'
     image: grafana/grafana:latest
     ports:
       - 3001:3000

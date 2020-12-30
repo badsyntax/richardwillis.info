@@ -30,10 +30,7 @@ In file `next.config.js`:
 ```js
 const isProd = process.env.NODE_ENV === 'production';
 module.exports = {
-  assetPrefix: isProd ? 'https://assets.example.com' : '',
-  images: {
-    domains: ['assets.example.com'],
-  },
+  assetPrefix: isProd ? process.env.ASSET_PREFIX || 'https://assets.example.com' : '';
   generateBuildId: () => {
     return process.env.APP_VERSION || 'unknown-app-version';
   },
@@ -42,19 +39,25 @@ module.exports = {
 
 ## Creating the Dockerfile
 
-The following Dockerfile shows how to use multi-stage builds to package a Next.js app. (Multi-stage builds are used to reduce the final size of the container.)
+The following Dockerfile shows how to use multi-stage builds to package a Next.js app.
 
 Please update where appropriate (at least `EMAIL`, `GITHUB_USER`, `REPO_NAME` & `DESCRIPTION`).
 
 ```dockerfile
-FROM node:14.15.3-alpine AS builder
+FROM node:14.15.3-alpine as base
+ARG APP_VERSION
+ARG ASSET_PREFIX
+ENV APP_VERSION $APP_VERSION
+ENV ASSET_PREFIX $ASSET_PREFIX
 
-LABEL maintainer=EMAIL
+
+FROM base AS builder
 
 WORKDIR /app
 
-ARG APP_VERSION
-ENV APP_VERSION=$APP_VERSION
+RUN apk update && apk add curl
+RUN curl -sf https://gobinaries.com/tj/node-prune | sh
+
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
@@ -67,9 +70,10 @@ COPY . .
 
 RUN NODE_ENV=production npm run build
 RUN npm prune --production
+RUN node-prune node_modules
 
 
-FROM node:14.15.3-alpine
+FROM base
 
 LABEL maintainer=EMAIL
 LABEL org.opencontainers.image.source https://github.com/GITHUB_USER/REPO_NAME
@@ -97,24 +101,62 @@ EXPOSE 3000
 
 USER node
 
-CMD ["node_modules/.bin/pm2-runtime", "node_modules/.bin/next", "--", "start"]
+CMD ["npm", "start"]
 ```
 
-## Building and Running the App Locally
+Notes:
+
+- Multi-stage builds are used to reduce the final size of the container.
+- A base image is used to share environment variables between build & runtime stages.
+- `npm prune --production` and [node-prune](https://github.com/tj/node-prune) are used to reduce the final size of `node_modules`/
+- No process manager is used (eg `pm2`) as by default Dokku will automatically restart containers that exit with a non-zero, so there's no need for an extra process manager.
+- `npm` is used to start the process as it handles termination signals (eg `SIGINT`) for us. If your app handles these signals itself, then you'll need to start the process with `node`.
+
+I'm not really happy with the final image size (+-300mb) but there's not much I can do about that it's mostly due to app dependencies within `node_modules`.
+
+## Deploying the dokku App manually
+
+First build and run the app locally:
 
 ```bash
-docker build -t GITHUB_USER/DOKKU_APP_NAME:latest .
-docker run --publish 3000:3000 GITHUB_USER/DOKKU_APP_NAME:latest
+docker build -t ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest --build-arg ASSET_PREFIX=/ .
+docker run --publish 3000:3000 ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest
 ```
 
-## Creating the dokku App
+Note we're passing `ASSET_PREFIX=/` as a build arg to serve assets from the app instead of S3.
+
+Once you're happy with the app, you'll need to rebuild without the `ASSET_PREFIX=/` build arg:
+
+```bash
+docker build -t ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest .
+```
+
+Now publish the image to GitHub container registry:
+
+```shell-session
+echo $CR_PAT | docker login ghcr.io -u GITHUB_USER --password-stdin
+docker build -t ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest .
+docker push ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest
+```
 
 On your dokku server:
 
 ```shell-session
-dokku apps:create myapp
-```
+# create the app
+dokku apps:create DOKKU_APP_NAME
+dokku proxy:ports-add DOKKU_APP_NAME http:80:3000
+dokku proxy:ports-remove DOKKU_APP_NAME http:3000:3000
 
+# deploy the app
+echo $CR_PAT | docker login ghcr.io -u GITHUB_USER --password-stdin
+docker pull ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest
+docker tag ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest dokku/DOKKU_APP_NAME:latest
+dokku tags:deploy DOKKU_APP_NAME latest
+
+# add custom domain and TLS
+dokku domains:add DOKKU_APP_NAME example.com
+dokku letsencrypt DOKKU_APP_NAME
+```
 
 ## Deploying the App with CI/CD
 
@@ -126,7 +168,7 @@ We'll use GitHub Actions to:
 
 ### Setting up S3 & CloudFront
 
-An S3 bucket is used to host all static assets for all app versions.
+An S3 bucket is required to host all static assets for all app versions.
 
 Refer to [Set up CloudFront & S3](/blog/setup-s3-cloudfront-cdn) to set this up.
 
@@ -229,12 +271,12 @@ jobs:
       - name: Sync static assets to S3
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --cache-control public,max-age=31536000,immutable
+          args: '--cache-control public,max-age=31536000,immutable --size-only'
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'eu-west-2'
+          AWS_REGION: 'us-east-1'
           SOURCE_DIR: '.next/static'
           DEST_DIR: '_next/static'
   deploy:
@@ -258,7 +300,7 @@ jobs:
             dokku cleanup"
 ```
 
-Some interesting points about this approach:
+Notes:
 
 - Static assets are copied out of the docker image as the file hashes don't match when building in different OS environments (even when setting the Next.js build ID).
 - `APP_VERSION` is used as the build ID and is set from the GitHub Release tag value

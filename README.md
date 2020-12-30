@@ -58,34 +58,28 @@ dokku domains:add richardwillis richardwillis.info
 
 ## Setting up Prometheus with dokku
 
-```shell-session
+```bash
 dokku apps:create prometheus
 dokku proxy:ports-add prometheus http:80:9090
-
+dokku proxy:ports-remove prometheus http:9090:9090
 
 mkdir -p /var/lib/dokku/data/storage/prometheus
 chown nobody /var/lib/dokku/data/storage/prometheus
 dokku storage:mount prometheus "/var/lib/dokku/data/storage/prometheus:/prometheus"
 dokku storage:mount prometheus "/home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
 
-dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--storage.tsdb.path=/prometheus/data/ --storage.tsdb.no-lockfile"
+dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
+  --storage.tsdb.path=/prometheus
+  --web.console.libraries=/usr/share/prometheus/console_libraries
+  --web.console.templates=/usr/share/prometheus/consoles
+  --storage.tsdb.no-lockfile"
+
+dokku docker-options:add prometheus build,deploy,run "--link richardwillis.web.1:richardwillis"
+
+## Add contents of ./prometheus/prometheus.yml to /home/dokku/prometheus/prometheus.yml
 
 docker pull prom/prometheus:latest
 docker tag prom/prometheus:latest dokku/prometheus:latest
 dokku tags:deploy prometheus latest
+dokku
 ```
-
-
-
-
-
-
-dokku network:report richardwillis
-dokku network:report prometheus
-
-
-docker run \
-    -p 9090:9090 \
-    -v /home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
-    -v /var/lib/dokku/data/storage/prometheus:/prometheus \
-    prom/prometheus

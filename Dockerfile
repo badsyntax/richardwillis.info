@@ -1,11 +1,16 @@
-FROM node:14.15.3-alpine AS builder
+FROM node:14.15.3-alpine as base
+ARG APP_VERSION
+ARG ASSET_PREFIX
+ENV APP_VERSION $APP_VERSION
+ENV ASSET_PREFIX $ASSET_PREFIX
 
-LABEL maintainer=willis.rh@gmail.com
+FROM base AS builder
 
 WORKDIR /app
 
-ARG APP_VERSION
-ENV APP_VERSION=$APP_VERSION
+RUN apk update && apk add curl
+RUN curl -sf https://gobinaries.com/tj/node-prune | sh
+
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
@@ -18,9 +23,10 @@ COPY . .
 
 RUN NODE_ENV=production npm run build
 RUN npm prune --production
+RUN node-prune node_modules
 
 
-FROM node:14.15.3-alpine
+FROM base
 
 LABEL maintainer=willis.rh@gmail.com
 LABEL org.opencontainers.image.source=https://github.com/badsyntax/richardwillis.info
@@ -45,9 +51,10 @@ COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.co
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
 COPY --from=builder --chown=node:node $APP_HOME/server $APP_HOME/server
 COPY --from=builder --chown=node:node $APP_HOME/config $APP_HOME/config
+COPY --from=builder --chown=node:node $APP_HOME/app.json $APP_HOME/app.json
 
 EXPOSE $PORT
 
 USER node
 
-CMD ["node_modules/.bin/pm2-runtime", "server"]
+CMD ["npm", "start"]

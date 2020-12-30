@@ -28,8 +28,10 @@
   "cSpell.words": [
     "Buildx",
     "DOKKU",
+    "LOGLEVEL",
     "Linkedin",
     "QEMU",
+    "WORKDIR",
     "badsyntax",
     "browserslist",
     "ghcr",
@@ -37,6 +39,7 @@
     "letsencrypt",
     "mapbox",
     "mkdir",
+    "opencontainers",
     "rehype",
     "richardwillis",
     "srcset",

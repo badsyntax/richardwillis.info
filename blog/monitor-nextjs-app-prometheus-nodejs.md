@@ -1,5 +1,5 @@
 ---
-title: 'Monitor a dokku Next.js app with Prometheus and the User Timing API'
+title: 'Monitor a dokku Next.js app with Prometheus & Grafana'
 excerpt: 'How to use the picture HTML element to provide responsive images.'
 date: '2020-12-28T05:35:07.322Z'
 author:
@@ -7,34 +7,20 @@ author:
   picture: '/assets/blog/authors/richard.jpg'
 ogImage:
   url: '/assets/blog/hello-world/cover.jpg'
-draft: false
+draft: true
 ---
 
-## Front-end Metrics
+Monitoring service health is important for ensuring uptime and discovering bugs early. There are various tools to help achieve this, but at a high level you want to:
 
-A standard Next.js app uses the `User Timing` API to mark various performance metrics of your app. You can see the marks by running `performance.getEntries()` in the Browser console. These performance marks can be read by analysis tools such as lighthouse, to monitor the performance of your application.
+- Store metrics in a time series database
+- Visualise those metrics
+- Alter on those metrics
 
-Next.js offers a way to record performance marks (using whatever tool you want) by sending the metrics to an HTTP endpoint. We can use this technique to publish the peroormance metrics to Prometheus:
+Prometheus is a monitoring and alerting toolkit and provides time series database and features to scrape (pull) metrics from applications.
 
-```js
-export function reportWebVitals(metric) {
-  const body = JSON.stringify(metric);
-  const endpointUrl = '/vitals';
+Grafana is a useful tool for visualising and alerting on metrics.
 
-  // Use `navigator.sendBeacon()` if available, falling back to `fetch()`.
-  if (navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' });
-    navigator.sendBeacon(endpointUrl, blob);
-  } else {
-    fetch(endpointUrl, {
-      body,
-      method: 'POST',
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-      keepalive: true,
-    });
-  }
-}
-```
+We'll use these tools to create a monitoring platform on a dokku server, and start to monitor our Next application metrics.
 
 ## Back-end Metrics
 
@@ -157,13 +143,35 @@ We want to prevent public access of the app metrics endpoints, prometheus & graf
 
 I attempted to do this with [dokku networking](http://dokku.viewdocs.io/dokku/networking/network/) but discovered this is not really helpful when you want a container to connect to multiple networks. So I decided to use the legacy docker `--link` feature as it's a whole lot more convenient. Perhaps someday I'll better understand how to do docker networking properly.
 
-The following assumes you're already created and deployed your Next app.
+<details><summary>Here's how you can achieve the above with `docker-compose`.</summary>
+
+```yaml
+version: '3'
+services:
+  nextapp:
+    container_name: 'next-app'
+    build: ./
+    ports:
+      - 3000:3000
+  prometheus:
+    container_name: 'prometheus'
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+  grafana:
+    container_name: 'grafana'
+    image: grafana/grafana:latest
+    ports:
+      - 3001:3000
+```
 
 ## Setting up Prometheus with dokku
 
 Create the prometheus dokku app and set the ports:
 
-```shell-session
+```bash
 dokku apps:create prometheus
 dokku proxy:ports-add prometheus http:80:9090
 dokku proxy:ports-remove prometheus http:9090:9090
@@ -171,7 +179,7 @@ dokku proxy:ports-remove prometheus http:9090:9090
 
 Set the volume mounts for persistent storage:
 
-```shell-session
+```bash
 mkdir -p /var/lib/dokku/data/storage/prometheus
 chown nobody /var/lib/dokku/data/storage/prometheus
 dokku storage:mount prometheus "/var/lib/dokku/data/storage/prometheus:/prometheus"
@@ -180,7 +188,7 @@ dokku storage:mount prometheus "/home/dokku/prometheus/prometheus.yml:/etc/prome
 
 Set the docker command to set tsdb config (to prevent a lockfile being saved):
 
-```shell-session
+```bash
 dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
   --storage.tsdb.path=/prometheus
   --web.console.libraries=/usr/share/prometheus/console_libraries
@@ -188,10 +196,17 @@ dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prome
   --storage.tsdb.no-lockfile"
 ```
 
-Link prometheus to your app instance/s:
+We want to link prometheus to specific apps to allow it to scape app metrics. By default dokku apps can't communicate with each other but we can achieve this using docker networking. You can create a new bridge network and attach containers to that network.
 
-```shell-session
-dokku docker-options:add prometheus build,deploy,run "--link next-app.web.1:next-app"
+So we'll create a new network called `prometheus-bridge` and attach our apps to that network. This results in all containers in this network being able to communicate with each other, which is not what we want, but I don't yet know how to link containers correctly without using (`--link`). I will update this blog post when I figure this out, as it seems like the service plugins (eg dokku-postgres) achieve this without using docker networking.
+
+Create the bridge network and attach the apps to it:
+
+```bash
+dokku network:create prometheus-bridge
+dokku network:set prometheus attach-post-deploy prometheus-bridge
+dokku network:set next-app attach-post-deploy prometheus-bridge
+dokku network:set grafana attach-post-deploy prometheus-bridge
 ```
 
 Create the prometheus configuration file at location `/home/dokku/prometheus/prometheus.yml`:
@@ -202,14 +217,14 @@ global:
 
 scrape_configs:
   - job_name: 'prometheus'
-    scrape_interval: 5s
+    scrape_interval: 15s
     static_configs:
       - targets: ['localhost:9090']
   - job_name: 'next-app-nodejs'
     scrape_interval: 30s
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['next-app:3000']
+      - targets: ['next-app.web:3000']
 ```
 
 Deploy the prometheus app:
@@ -218,9 +233,13 @@ Deploy the prometheus app:
 docker pull prom/prometheus:latest
 docker tag prom/prometheus:latest dokku/prometheus:latest
 dokku tags:deploy prometheus latest
+
+dokku letsencrypt prometheus
+dokku plugin:install https://github.com/dokku/dokku-http-auth.git
+dokku http-auth:on prometheus USER PASSWORD
 ```
 
-Once the prometheus app is deployed visit [http://prometheus.dokku.me/targets](http://prometheus.dokku.me/targets) to confirm prometheus can connect to your Next app.
+Once the prometheus app is deployed visit [https://prometheus.dokku.me/targets](https://prometheus.dokku.me/targets) to confirm prometheus can connect to your Next app.
 
 ## Setting up Grafana
 
@@ -252,8 +271,113 @@ Deploy Grafana:
 docker pull grafana/grafana:latest
 docker tag grafana/grafana:latest dokku/grafana:latest
 dokku tags:deploy grafana latest
+dokku letsencrypt grafana
 ```
 
 ### Adding the Prometheus data source
 
-Grafana should be be able to access `http://prometheus:9090`.
+Head on over to `http://grafana.dokku.me` and add the prometheus data source at `http://prometheus:9090`.
+
+### Import Dashboards
+
+Import the following dashboards:
+
+- [Prometheus internal metrics](https://grafana.com/grafana/dashboards/3662)
+
+## Front-end Metrics
+
+[Real User Monitoring](https://en.wikipedia.org/wiki/Real_user_monitoring) (RUM) data captures the performance experienced by a site's actual users.
+
+A standard Next.js app uses the `User Timing API` to mark various performance metrics of your app. These performance marks are known as [web vitals](https://web.dev/vitals/).
+
+You can see the marks by running `performance.getEntries()` in the Browser console. These marks can be read by analysis tools such as lighthouse and others to monitor the performance of your application.
+
+Next.js offers a way to record performance marks (using whatever tool you want) by sending the metrics to an HTTP endpoint:
+
+```js
+export function reportWebVitals(metric) {
+  const body = JSON.stringify(metric);
+  const endpointUrl = '/vitals';
+
+  // Use `navigator.sendBeacon()` if available, falling back to `fetch()`.
+  if (navigator.sendBeacon) {
+    const blob = new Blob([body], { type: 'application/json' });
+    navigator.sendBeacon(endpointUrl, blob);
+  } else {
+    fetch(endpointUrl, {
+      body,
+      method: 'POST',
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+      keepalive: true,
+    });
+  }
+}
+```
+
+We'll use this technique to publish performance metrics to Prometheus.
+
+First we'll need to create an endpoint (`/vitals`) to process metrics sent from the client.
+
+### Create the vitals endpoint
+
+First register a new metrics provider with your prometheus client:
+
+```ts
+export const ttfbHistogram = new client.Histogram({
+  name: 'client_user_timing_ttfb',
+  help: 'Time to first byte',
+  labelNames: ['path'],
+});
+
+registry.registerMetric(ttfbHistogram);
+```
+
+Now create the `/vitals` endpoint to record the metric:
+
+```ts
+import { Request, Response } from 'express';
+import { Vital } from '../types/types';
+import { ttfbHistogram } from './metrics/client';
+
+export const vitalsHandler = (
+  req: Request,
+  res: Response
+): Response<string> => {
+  if (req.headers['content-type'] !== 'application/json') {
+    return res.status(415).send('Invalid content-type');
+  }
+  const vital = req.body as Vital;
+  switch (vital.metric.name) {
+    case 'TTFB': {
+      ttfbHistogram.observe(
+        {
+          path: vital.path,
+        },
+        vital.metric.value
+      );
+      break;
+    }
+    default:
+      break;
+  }
+  return res.status(200).send('ok');
+};
+```
+
+## Adding Deploy Annotations to Grafana
+
+We can use dokku [deployment tasks](http://dokku.viewdocs.io/dokku~v0.22.4/advanced-usage/deployment-tasks/) to record a deployment with Grafana each time the app is deployed, and display that deployment as an annotation on your Grafana graphs. This is useful to understand if metrics changes as a result of a new deployment.
+
+If using a Dockerfile for deployment, we'll need to place an `app.json` within the docker `WORKDIR` (typically the root of your application):
+
+```json
+{
+  "scripts": {
+    "dokku": {
+      "postdeploy": "echo 'hello from post deploy'"
+    }
+  }
+}
+```
+
+(Also don't forget to add this file to your docker image with `COPY` or `ADD`!)
