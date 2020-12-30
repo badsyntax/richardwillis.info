@@ -21,7 +21,7 @@ registry.registerMetric(httpRequestDurationMicroseconds);
 export const ttfbHistogram = new client.Histogram({
   name: 'client_user_timing_ttfb',
   help: 'Time to first byte',
-  labelNames: ['method', 'path'],
+  labelNames: ['path'],
 });
 
 registry.registerMetric(ttfbHistogram);

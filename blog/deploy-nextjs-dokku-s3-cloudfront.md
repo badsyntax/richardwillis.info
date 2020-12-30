@@ -1,5 +1,5 @@
 ---
-title: 'Deploy a Next.js docker app to dokku & S3'
+title: 'Deploy a Next.js app to dokku & S3'
 excerpt: 'How to package and deploy & Next.js app to your dokku server and the cloud.'
 date: '2020-12-27T05:35:07.322Z'
 author:
@@ -106,6 +106,15 @@ CMD ["node_modules/.bin/pm2-runtime", "node_modules/.bin/next", "--", "start"]
 docker build -t GITHUB_USER/DOKKU_APP_NAME:latest .
 docker run --publish 3000:3000 GITHUB_USER/DOKKU_APP_NAME:latest
 ```
+
+## Creating the dokku App
+
+On your dokku server:
+
+```shell-session
+dokku apps:create myapp
+```
+
 
 ## Deploying the App with CI/CD
 

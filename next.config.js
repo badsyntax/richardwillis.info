@@ -8,10 +8,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
 /**@type {import('next/dist/next-server/server/config').NextConfig}*/
 module.exports = {
-  assetPrefix: isProd ? 'https://assets.richardwillis.info' : '',
-  images: {
-    domains: ['assets.richardwillis.info'],
-  },
+  // assetPrefix: isProd ? 'https://assets.richardwillis.info' : '',
   generateBuildId: async () => {
     return process.env.APP_VERSION || 'unknown-app-version';
   },

@@ -47,11 +47,45 @@ Now pull & deploy the image on the dokku server:
 ```bash
 dokku apps:create richardwillis
 dokku proxy:ports-add richardwillis http:80:3000
+dokku proxy:ports-remove richardwillis http:3000:3000
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin
 docker pull ghcr.io/badsyntax/richardwillis:latest
 docker tag ghcr.io/badsyntax/richardwillis:latest dokku/richardwillis:latest
 dokku tags:deploy richardwillis latest
-dokku proxy:ports-add richardwillis http:80:3000
 dokku letsencrypt richardwillis
 dokku domains:add richardwillis richardwillis.info
 ```
+
+## Setting up Prometheus with dokku
+
+```shell-session
+dokku apps:create prometheus
+dokku proxy:ports-add prometheus http:80:9090
+
+
+mkdir -p /var/lib/dokku/data/storage/prometheus
+chown nobody /var/lib/dokku/data/storage/prometheus
+dokku storage:mount prometheus "/var/lib/dokku/data/storage/prometheus:/prometheus"
+dokku storage:mount prometheus "/home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+
+dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--storage.tsdb.path=/prometheus/data/ --storage.tsdb.no-lockfile"
+
+docker pull prom/prometheus:latest
+docker tag prom/prometheus:latest dokku/prometheus:latest
+dokku tags:deploy prometheus latest
+```
+
+
+
+
+
+
+dokku network:report richardwillis
+dokku network:report prometheus
+
+
+docker run \
+    -p 9090:9090 \
+    -v /home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml \
+    -v /var/lib/dokku/data/storage/prometheus:/prometheus \
+    prom/prometheus

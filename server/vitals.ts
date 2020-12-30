@@ -15,7 +15,6 @@ export const vitalsHandler = (
       ttfbHistogram.observe(
         {
           path: vital.path,
-          method: req.method,
         },
         vital.metric.value
       );
