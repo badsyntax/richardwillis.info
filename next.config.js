@@ -1,25 +1,13 @@
-//@ts-check
-const {
-  CLIENT_STATIC_FILES_RUNTIME_MAIN,
-  CLIENT_STATIC_FILES_RUNTIME_WEBPACK,
-} = require('next/constants');
+const { ASSET_PREFIX, IS_PROD, APP_VERSION } = require('./config/config');
 
-const isProd = process.env.NODE_ENV === 'production';
-
-/**@type {import('next/dist/next-server/server/config').NextConfig}*/
 module.exports = {
-  assetPrefix: isProd ? 'https://assets.richardwillis.info' : '',
-  images: {
-    domains: ['assets.richardwillis.info'],
-  },
-  generateBuildId: async () => {
-    return process.env.APP_VERSION || 'unknown-app-version';
-  },
+  assetPrefix: ASSET_PREFIX,
+  generateBuildId: () => APP_VERSION,
   webpack(config, options) {
     const adjustCssModulesConfig = (use) => {
       if (use.loader.indexOf('css-loader') >= 0 && use.options.modules) {
         delete use.options.modules.getLocalIdent;
-        use.options.modules.localIdentName = isProd
+        use.options.modules.localIdentName = IS_PROD
           ? '[sha1:hash:hex:4]'
           : '[name]__[local]--[sha1:hash:hex:4]';
       }
