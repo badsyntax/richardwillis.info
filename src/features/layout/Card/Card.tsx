@@ -3,6 +3,7 @@ import classNames from 'classnames/bind';
 
 import { Link, LinkProps } from '../Link/Link';
 import { Typography, TypographyProps } from '../Typography/Typography';
+
 import STYLES from './Card.module.css';
 const classes = classNames.bind(STYLES);
 
@@ -35,7 +36,11 @@ export type CardType = React.FunctionComponent<CardProps> & {
 
 export const Card: CardType = ({ children, className, ...props }) => {
   return (
-    <Link className={classes('card', className)} variant="button" {...props}>
+    <Link
+      className={classes('card', className)}
+      variant="card-button"
+      {...props}
+    >
       {children}
     </Link>
   );

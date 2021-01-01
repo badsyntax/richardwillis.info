@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classNames from 'classnames/bind';
-import { MdClose, MdMenu } from 'react-icons/md';
 import { Link } from '../Link/Link';
 import { Nav } from '../Nav/Nav';
 import STYLES from './Header.module.css';

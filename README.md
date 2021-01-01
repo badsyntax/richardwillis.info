@@ -83,3 +83,37 @@ docker tag prom/prometheus:latest dokku/prometheus:latest
 dokku tags:deploy prometheus latest
 dokku
 ```
+
+## Setup staticman
+
+On your local machine:
+
+```shell
+cd staticman
+docker build -t ghcr.io/badsyntax/staticman:latest .
+echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin
+docker push ghcr.io/badsyntax/staticman:latest
+
+# Run locally
+ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman -q -N ""
+docker run --publish 3002:3000 -e "RSA_PRIVATE_KEY=$(cat ~/.ssh/staticman)" ghcr.io/badsyntax/staticman:latest
+```
+
+On the dokku server:
+
+```bash
+dokku apps:create staticman
+dokku proxy:ports-add staticman http:80:3000
+
+# Create the private key with an empty passphrase
+ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman -q -N ""
+dokku config:set --encoded --no-restart staticman RSA_PRIVATE_KEY="$(base64 ~/.ssh/staticman)"
+dokku config:set staticman --no-restart GITHUB_TOKEN=YOUR_GITHUB_TOKEN PORT=3000
+
+docker pull ghcr.io/badsyntax/staticman:latest
+docker tag ghcr.io/badsyntax/staticman:latest dokku/staticman:latest
+
+dokku domains:add staticman staticman.richardwillis.info
+dokku tags:deploy staticman latest
+dokku letsencrypt staticman
+```

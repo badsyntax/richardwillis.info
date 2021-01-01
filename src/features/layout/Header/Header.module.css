@@ -15,7 +15,8 @@
 .title {
   @apply flex
   flex-shrink-0
-  items-center text-2xl;
+  items-center text-2xl
+  no-underline;
 }
 
 .body {

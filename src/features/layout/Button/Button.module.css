@@ -1,4 +1,23 @@
-.root {
+.variant-default {
+  @apply bg-white
+    text-gray-700
+    font-medium
+    py-1
+    px-4
+    border
+    border-gray-400
+    rounded-lg
+    tracking-wide
+    hover:bg-gray-100;
+}
+
+.variant-default:disabled {
+  @apply text-gray-500
+    cursor-auto
+    hover:bg-white;
+}
+
+.variant-card {
   @apply text-2xl
     font-normal
     p-4
@@ -13,12 +32,12 @@
   transition-property: box-shadow, border-color;
 }
 
-.root:hover {
+.variant-card:hover {
   @apply border-gray-400
     shadow-md;
 }
 
-.root:active {
+.variant-card:active {
   @apply border-gray-400
     shadow-sm;
 }

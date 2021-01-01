@@ -1,0 +1,83 @@
+.form {
+  @apply mt-8;
+}
+
+.textarea-container {
+  @apply w-full
+    md:w-full
+    mb-3
+    mt-2;
+}
+
+.textarea {
+  @apply block
+    bg-gray-50
+    rounded
+    border
+    border-gray-200
+    leading-normal
+    w-full
+    h-20
+    py-2
+    px-3
+    resize-y
+    placeholder-gray-400
+    focus:outline-none
+    focus:bg-white;
+}
+
+.submit-container {
+  @apply flex
+    items-start
+    justify-between;
+}
+
+.heading {
+  @apply pt-3
+    pb-2
+    text-gray-800
+    font-medium
+    text-lg;
+}
+
+.info-container {
+  @apply flex
+    items-center
+    text-gray-700
+}
+
+.info-icon {
+  @apply w-5
+    h-5
+    text-gray-600
+    mr-1;
+}
+
+.info-message {
+  @apply text-xs
+    md:text-sm;
+}
+
+.footer {
+  @apply flex;
+}
+
+.button {
+  @apply mx-1 transition-opacity duration-200 ease-out;
+}
+
+.button:last-child {
+  @apply mr-0;
+}
+
+.button-hidden {
+  @apply opacity-0;
+}
+
+.preview {
+  @apply m-0;
+}
+
+.sr-hidden {
+  @apply hidden;
+}

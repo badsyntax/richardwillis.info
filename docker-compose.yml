@@ -19,3 +19,15 @@ services:
     image: grafana/grafana:latest
     ports:
       - 3001:3000
+  staticman:
+    container_name: 'staticman'
+    build: ./staticman/
+    ports:
+      - 3002:3000
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      GITHUB_TOKEN: #insert your GitHub token here
+      RSA_PRIVATE_KEY: |
+#        RSA private key to encrypt sensitive configuration parameters with.
+#        the correct format starts with "-----BEGIN RSA PRIVATE KEY-----"

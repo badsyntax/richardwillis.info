@@ -7,6 +7,15 @@ export interface OGImage {
   url: string;
 }
 
+export interface PostComment {
+  _id: string;
+  author: string;
+  date: number;
+  message: string;
+  slug: string;
+  messageHtml?: string;
+}
+
 export interface Post {
   slug: string;
   title: string;
@@ -15,5 +24,6 @@ export interface Post {
   content: string;
   excerpt: string;
   ogImage: OGImage;
-  draft?: boolean;
+  draft: boolean;
+  comments: PostComment[];
 }

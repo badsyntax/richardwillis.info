@@ -1,6 +1,7 @@
-import unified from 'unified';
+import React from 'react';
 import classNames from 'classnames/bind';
 import { MarkdownContent } from '../MarkdownContent/MarkdownContent';
+
 import STYLES from './PostBody.module.css';
 const classes = classNames.bind(STYLES);
 

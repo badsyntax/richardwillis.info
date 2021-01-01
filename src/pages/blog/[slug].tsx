@@ -8,12 +8,14 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (Array.isArray(params.slug)) {
     return null;
   }
+
   const post = getPostBySlug(params.slug, [
     'title',
     'date',
     'slug',
     'author',
     'content',
+    'comments',
     'ogImage',
   ]);
   const content = await markdownToHtml(post.content || '');

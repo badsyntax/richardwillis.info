@@ -1,12 +1,43 @@
 import fs from 'fs';
+import yaml from 'js-yaml';
 import { join } from 'path';
 import matter from 'gray-matter';
-import { Post } from './types';
+import { Post, PostComment } from './types';
+import { logger } from '../logger/logger';
+import { markdownToSimpleHtml } from '../markdown/markdownToSimpleHtml';
 
-const postsDirectory = join(process.cwd(), './blog');
+const postsDirectory = join(process.cwd(), 'blog');
+const commentsDirectory = join(postsDirectory, 'comments');
 
 export function getPostSlugs(): string[] {
-  return fs.readdirSync(postsDirectory);
+  return fs
+    .readdirSync(postsDirectory)
+    .filter(
+      (file: string) => !fs.lstatSync(join(postsDirectory, file)).isDirectory()
+    );
+}
+
+export function getComments(slug: string): PostComment[] {
+  const rootDir = join(commentsDirectory, slug);
+  const comments = fs
+    .readdirSync(rootDir)
+    .map<PostComment | null>((fileName: string) => {
+      const filePath = join(rootDir, fileName);
+      try {
+        return yaml.safeLoad(fs.readFileSync(filePath, 'utf8')) as PostComment;
+      } catch (e) {
+        logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
+        return null;
+      }
+    })
+    .filter((comment) => comment !== null)
+    .map((comment) => {
+      return {
+        ...comment,
+        messageHtml: markdownToSimpleHtml(comment.message),
+      };
+    });
+  return comments;
 }
 
 export function getPostBySlug(slug: string, fields = []): Post {
@@ -21,16 +52,18 @@ export function getPostBySlug(slug: string, fields = []): Post {
         return realSlug;
       case 'content':
         return content;
+      case 'comments':
+        return getComments(realSlug);
       default:
         return data[key];
     }
   };
 
   const items = fields.reduce(
-    (previousValue: Record<string, string>, currentValue: string) =>
-      Object.assign({}, previousValue, {
-        [currentValue]: getData(currentValue),
-      }),
+    (acc: Record<string, string>, field: string) => ({
+      ...acc,
+      [field]: getData(field),
+    }),
     {}
   );
 
