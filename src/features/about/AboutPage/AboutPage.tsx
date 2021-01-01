@@ -24,17 +24,14 @@ export const AboutPage: React.FunctionComponent = () => {
           . I'm a front-end leaning full-stack developer with more than 10 years
           of professional web development experience. I enjoy coding as a day
           job and as a hobby (check out my{' '}
-          <Link href="/projects">open-source projects</Link>). I also find
-          programming to be rather frustrating at times but it's really
-          satisfying building something that's useful and works well and I guess
-          I like to chase that feeling. When not coding I enjoy being outdoors
-          and love hiking and cycling. Sometimes I do a bit of indoor bouldering
-          too.
+          <Link href="/projects">open-source projects</Link>).
         </p>
         <p>
-          I grew up in South Africa before moving to London for a few years, and
-          then to Barcelona for a few years. Recently I moved back to the UK, to
-          beautiful rural North Yorkshire, which is where I'm currently based.
+          When not coding I enjoy being outdoors and love hiking and cycling.
+          Sometimes I do a bit of indoor bouldering too. I grew up in South
+          Africa before moving to London, then Barcelona. I recently moved back
+          to the UK and am currently residing in beautiful rural North
+          Yorkshire.
         </p>
         {/* <h2>Professional Experience</h2>
         <p>

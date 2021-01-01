@@ -56,7 +56,7 @@ dokku letsencrypt richardwillis
 dokku domains:add richardwillis richardwillis.info
 ```
 
-## Setting up Prometheus with dokku
+## Set up Prometheus with dokku
 
 ```bash
 dokku apps:create prometheus

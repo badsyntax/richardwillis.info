@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "npm run build:server && npm start",
-    "build:server": "tsc -p src/server",
+    "build:server": "tsc -p src/server --outDir build",
     "build": "npm run build:server && next build",
-    "start": "node server",
+    "start": "node build/server",
     "lint": "npm run lint:prettier && npm run lint:eslint",
     "lint:fix": "npm run lint:fix:prettier && npm run lint:eslint -- --fix",
     "lint:prettier": "prettier --check \"**/*.{js,json,svg,md,yml}\"",

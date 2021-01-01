@@ -26,7 +26,7 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({
   return (
     <PageShell
       preview={preview}
-      title={`Blog - ${post.title}`}
+      title={`${post.title} - Blog`}
       description={post.excerpt}
     >
       {router.isFallback ? (

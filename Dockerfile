@@ -49,7 +49,7 @@ COPY --from=builder --chown=node:node $APP_HOME/node_modules $APP_HOME/node_modu
 COPY --from=builder --chown=node:node $APP_HOME/.next $APP_HOME/.next
 COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.config.js
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
-COPY --from=builder --chown=node:node $APP_HOME/server $APP_HOME/server
+COPY --from=builder --chown=node:node $APP_HOME/build $APP_HOME/build
 COPY --from=builder --chown=node:node $APP_HOME/config $APP_HOME/config
 COPY --from=builder --chown=node:node $APP_HOME/app.json $APP_HOME/app.json
 
