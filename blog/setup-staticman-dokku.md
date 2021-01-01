@@ -42,8 +42,6 @@ dokku proxy:ports-remove staticman http:3000:3000
 
 GITHUB_TOKEN
 
-
-
 ```dockerfile
 FROM node:14.15.3-alpine as builder
 

@@ -18,10 +18,6 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
   ...props
 }) => {
   return (
-    <button
-      type="submit"
-      className={classes(`variant-${variant}`, className)}
-      {...props}
-    />
+    <button className={classes(`variant-${variant}`, className)} {...props} />
   );
 };

@@ -62,7 +62,8 @@
   "eslintConfig": {
     "ignorePatterns": [
       "**/*.js",
-      ".next"
+      ".next",
+      "build"
     ],
     "extends": [
       "eslint:recommended",
