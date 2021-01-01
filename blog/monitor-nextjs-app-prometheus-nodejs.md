@@ -22,13 +22,19 @@ Grafana is a useful tool for visualising and alerting on metrics.
 
 We'll use these 2 tools to create a monitoring platform on a dokku server, and start to monitor our Next application metrics.
 
+## Preparing your server
+
+Adding a monitoring solution to your dokku server increases the required resources. You'll need more RAM and CPU. I settled on 4vCPU's and 8GB RAM hosted with Hetzner.
+
 ## Setting up dokku
 
-We'll be running 3 different dokku apps:
+We'll be running 5 different dokku apps:
 
-- Application container exposing metrics at `next-app:3000/metrics`
-- Prometheus container that can read `next-app:3000/metrics`
-- Grafana container that can read prometheus at `prometheus:9090`
+- Application container (`next-app`)
+- Node-exporter container (`node-advisor`)
+- cAdvistor container (`cadvisor`)
+- Prometheus container (`prometheus`) that can read metrics from `next-app`, `node-advisor` & `cadvisor`
+- Grafana container (`grafana`) that can read `prometheus`
 
 We'll be using a private docker network for cross-container communication.
 
@@ -58,6 +64,8 @@ services:
 
 </details>
 
+See: https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
+
 ### Setting up Prometheus with dokku
 
 Create the prometheus dokku app and set the ports:
@@ -71,10 +79,18 @@ dokku proxy:ports-remove prometheus http:9090:9090
 Set the volume mounts for persistent storage:
 
 ```bash
-mkdir -p /var/lib/dokku/data/storage/prometheus
-chown nobody /var/lib/dokku/data/storage/prometheus
-dokku storage:mount prometheus "/var/lib/dokku/data/storage/prometheus:/prometheus"
-dokku storage:mount prometheus "/home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+# mkdir -p /var/lib/dokku/data/storage/prometheus
+# chown -R nobody:nogroup /var/lib/dokku/data/storage/prometheus
+
+dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/config:/etc/prometheus
+dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/data:/prometheus
+mkdir -p /var/lib/dokku/data/storage/prometheus/{config,data}
+touch /var/lib/dokku/data/storage/prometheus/config/{alert.rules,prometheus.yml}
+chown -R nobody:nogroup /var/lib/dokku/data/storage/prometheus
+
+# old
+# dokku storage:mount prometheus "/var/lib/dokku/data/storage/prometheus:/prometheus"
+# dokku storage:mount prometheus "/home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
 ```
 
 Set the docker command to set tsdb config (to prevent a lockfile being saved to allow us to re-deploy without errors):
@@ -84,12 +100,13 @@ dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prome
   --storage.tsdb.path=/prometheus
   --web.console.libraries=/usr/share/prometheus/console_libraries
   --web.console.templates=/usr/share/prometheus/consoles
+  --web.enable-lifecycle
   --storage.tsdb.no-lockfile"
 ```
 
 We want to link prometheus to specific apps to allow it to scape app metrics. By default dokku apps can't communicate with each other but we can achieve this using docker networking. You can create a new bridge network and attach containers to that network.
 
-So we'll create a new network called `prometheus-bridge` and attach our apps to that network. This results in all containers in this network being able to communicate with each other, which is not what we want, but I don't yet know how to link containers correctly without using (`--link`). (*I will update this blog post when I figure this out, as it seems the service plugins (eg `dokku-postgres`) achieve this without using docker networking.*)
+So we'll create a new network called `prometheus-bridge` and attach our apps to that network. This results in all containers in this network being able to communicate with each other, which is not what we want, but I don't yet know how to link containers correctly without using (`--link`). (_I will update this blog post when I figure this out, as it seems the service plugins (eg `dokku-postgres`) achieve this without using docker networking._)
 
 Create the bridge network and attach the prometheus app to it:
 
@@ -98,7 +115,10 @@ dokku network:create prometheus-bridge
 dokku network:set prometheus attach-post-deploy prometheus-bridge
 ```
 
-Create the prometheus configuration file at location `/home/dokku/prometheus/prometheus.yml`:
+Create the prometheus configuration file at location `/var/lib/dokku/data/storage/prometheus/config/prometheus.yml`:
+
+<!-- # old -->
+<!-- Create the prometheus configuration file at location `/home/dokku/prometheus/prometheus.yml`: -->
 
 ```yaml
 global:
@@ -109,8 +129,26 @@ scrape_configs:
     scrape_interval: 15s
     static_configs:
       - targets: ['localhost:9090']
+  - job_name: node-exporter
+    scrape_interval: 15s
+    scheme: https
+    basic_auth:
+      username: <supersecret>
+      password: <supersecret>
+    static_configs:
+      - targets:
+          - 'node-exporter.dokku.me'
+  - job_name: cadvisor
+    scrape_interval: 15s
+    scheme: https
+    basic_auth:
+      username: <supersecret>
+      password: <supersecret>
+    static_configs:
+      - targets:
+          - 'cadvisor.dokku.me'
   - job_name: 'next-app-nodejs'
-    scrape_interval: 30s
+    scrape_interval: 15s
     metrics_path: '/metrics'
     static_configs:
       - targets: ['next-app.web:3000']
@@ -166,6 +204,55 @@ dokku letsencrypt grafana
 TODO: grafana config eg smtp
 
 https://medium.com/better-programming/node-js-application-monitoring-with-prometheus-and-grafana-b08deaf0efe3
+https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
+
+### Setting up Node-exporter
+
+Node exporter provides metrics about the host machine.
+
+```bash
+dokku apps:create node-exporter
+
+docker image pull prom/node-exporter:latest
+docker image tag prom/node-exporter:latest dokku/node-exporter:latest
+
+dokku config:set node-exporter DOKKU_DOCKERFILE_START_CMD="--collector.textfile.directory=/data --path.procfs=/host/proc --path.sysfs=/host/sys"
+
+dokku storage:mount node-exporter /proc:/host/proc:ro
+dokku storage:mount node-exporter /:/rootfs:ro
+dokku storage:mount node-exporter /sys:/host/sys:ro
+dokku storage:mount node-exporter /var/lib/dokku/data/storage/node-exporter:/data
+
+mkdir -p /var/lib/dokku/data/storage/node-exporter
+chown nobody:nogroup /var/lib/dokku/data/storage/node-exporter
+
+dokku docker-options:add node-exporter deploy "--net=host"
+dokku checks:disable node-exporter
+
+dokku tags:deploy node-exporter latest
+dokku proxy:ports-set node-exporter http:80:9100
+dokku letsencrypt node-exporter
+dokku http-auth:on node-exporter <username> <password>
+```
+
+### Setting up cAdvisor
+
+dokku apps:create cadvisor
+
+docker image pull gcr.io/google-containers/cadvisor:latest
+docker image tag gcr.io/google-containers/cadvisor:latest dokku/cadvisor:latest
+
+dokku config:set cadvisor DOKKU_DOCKERFILE_START_CMD="--docker_only --housekeeping_interval=10s --max_housekeeping_interval=60s"
+
+dokku storage:mount cadvisor /:/rootfs:ro
+dokku storage:mount cadvisor /sys:/sys:ro
+dokku storage:mount cadvisor /var/lib/docker:/var/lib/docker:ro
+dokku storage:mount cadvisor /var/run:/var/run:rw
+
+dokku tags:deploy cadvisor latest
+dokku proxy:ports-set cadvisor http:80:8080
+dokku letsencrypt cadvisor
+dokku http-auth:on cadvisor <username> <password>
 
 #### Adding the Prometheus data source
 

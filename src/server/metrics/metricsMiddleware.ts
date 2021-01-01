@@ -20,13 +20,17 @@ export function withRouteMetrics(
     const parsedUrl = parse(req.url, true);
     const { pathname } = parsedUrl;
     const shouldRecordMetrics = !denyMetricsRoutes.some((denyRoute) =>
-      pathname.startsWith(denyRoute)
+      pathname?.startsWith(denyRoute)
     );
     if (shouldRecordMetrics) {
       const end = httpRequestDurationMicroseconds.startTimer();
       res.on('finish', () => {
         if (res.statusCode === 200) {
-          end({ path: pathname, code: res.statusCode, method: req.method });
+          end({
+            path: pathname || undefined,
+            code: res.statusCode,
+            method: req.method,
+          });
         }
       });
     }
