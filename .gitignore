@@ -33,8 +33,5 @@ yarn-error.log*
 # vercel
 .vercel
 
-# compiled files
-/server/**/*.js
-/features/**/*.js
-/config/**/*.js
-/types/**/*.js
+# compiled typescript files
+/src/**/*.js

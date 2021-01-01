@@ -114,26 +114,23 @@ Notes:
 
 I'm not really happy with the final image size (+-300mb) but there's not much I can do about that it's mostly due to app dependencies within `node_modules`.
 
-## Deploying the dokku App manually
+## Create & Deploy the dokku App
 
-First build and run the app locally:
+First build the app image locally, setting `ASSET_PREFIX=/` to serve assets from the app instead of S3.
 
 ```bash
 docker build -t ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest --build-arg ASSET_PREFIX=/ .
+```
+
+Run the app locally to test everything works as expected:
+
+```bash
 docker run --publish 3000:3000 ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest
 ```
 
-Note we're passing `ASSET_PREFIX=/` as a build arg to serve assets from the app instead of S3.
-
-Once you're happy with the app, you'll need to rebuild without the `ASSET_PREFIX=/` build arg:
+Publish the image to GitHub container registry:
 
 ```bash
-docker build -t ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest .
-```
-
-Now publish the image to GitHub container registry:
-
-```shell-session
 echo $CR_PAT | docker login ghcr.io -u GITHUB_USER --password-stdin
 docker build -t ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest .
 docker push ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest
@@ -141,7 +138,7 @@ docker push ghcr.io/GITHUB_USER/DOKKU_APP_NAME:latest
 
 On your dokku server:
 
-```shell-session
+```bash
 # create the app
 dokku apps:create DOKKU_APP_NAME
 dokku proxy:ports-add DOKKU_APP_NAME http:80:3000
@@ -158,7 +155,13 @@ dokku domains:add DOKKU_APP_NAME example.com
 dokku letsencrypt DOKKU_APP_NAME
 ```
 
-## Deploying the App with CI/CD
+## Set up S3 & CloudFront
+
+An S3 bucket is required to host all static assets for all app versions.
+
+Refer to [Set up CloudFront & S3](/blog/setup-s3-cloudfront-cdn) to set this up.
+
+## Continuous deployment with GitHub Actions
 
 We'll use GitHub Actions to:
 
@@ -166,13 +169,7 @@ We'll use GitHub Actions to:
 2. Extract the static assets from the docker image and publish them to S3
 3. Deploy the app to dokku using GitHub Actions
 
-### Setting up S3 & CloudFront
-
-An S3 bucket is required to host all static assets for all app versions.
-
-Refer to [Set up CloudFront & S3](/blog/setup-s3-cloudfront-cdn) to set this up.
-
-### Setting up Remote Dokku access
+### Set up Remote Dokku access
 
 You'll need a SSH keypair created (without a passphrase) to allow the GitHub Action runner to SSH to the dokku server.
 
@@ -206,9 +203,15 @@ You'll need to set the following secrets in your Github repo:
 - `DOKKU_HOST`
 - `DOKKU_SSH_PRIVATE_KEY`
 
-### Workflow
+### Workflows
 
-The following workflow file demonstrates how to release the app when creating a new GitHub Release:
+#### Release drafter
+
+I use [release drafter](https://github.com/release-drafter/release-drafter) to automatically draft new releases and bump versions and I find it really useful. I suggest setting it up on your project.
+
+#### Publish
+
+The following workflow file demonstrates how to release the app when creating a new GitHub Release. Place this file in location `.github/workflows/publish.yml`:
 
 ```yaml
 name: Publish
@@ -304,3 +307,10 @@ Notes:
 
 - Static assets are copied out of the docker image as the file hashes don't match when building in different OS environments (even when setting the Next.js build ID).
 - `APP_VERSION` is used as the build ID and is set from the GitHub Release tag value
+
+### Release Workflow
+
+- Add new features with pull requests
+- Release drafter will drafter new releases based on merged pull requests, as well as bump the next release version
+- When happy to release, simply publish the latest draft release
+- This will trigger the publish workflow and the app will be deployed using the release tag version

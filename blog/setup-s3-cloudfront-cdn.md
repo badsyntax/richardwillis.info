@@ -22,7 +22,7 @@ This posts outlines how to:
 - Compression is handled automatically by the CDN
 - File serving is offloaded from the runtime application server allowing it to focus solely on request/runtime computations
 
-## Setting up CloudFront & S3
+## Set up CloudFront & S3
 
 Setting up a basic Cloudfront distribution and S3 bucket is fairly straightforward, but the complexity lies in setting the correct response headers.
 

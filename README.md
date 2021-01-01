@@ -38,7 +38,7 @@ First build & push the docker image:
 
 ```bash
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin
-docker build -t ghcr.io/badsyntax/richardwillis:latest .
+docker build -t ghcr.io/badsyntax/richardwillis:latest --build-arg ASSET_PREFIX=/ .
 docker push ghcr.io/badsyntax/richardwillis:latest
 ```
 
@@ -56,7 +56,7 @@ dokku letsencrypt richardwillis
 dokku domains:add richardwillis richardwillis.info
 ```
 
-## Setting up Prometheus with dokku
+## Set up Prometheus with dokku
 
 ```bash
 dokku apps:create prometheus

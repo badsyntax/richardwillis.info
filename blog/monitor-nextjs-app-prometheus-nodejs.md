@@ -10,23 +10,278 @@ ogImage:
 draft: true
 ---
 
-Monitoring service health is important for ensuring uptime and discovering bugs early. There are various tools to help achieve this, but at a high level you want to:
+Monitoring service health is important for ensuring uptime and discovering bugs early. At a high level you want to:
 
 - Store metrics in a time series database
 - Visualise those metrics
-- Alter on those metrics
+- Alert on those metrics
 
-Prometheus is a monitoring and alerting toolkit and provides time series database and features to scrape (pull) metrics from applications.
+There are various tools to help achieve this but Prometheus & Grafana are a good fit and a popular setup.
 
-Grafana is a useful tool for visualising and alerting on metrics.
+- Prometheus is a monitoring and alerting toolkit and provides time series database and features to scrape (pull) metrics from applications.
+- Grafana is a useful tool for visualising and alerting on metrics.
 
-We'll use these tools to create a monitoring platform on a dokku server, and start to monitor our Next application metrics.
+We'll use these 2 tools to create a monitoring & alerting platform on a dokku server, then setup our Next.js application to provide both runtime Node.js and Browser metrics. These metrics will ultimately allow us to identify performance issues & fine-tune our Next.js app so it runs well.
 
-## Back-end Metrics
+Adding a monitoring solution to your dokku server increases the required resources. Once all the tools are setup you'll be able to have metrics to identify whether you need to add more server resources to accommodate the monitoring solution. I settled on 4vCPU's and 8GB RAM hosted with Hetzner.
 
-It's important to gather back-end metrics to monitor app health and optimise the runtime environment.
+## Set up dokku
 
-### Goals
+We'll be running 5 different dokku apps:
+
+- Next.js application container (`next-app`) - provides application metrics
+- Node-exporter container (`node-advisor`) - provides metrics about the host machine
+- cAdvisor container (`cadvisor`) - provides metrics about running containers
+- Prometheus container (`prometheus`) - read & index metrics from `next-app`, `node-advisor` & `cadvisor`
+- Grafana container (`grafana`) - read & graph time series data from `prometheus`
+
+Make sure you've already [setup and deployed your Next.js app](/blog/deploy-nextjs-dokku-s3-cloudfront) to your dokku server.
+
+Public endpoints are secured with `http-auth` and `tls` so you'll need to make sure you have the relevant plugins installed:
+
+```bash
+dokku plugin:install https://github.com/dokku/dokku-http-auth.git
+dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+```
+
+<!--
+<details><summary>Here's how you can achieve the above with `docker-compose`.</summary>
+
+```yaml
+version: '3'
+services:
+  nextapp:
+    container_name: 'next-app.web'
+    build: ./
+    ports:
+      - 3000:3000
+  prometheus:
+    container_name: 'prometheus.web'
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+  grafana:
+    container_name: 'grafana.web'
+    image: grafana/grafana:latest
+    ports:
+      - 3001:3000
+```
+
+</details> -->
+
+See: https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
+
+### Set up Prometheus
+
+Create the prometheus dokku app and set the ports:
+
+```bash
+dokku apps:create prometheus
+dokku proxy:ports-add prometheus http:80:9090
+dokku proxy:ports-remove prometheus http:9090:9090
+```
+
+Set the volume mounts for persistent storage:
+
+```bash
+dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/config:/etc/prometheus
+dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/data:/prometheus
+mkdir -p /var/lib/dokku/data/storage/prometheus/{config,data}
+touch /var/lib/dokku/data/storage/prometheus/config/{alert.rules,prometheus.yml}
+chown -R nobody:nogroup /var/lib/dokku/data/storage/prometheus
+```
+
+Set the docker command to set tsdb config (to prevent a lockfile being saved to allow us to re-deploy without errors):
+
+```bash
+dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
+  --storage.tsdb.path=/prometheus
+  --web.console.libraries=/usr/share/prometheus/console_libraries
+  --web.console.templates=/usr/share/prometheus/consoles
+  --web.enable-lifecycle
+  --storage.tsdb.no-lockfile"
+```
+
+#### Prometheus Networking
+
+Prometheus needs access to the apps in order to scrape metrics and by default dokku apps can't communicate with each other, but you can achieve this with either docker networking or via public endpoints.
+
+If you want prometheus to connect to apps on the local network, you can create a new bridge network and attach `prometheus` and other apps to that network:
+
+```bash
+dokku network:create prometheus-bridge
+dokku network:set prometheus attach-post-deploy prometheus-bridge
+dokku network:set next-app attach-post-deploy prometheus-bridge
+
+# These hostnames will be available to both apps: next-app.web, prometheus.web
+```
+
+If you want prometheus to connect to public endpoints you should ensure the endpoints are secured with `http-auth`.
+
+#### Prometheus Config
+
+The following example shows how to use both local and public app hostnames.
+
+You'll need to create the prometheus configuration file at location `/var/lib/dokku/data/storage/prometheus/config/prometheus.yml`.
+
+<!-- # old -->
+<!-- Create the prometheus configuration file at location `/home/dokku/prometheus/prometheus.yml`: -->
+
+```yaml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: node-exporter
+    scrape_interval: 15s
+    scheme: https
+    basic_auth:
+      username: <supersecret>
+      password: <supersecret>
+    static_configs:
+      - targets:
+          - 'node-exporter.dokku.me'
+  - job_name: cadvisor
+    scrape_interval: 15s
+    scheme: https
+    basic_auth:
+      username: <supersecret>
+      password: <supersecret>
+    static_configs:
+      - targets:
+          - 'cadvisor.dokku.me'
+  - job_name: 'next-app'
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+          - 'next-app.web:3000'
+```
+
+Deploy the prometheus app and secure it with `http-auth`:
+
+```shell-session
+docker pull prom/prometheus:latest
+docker tag prom/prometheus:latest dokku/prometheus:latest
+dokku tags:deploy prometheus latest
+
+dokku letsencrypt prometheus
+dokku http-auth:on prometheus USER PASSWORD
+```
+
+Once the prometheus app is deployed visit [https://prometheus.dokku.me/targets](https://prometheus.dokku.me/targets) to confirm prometheus can connect to localhost, but other targets should all be down.
+
+### Set up Node-exporter
+
+Node exporter provides metrics about the host machine.
+
+```bash
+dokku apps:create node-exporter
+
+docker image pull prom/node-exporter:latest
+docker image tag prom/node-exporter:latest dokku/node-exporter:latest
+
+dokku config:set node-exporter DOKKU_DOCKERFILE_START_CMD="--collector.textfile.directory=/data --path.procfs=/host/proc --path.sysfs=/host/sys"
+
+dokku storage:mount node-exporter /proc:/host/proc:ro
+dokku storage:mount node-exporter /:/rootfs:ro
+dokku storage:mount node-exporter /sys:/host/sys:ro
+dokku storage:mount node-exporter /var/lib/dokku/data/storage/node-exporter:/data
+
+mkdir -p /var/lib/dokku/data/storage/node-exporter
+chown nobody:nogroup /var/lib/dokku/data/storage/node-exporter
+
+dokku docker-options:add node-exporter deploy "--net=host"
+dokku checks:disable node-exporter
+
+dokku tags:deploy node-exporter latest
+dokku proxy:ports-set node-exporter http:80:9100
+dokku letsencrypt node-exporter
+dokku http-auth:on node-exporter <username> <password>
+```
+
+### Set up cAdvisor
+
+```bash
+dokku apps:create cadvisor
+
+docker image pull gcr.io/google-containers/cadvisor:latest
+docker image tag gcr.io/google-containers/cadvisor:latest dokku/cadvisor:latest
+
+dokku config:set cadvisor DOKKU_DOCKERFILE_START_CMD="--docker_only --housekeeping_interval=10s --max_housekeeping_interval=60s"
+
+dokku storage:mount cadvisor /:/rootfs:ro
+dokku storage:mount cadvisor /sys:/sys:ro
+dokku storage:mount cadvisor /var/lib/docker:/var/lib/docker:ro
+dokku storage:mount cadvisor /var/run:/var/run:rw
+
+dokku tags:deploy cadvisor latest
+dokku proxy:ports-set cadvisor http:80:8080
+dokku letsencrypt cadvisor
+dokku http-auth:on cadvisor <username> <password>
+```
+
+### Set up Grafana
+
+Create the dokku app and set the ports:
+
+```shell-session
+dokku apps:create grafana
+dokku proxy:ports-add grafana http:80:3000
+dokku proxy:ports-remove grafana http:3000:3000
+```
+
+Set the volume mounts for persistent storage:
+
+```shell-session
+mkdir -p /var/lib/dokku/data/storage/grafana
+chown 472:472 /var/lib/dokku/data/storage/grafana
+dokku storage:mount grafana "/var/lib/dokku/data/storage/grafana:/var/lib/grafana"
+```
+
+If using a private network, add Grafana to the `prometheus-bridge` network:
+
+```bash
+dokku network:set grafana attach-post-deploy prometheus-bridge
+```
+
+Deploy Grafana:
+
+```shell-session
+docker pull grafana/grafana:latest
+docker tag grafana/grafana:latest dokku/grafana:latest
+dokku tags:deploy grafana latest
+dokku letsencrypt grafana
+```
+
+TODO: grafana config eg smtp
+
+https://medium.com/better-programming/node-js-application-monitoring-with-prometheus-and-grafana-b08deaf0efe3
+https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
+
+#### Add the Prometheus data source
+
+Head on over to `http://grafana.dokku.me` and add the prometheus data source (eg `http://prometheus.web:9090` or `https://prometheus.dokke.me` depending on your network setup).
+
+## Recording App Metrics
+
+We'll be recording both back-end and front-end metrics.
+
+Before continuing, ensure you've deployed your app, then add it to the `prometheus-bridge` network:
+
+```bash
+dokku network:set next-app attach-post-deploy prometheus-bridge
+```
+
+### Back-end Metrics
+
+Goals:
 
 - The server should provide a prometheus compatible endpoint (`/metrics`) that provides metrics of the running Node.js app
 - Metrics should include useful Node.js metrics like event loop lag, memory usage etc
@@ -83,11 +338,13 @@ And here's the Prometheus client:
 
 ```ts
 import client from 'prom-client';
+import { APP_VERSION } from '../../config/config';
 
 export const registry = new client.Registry();
 
 registry.setDefaultLabels({
   app: 'example-nodejs-app',
+  version: APP_VERSION,
 });
 
 client.collectDefaultMetrics({ register: registry });
@@ -101,188 +358,45 @@ export const httpRequestDurationMicroseconds = new client.Histogram({
 registry.registerMetric(httpRequestDurationMicroseconds);
 ```
 
-Create a custom `tsconfig` for the server:
+The server is written in TypeScript and is not part of the Next.js build, so we need a new build setup for compiling the server.
+
+Install a base tsconfig for Node 14:
+
+```bash
+npm i @tsconfig/node14 --save-dev
+```
+
+Create a new directory called `server` and create a new file at `server/tsconfig.json` with:
 
 ```json
 {
-  "extends": "./tsconfig.json",
+  "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
     "isolatedModules": false,
     "noEmit": false
   },
-  "include": ["./server.ts"]
+  "include": ["**/*.ts"]
 }
 ```
 
-Adjust your `npm` run scripts in `package.json`:
+(Placing the `tsconfig.json` in a nested folder provides better compatibility for IDE intellisense, and this approach works well in VS Code.)
+
+Adjust your `npm` run scripts in `package.json` to compile the server and adjust the start script:
 
 ```json
 {
   "scripts": {
     "dev": "npm run build:server && npm start",
-    "build:server": "tsc --project tsconfig.server.json",
+    "build:server": "tsc -p server --outDir build",
     "build": "npm run build:server && next build",
-    "start": "node server"
+    "start": "node build/server"
   }
 }
 ```
 
 After running `npm run dev` you should see metrics available at [http://localhost:3000/metrics](http://localhost:3000/metrics).
-
-## Setting up dokku
-
-We'll be running 3 different dokku apps:
-
-- Application container exposing metrics at `next-app:3000/metrics`
-- Prometheus container that can read `next-app:3000/metrics`
-- Grafana container that can read prometheus at `prometheus:9090`
-
-We want to prevent public access of the app metrics endpoints, prometheus & grafana so we'll be using private local hostnames for inter-container communication.
-
-I attempted to do this with [dokku networking](http://dokku.viewdocs.io/dokku/networking/network/) but discovered this is not really helpful when you want a container to connect to multiple networks. So I decided to use the legacy docker `--link` feature as it's a whole lot more convenient. Perhaps someday I'll better understand how to do docker networking properly.
-
-<details><summary>Here's how you can achieve the above with `docker-compose`.</summary>
-
-```yaml
-version: '3'
-services:
-  nextapp:
-    container_name: 'next-app'
-    build: ./
-    ports:
-      - 3000:3000
-  prometheus:
-    container_name: 'prometheus'
-    image: prom/prometheus
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
-  grafana:
-    container_name: 'grafana'
-    image: grafana/grafana:latest
-    ports:
-      - 3001:3000
-```
-
-## Setting up Prometheus with dokku
-
-Create the prometheus dokku app and set the ports:
-
-```bash
-dokku apps:create prometheus
-dokku proxy:ports-add prometheus http:80:9090
-dokku proxy:ports-remove prometheus http:9090:9090
-```
-
-Set the volume mounts for persistent storage:
-
-```bash
-mkdir -p /var/lib/dokku/data/storage/prometheus
-chown nobody /var/lib/dokku/data/storage/prometheus
-dokku storage:mount prometheus "/var/lib/dokku/data/storage/prometheus:/prometheus"
-dokku storage:mount prometheus "/home/dokku/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
-```
-
-Set the docker command to set tsdb config (to prevent a lockfile being saved):
-
-```bash
-dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
-  --storage.tsdb.path=/prometheus
-  --web.console.libraries=/usr/share/prometheus/console_libraries
-  --web.console.templates=/usr/share/prometheus/consoles
-  --storage.tsdb.no-lockfile"
-```
-
-We want to link prometheus to specific apps to allow it to scape app metrics. By default dokku apps can't communicate with each other but we can achieve this using docker networking. You can create a new bridge network and attach containers to that network.
-
-So we'll create a new network called `prometheus-bridge` and attach our apps to that network. This results in all containers in this network being able to communicate with each other, which is not what we want, but I don't yet know how to link containers correctly without using (`--link`). I will update this blog post when I figure this out, as it seems like the service plugins (eg dokku-postgres) achieve this without using docker networking.
-
-Create the bridge network and attach the apps to it:
-
-```bash
-dokku network:create prometheus-bridge
-dokku network:set prometheus attach-post-deploy prometheus-bridge
-dokku network:set next-app attach-post-deploy prometheus-bridge
-dokku network:set grafana attach-post-deploy prometheus-bridge
-```
-
-Create the prometheus configuration file at location `/home/dokku/prometheus/prometheus.yml`:
-
-```yaml
-global:
-  scrape_interval: 15s
-
-scrape_configs:
-  - job_name: 'prometheus'
-    scrape_interval: 15s
-    static_configs:
-      - targets: ['localhost:9090']
-  - job_name: 'next-app-nodejs'
-    scrape_interval: 30s
-    metrics_path: '/metrics'
-    static_configs:
-      - targets: ['next-app.web:3000']
-```
-
-Deploy the prometheus app:
-
-```shell-session
-docker pull prom/prometheus:latest
-docker tag prom/prometheus:latest dokku/prometheus:latest
-dokku tags:deploy prometheus latest
-
-dokku letsencrypt prometheus
-dokku plugin:install https://github.com/dokku/dokku-http-auth.git
-dokku http-auth:on prometheus USER PASSWORD
-```
-
-Once the prometheus app is deployed visit [https://prometheus.dokku.me/targets](https://prometheus.dokku.me/targets) to confirm prometheus can connect to your Next app.
-
-## Setting up Grafana
-
-Create the dokku app and set the ports:
-
-```shell-session
-dokku apps:create grafana
-dokku proxy:ports-add grafana http:80:3000
-dokku proxy:ports-remove grafana http:3000:3000
-```
-
-Set the volume mounts for persistent storage:
-
-```shell-session
-mkdir -p /var/lib/dokku/data/storage/grafana
-chown 472:472 /var/lib/dokku/data/storage/grafana
-dokku storage:mount grafana "/var/lib/dokku/data/storage/grafana:/var/lib/grafana"
-```
-
-Link Grafana to Prometheus:
-
-```shell-session
-dokku docker-options:add grafana build,deploy,run "--link prometheus.web.1:prometheus"
-```
-
-Deploy Grafana:
-
-```shell-session
-docker pull grafana/grafana:latest
-docker tag grafana/grafana:latest dokku/grafana:latest
-dokku tags:deploy grafana latest
-dokku letsencrypt grafana
-```
-
-### Adding the Prometheus data source
-
-Head on over to `http://grafana.dokku.me` and add the prometheus data source at `http://prometheus:9090`.
-
-### Import Dashboards
-
-Import the following dashboards:
-
-- [Prometheus internal metrics](https://grafana.com/grafana/dashboards/3662)
 
 ## Front-end Metrics
 
@@ -314,13 +428,11 @@ export function reportWebVitals(metric) {
 }
 ```
 
-We'll use this technique to publish performance metrics to Prometheus.
-
-First we'll need to create an endpoint (`/vitals`) to process metrics sent from the client.
+We'll use this technique to publish performance metrics to Prometheus and we'll need to create an endpoint (`/vitals`) to process metrics sent from the client.
 
 ### Create the vitals endpoint
 
-First register a new metrics provider with your prometheus client:
+Register a new metrics provider with your prometheus client:
 
 ```ts
 export const ttfbHistogram = new client.Histogram({
@@ -332,7 +444,7 @@ export const ttfbHistogram = new client.Histogram({
 registry.registerMetric(ttfbHistogram);
 ```
 
-Now create the `/vitals` endpoint to record the metric:
+Create the `/vitals` endpoint to record the metric:
 
 ```ts
 import { Request, Response } from 'express';
@@ -364,7 +476,13 @@ export const vitalsHandler = (
 };
 ```
 
-## Adding Deploy Annotations to Grafana
+## Grafana Dashboards
+
+Import the following dashboards:
+
+- [Prometheus internal metrics](https://grafana.com/grafana/dashboards/3662)
+
+## Add Deploy Annotations to Grafana
 
 We can use dokku [deployment tasks](http://dokku.viewdocs.io/dokku~v0.22.4/advanced-usage/deployment-tasks/) to record a deployment with Grafana each time the app is deployed, and display that deployment as an annotation on your Grafana graphs. This is useful to understand if metrics changes as a result of a new deployment.
 
@@ -381,3 +499,5 @@ If using a Dockerfile for deployment, we'll need to place an `app.json` within t
 ```
 
 (Also don't forget to add this file to your docker image with `COPY` or `ADD`!)
+
+https://frederic-hemberger.de/notes/grafana/annotate-dashboards-with-deployments/

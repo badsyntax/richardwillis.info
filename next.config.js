@@ -1,4 +1,4 @@
-const { ASSET_PREFIX, IS_PROD, APP_VERSION } = require('./config/config');
+const { ASSET_PREFIX, IS_PROD, APP_VERSION } = require('./build/config/config');
 
 module.exports = {
   assetPrefix: ASSET_PREFIX,
