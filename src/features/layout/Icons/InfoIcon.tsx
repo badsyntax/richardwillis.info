@@ -1,8 +1,8 @@
 import React from 'react';
 
 export type InfoIconProps = React.DetailedHTMLProps<
-  React.HTMLAttributes<SVGElement>,
-  SVGElement
+  React.HTMLAttributes<SVGSVGElement>,
+  SVGSVGElement
 >;
 
 export const InfoIcon: React.FunctionComponent<InfoIconProps> = (props) => (
