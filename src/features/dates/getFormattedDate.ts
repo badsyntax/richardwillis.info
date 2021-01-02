@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import { LOCALE } from '../../config/config';
+import config from '../../config/config';
+
+const { locale } = config;
 
 export function getFormattedDate(
   date: Date,
   options: Intl.DateTimeFormatOptions
 ): string {
-  return new Intl.DateTimeFormat(LOCALE, options).format(date);
+  return new Intl.DateTimeFormat(locale, options).format(date);
 }
 
 export function getFormattedDateLong(date: Date): string {

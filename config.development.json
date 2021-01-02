@@ -1,0 +1,5 @@
+{
+  "staticManRepo": "badsyntax/richardwillis.info",
+  "staticManEndpoint": "http://localhost:3002",
+  "assetPrefix": "/"
+}

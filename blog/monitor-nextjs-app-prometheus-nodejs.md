@@ -166,7 +166,7 @@ scrape_configs:
 
 Deploy the prometheus app and secure it with `http-auth`:
 
-```shell-session
+```bash
 docker pull prom/prometheus:latest
 docker tag prom/prometheus:latest dokku/prometheus:latest
 dokku tags:deploy prometheus latest
@@ -231,7 +231,7 @@ dokku http-auth:on cadvisor <username> <password>
 
 Create the dokku app and set the ports:
 
-```shell-session
+```bash
 dokku apps:create grafana
 dokku proxy:ports-add grafana http:80:3000
 dokku proxy:ports-remove grafana http:3000:3000
@@ -239,7 +239,7 @@ dokku proxy:ports-remove grafana http:3000:3000
 
 Set the volume mounts for persistent storage:
 
-```shell-session
+```bash
 mkdir -p /var/lib/dokku/data/storage/grafana
 chown 472:472 /var/lib/dokku/data/storage/grafana
 dokku storage:mount grafana "/var/lib/dokku/data/storage/grafana:/var/lib/grafana"
@@ -253,7 +253,7 @@ dokku network:set grafana attach-post-deploy prometheus-bridge
 
 Deploy Grafana:
 
-```shell-session
+```bash
 docker pull grafana/grafana:latest
 docker tag grafana/grafana:latest dokku/grafana:latest
 dokku tags:deploy grafana latest

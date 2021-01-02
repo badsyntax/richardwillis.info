@@ -1,38 +1,37 @@
 import { ConsoleChannel } from './channels/ConsoleChannel';
 import { OutputChannel } from './OutputChannel';
-
-type logType = 'info' | 'warning' | 'error' | 'debug';
+import { LogType } from './types';
 
 export class Logger {
   constructor(private readonly channels: OutputChannel[]) {}
 
-  private log(message: string, type: logType): void {
-    const logMessage = this.format(message, type);
-    this.channels.forEach((channel) => channel.log(logMessage));
-  }
-
-  public format(message: string, type: logType): string {
-    return `[${type}] ${message}`;
-  }
-
   public info(...messages: string[]): void {
-    this.log(messages.join(' '), 'info');
+    this.log(messages.join(' '), LogType.info);
   }
 
-  public warning(...messages: string[]): void {
-    this.log(messages.join(' '), 'warning');
+  public warn(...messages: string[]): void {
+    this.log(messages.join(' '), LogType.warn);
   }
 
   public error(...messages: string[]): void {
-    this.log(messages.join(' '), 'error');
+    this.log(messages.join(' '), LogType.error);
   }
 
   public debug(...messages: string[]): void {
-    this.log(messages.join(' '), 'debug');
+    this.log(messages.join(' '), LogType.debug);
   }
 
   public getChannels(): OutputChannel[] {
     return this.channels;
+  }
+
+  private log(message: string, type: LogType): void {
+    const logMessage = this.format(message, type);
+    this.channels.forEach((channel) => channel.log(logMessage, type));
+  }
+
+  private format(message: string, type: LogType): string {
+    return `[${type}] ${message}`;
   }
 }
 

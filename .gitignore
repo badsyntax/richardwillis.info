@@ -36,3 +36,5 @@ yarn-error.log*
 # compiled typescript files
 /src/**/*.js
 /staticman/.ssh
+
+.envrc

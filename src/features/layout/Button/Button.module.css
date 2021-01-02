@@ -1,15 +1,35 @@
+.root {
+  @apply flex
+    items-center
+    justify-center;
+  transition-property: box-shadow, border-color;
+}
+
 .variant-default {
   @apply bg-white
     text-gray-700
     font-medium
-    py-1
+    py-2
     px-4
     border
-    border-gray-400
+    border-gray-300
     rounded-lg
     tracking-wide
-    hover:bg-gray-100;
+    duration-200
+    transform-gpu
+    hover:border-gray-400
+    hover:shadow-sm
+    focus:border-gray-400
+    focus:shadow-sm
+    focus:bg-gray-100
+    focus:outline-none;
 }
+
+.variant-default:active {
+  @apply border-gray-400
+    shadow-sm;
+}
+
 
 .variant-default:disabled {
   @apply text-gray-500
@@ -25,19 +45,40 @@
     border
     border-gray-300
     text-gray-800
-    transform-gpu
     duration-200
+    transform-gpu
     inline-block
-    no-underline;
-  transition-property: box-shadow, border-color;
-}
-
-.variant-card:hover {
-  @apply border-gray-400
-    shadow-md;
+    no-underline
+    hover:border-gray-400
+    hover:shadow-md;
 }
 
 .variant-card:active {
   @apply border-gray-400
     shadow-sm;
+}
+
+.loading-icon {
+  @apply animate-spin
+    -ml-1
+    mr-2
+    h-5
+    w-5;
+}
+
+.loading-icon-circle {
+  @apply opacity-25;
+}
+
+.loading-icon-path {
+  @apply opacity-75;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

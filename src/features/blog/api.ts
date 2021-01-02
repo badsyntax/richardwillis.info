@@ -19,25 +19,31 @@ export function getPostSlugs(): string[] {
 
 export function getComments(slug: string): PostComment[] {
   const rootDir = join(commentsDirectory, slug);
-  const comments = fs
-    .readdirSync(rootDir)
-    .map<PostComment | null>((fileName: string) => {
-      const filePath = join(rootDir, fileName);
-      try {
-        return yaml.safeLoad(fs.readFileSync(filePath, 'utf8')) as PostComment;
-      } catch (e) {
-        logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
-        return null;
-      }
-    })
-    .filter((comment) => comment !== null)
-    .map((comment) => {
-      return {
-        ...comment,
-        messageHtml: markdownToSimpleHtml(comment.message),
-      };
-    });
-  return comments;
+  try {
+    return fs
+      .readdirSync(rootDir)
+      .map<PostComment | null>((fileName: string) => {
+        const filePath = join(rootDir, fileName);
+        try {
+          return yaml.safeLoad(
+            fs.readFileSync(filePath, 'utf8')
+          ) as PostComment;
+        } catch (e) {
+          logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
+          return null;
+        }
+      })
+      .filter((comment) => comment !== null)
+      .map((comment) => {
+        return {
+          ...comment,
+          messageHtml: markdownToSimpleHtml(comment.message),
+        };
+      });
+  } catch (e) {
+    logger.warn(`Unable to read reading comments: ${e.message}`);
+    return [];
+  }
 }
 
 export function getPostBySlug(slug: string, fields = []): Post {

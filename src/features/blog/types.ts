@@ -9,7 +9,7 @@ export interface OGImage {
 
 export interface PostComment {
   _id: string;
-  author: string;
+  name: string;
   date: number;
   message: string;
   slug: string;

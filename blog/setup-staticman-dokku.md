@@ -14,7 +14,7 @@ draft: true
 
 On your local machine:
 
-```shell
+```bash
 docker build -t ghcr.io/GITHUB_USER/staticman:latest .
 echo $CR_PAT | docker login ghcr.io -u GITHUB_USER --password-stdin
 docker push ghcr.io/GITHUB_USER/staticman:latest
@@ -89,7 +89,7 @@ ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f .ssh/staticman_key
 
 Build and run docker image:
 
-```sh
+```bash
 docker build -t dokku/staticman:latest .
 docker run --publish 3000:3000 -e "RSA_PRIVATE_KEY=$(cat .ssh/staticman_key)" dokku/staticman:latest
 ```

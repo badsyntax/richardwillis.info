@@ -9,29 +9,37 @@ import { Link } from '../Link/Link';
 import { MarkdownContent } from '../../blog/MarkdownContent/MarkdownContent';
 const classes = classNames.bind(STYLES);
 
-export interface CommentBoxProps {
-  author?: string;
+export type CommentBoxProps = React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+> & {
+  name?: string;
   date?: Date;
-  className?: string;
   message: string;
   showHeader?: boolean;
-}
+  proseClassName?: string;
+};
 
 export const CommentBox: React.FunctionComponent<CommentBoxProps> = ({
-  author,
+  name,
   date,
   className,
+  proseClassName,
   message,
   showHeader = true,
+  ...props
 }) => {
   return (
-    <section className={classes('root', className)}>
+    <section className={classes('root', className)} {...props}>
       {showHeader && (
-        <Typography as="h3" className={classes('author')}>
-          {author} on <Link href="#">{getFormattedDateLong(date)}</Link>
+        <Typography as="h3" className={classes('name')}>
+          {name} on <Link href="#">{getFormattedDateLong(date)}</Link>
         </Typography>
       )}
-      <MarkdownContent content={message} />
+      <MarkdownContent
+        content={message}
+        className={classes('prose', proseClassName)}
+      />
     </section>
   );
 };

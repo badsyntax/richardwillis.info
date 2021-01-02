@@ -1,24 +1,45 @@
-import React, { lazy, useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { Button } from '../../layout/Button/Button';
 import { Typography } from '../../layout/Typography/Typography';
 
-import { MarkdownContent } from '../MarkdownContent/MarkdownContent';
 import { CommentBox } from '../../layout/CommentBox/CommentBox';
+import { FormRow } from '../../layout/FormRow/FormRow';
+
+import { Textarea } from '../../layout/Field/Textarea';
+import { Label } from '../../layout/Label/Label';
+import { Input } from '../../layout/Field/Input';
+
 import STYLES from './AddCommentForm.module.css';
+import { postComment } from '../../apiClient/apiClient';
+import { Alert, AlertSeverity } from '../../layout/Alert/Alert';
 const classes = classNames.bind(STYLES);
 
 export const AddCommentForm: React.FunctionComponent = () => {
+  const [error, setError] = useState<string>(null);
   const [message, setMessage] = useState<string>('');
   const [preview, setPreview] = useState<string>(null);
-
+  const [isPosting, setIsPosting] = useState<boolean>(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
-  const [hasPreviewLoaded, setHasPreviewLoaded] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert('form submit');
+    setError(null);
+    setIsPosting(true);
+    const formData = new FormData(e.target as HTMLFormElement);
+    postComment(formData)
+      .then(
+        () => {
+          // success
+        },
+        (e) => {
+          setError(e.message);
+        }
+      )
+      .finally(() => {
+        setIsPosting(false);
+      });
   };
 
   const handleMessageChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -26,6 +47,7 @@ export const AddCommentForm: React.FunctionComponent = () => {
   };
 
   const handlePreviewButtonClick = async () => {
+    setError(null);
     setIsPreviewLoading(true);
     import('../../markdown/markdownToSimpleHtml')
       .then(({ markdownToSimpleHtml }) => {
@@ -38,15 +60,52 @@ export const AddCommentForm: React.FunctionComponent = () => {
   };
 
   const handleEditButtonClick = () => {
+    setError(null);
     setPreview(null);
   };
 
   return (
     <form className={classes('form')} action="" onSubmit={handleSubmit}>
-      <label className={classes('heading')} htmlFor="comment-text">
-        Add a new comment
-      </label>
-      <div className={classes('textarea-container')}>
+      {/* <input
+        type="hidden"
+        name="options[origin]"
+        value="{{ page.url | absolute_url }}"
+      /> */}
+      <FormRow>
+        <label className={classes('heading')} htmlFor="comment-text">
+          Add a new comment
+        </label>
+      </FormRow>
+      <FormRow>
+        <Label htmlFor="comment-name" hidden>
+          Your name
+        </Label>
+        <Input
+          id="comment-name"
+          type="text"
+          className={classes('name-field')}
+          placeholder="Name"
+          required
+          name="fields[name]"
+          disabled={isPosting}
+        />
+      </FormRow>
+      <FormRow>
+        <Label htmlFor="comment-text" hidden>
+          Your comment
+        </Label>
+        <Textarea
+          id="comment-text"
+          className={classes(!!preview && 'sr-hidden')}
+          name="fields[message]"
+          placeholder="Comment"
+          required
+          value={message}
+          onChange={handleMessageChange}
+          rows={3}
+          disabled={isPosting}
+          fullWidth
+        ></Textarea>
         {!!preview && (
           <CommentBox
             showHeader={false}
@@ -54,17 +113,13 @@ export const AddCommentForm: React.FunctionComponent = () => {
             message={preview}
           />
         )}
-        <textarea
-          id="comment-text"
-          className={classes('textarea', !!preview && 'sr-hidden')}
-          name="message"
-          placeholder="Type Your Comment"
-          required
-          value={message}
-          onChange={handleMessageChange}
-        ></textarea>
-      </div>
-      <div className={classes('submit-container')}>
+      </FormRow>
+      {error && (
+        <Alert severity={AlertSeverity.error} className={classes('alert')}>
+          There was an error saving your comment. Please try again.
+        </Alert>
+      )}
+      <FormRow className={classes('footer')}>
         <div className={classes('info-container')}>
           <svg
             fill="none"
@@ -89,9 +144,10 @@ export const AddCommentForm: React.FunctionComponent = () => {
               type="button"
               className={classes('button', !message && 'button-hidden')}
               onClick={handlePreviewButtonClick}
+              isLoading={isPreviewLoading}
+              disabled={isPosting}
             >
               Preview
-              {isPreviewLoading && 'loading'}
             </Button>
           )}
           {!!preview && (
@@ -99,19 +155,21 @@ export const AddCommentForm: React.FunctionComponent = () => {
               type="button"
               className={classes('button', !message && 'button-hidden')}
               onClick={handleEditButtonClick}
+              disabled={isPosting}
             >
               Edit
             </Button>
           )}
           <Button
+            isLoading={isPosting}
             type="submit"
             className={classes('button')}
-            disabled={!message}
+            disabled={isPosting}
           >
             Post Comment
           </Button>
         </div>
-      </div>
+      </FormRow>
     </form>
   );
 };

@@ -88,7 +88,7 @@ dokku
 
 On your local machine:
 
-```shell
+```bash
 cd staticman
 docker build -t ghcr.io/badsyntax/staticman:latest .
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin

@@ -1,3 +1,5 @@
+import { LogType } from './types';
+
 export interface OutputChannel {
-  log: (output: string) => void;
+  log: (output: string, type: LogType) => void;
 }

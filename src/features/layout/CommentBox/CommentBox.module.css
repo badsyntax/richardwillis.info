@@ -7,9 +7,13 @@
     my-6;
 }
 
-.author {
+.name {
   @apply text-gray-500
     text-base
     font-normal
     mb-2;
+}
+
+.prose {
+  @apply text-base;
 }

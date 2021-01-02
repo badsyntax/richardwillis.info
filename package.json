@@ -61,7 +61,7 @@
   },
   "eslintConfig": {
     "ignorePatterns": [
-      "**/*.js",
+      "src/**/*.js",
       ".next",
       "build"
     ],
