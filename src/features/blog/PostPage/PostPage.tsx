@@ -34,7 +34,7 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({
             author={post.author}
           />
           <PostBody content={post.content} />
-          <PostComments comments={post.comments} />
+          <PostComments comments={post.comments} slug={post.slug} />
         </Fragment>
       )}
     </PageShell>

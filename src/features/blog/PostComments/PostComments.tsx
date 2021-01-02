@@ -11,10 +11,12 @@ const classes = classNames.bind(STYLES);
 
 export interface PostCommentsProps {
   comments: PostComment[];
+  slug: string;
 }
 
 export const PostComments: React.FunctionComponent<PostCommentsProps> = ({
   comments,
+  slug,
 }) => {
   return (
     <Fragment>
@@ -35,7 +37,7 @@ export const PostComments: React.FunctionComponent<PostCommentsProps> = ({
           <CommentBox showHeader={false} message="No comments" />
         )}
       </div>
-      <AddCommentForm />
+      <AddCommentForm slug={slug} />
     </Fragment>
   );
 };

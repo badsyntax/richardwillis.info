@@ -16,7 +16,13 @@ import { postComment } from '../../apiClient/apiClient';
 import { Alert, AlertSeverity } from '../../layout/Alert/Alert';
 const classes = classNames.bind(STYLES);
 
-export const AddCommentForm: React.FunctionComponent = () => {
+export interface AddCommentFormProps {
+  slug: string;
+}
+
+export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
+  slug,
+}) => {
   const [error, setError] = useState<string>(null);
   const [message, setMessage] = useState<string>('');
   const [preview, setPreview] = useState<string>(null);
@@ -66,11 +72,7 @@ export const AddCommentForm: React.FunctionComponent = () => {
 
   return (
     <form className={classes('form')} action="" onSubmit={handleSubmit}>
-      {/* <input
-        type="hidden"
-        name="options[origin]"
-        value="{{ page.url | absolute_url }}"
-      /> */}
+      <input type="hidden" name="fields[slug]" value={slug} />
       <FormRow>
         <label className={classes('heading')} htmlFor="comment-text">
           Add a new comment
