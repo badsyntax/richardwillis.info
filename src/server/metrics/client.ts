@@ -1,11 +1,13 @@
 import client from 'prom-client';
-import { APP_VERSION, SITE_ID } from '../../config/config';
+import config from '../../config/config';
+
+const { appVersion, siteId } = config;
 
 export const registry = new client.Registry();
 
 registry.setDefaultLabels({
-  app: `${SITE_ID}-nodejs-app`,
-  version: APP_VERSION,
+  app: `${siteId}-nodejs-app`,
+  version: appVersion,
 });
 
 client.collectDefaultMetrics({ register: registry });

@@ -1,0 +1,19 @@
+.root {
+  @apply rounded
+    border
+    border-gray-200
+    py-2
+    px-3
+    my-6;
+}
+
+.name {
+  @apply text-gray-500
+    text-base
+    font-normal
+    mb-2;
+}
+
+.prose {
+  @apply text-base;
+}

@@ -1,13 +1,17 @@
-const { ASSET_PREFIX, IS_PROD, APP_VERSION } = require('./build/config/config');
+const {
+  assetPrefix,
+  isProd,
+  appVersion,
+} = require('./build/config/config').default;
 
 module.exports = {
-  assetPrefix: ASSET_PREFIX,
-  generateBuildId: () => APP_VERSION,
-  webpack(config, options) {
+  assetPrefix: assetPrefix,
+  generateBuildId: () => appVersion,
+  webpack(config) {
     const adjustCssModulesConfig = (use) => {
       if (use.loader.indexOf('css-loader') >= 0 && use.options.modules) {
         delete use.options.modules.getLocalIdent;
-        use.options.modules.localIdentName = IS_PROD
+        use.options.modules.localIdentName = isProd
           ? '[sha1:hash:hex:4]'
           : '[name]__[local]--[sha1:hash:hex:4]';
       }

@@ -1,0 +1,19 @@
+.hr {
+  @apply mt-10
+    sm:mt-16
+    mb-8
+    sm:mb-10;
+  margin-left: -100%;
+  margin-right: -100%;
+}
+
+.heading {
+  @apply mb-8
+    sm:mb-10
+    text-gray-800;
+}
+
+.comments {
+  @apply mb-10;
+}
+

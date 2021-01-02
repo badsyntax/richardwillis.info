@@ -17,7 +17,7 @@ const HomeNavLink: React.FunctionComponent<HomeNavLinkProps & LinkProps> = ({
   ...props
 }) => {
   return (
-    <Link {...props} variant="button" className={classes('nav-item')}>
+    <Link {...props} variant="card-button" className={classes('nav-item')}>
       {title}&nbsp;&rarr;
     </Link>
   );

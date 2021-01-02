@@ -8,7 +8,6 @@ const classes = classNames.bind(STYLES);
 export interface PageShellProps {
   title: string;
   description: string;
-  preview?: boolean;
   mainClassName?: string;
 }
 
@@ -17,7 +16,6 @@ export const PageShell: React.FunctionComponent<PageShellProps> = ({
   children,
   mainClassName,
   description,
-  preview,
 }) => {
   return (
     <Fragment>

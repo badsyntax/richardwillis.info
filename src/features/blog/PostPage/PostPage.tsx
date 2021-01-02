@@ -7,28 +7,23 @@ import { PostBody } from '../PostBody/PostBody';
 import { PostHeader } from '../PostHeader/PostHeader';
 import { PostTitle } from '../PostTitle/PostTitle';
 import { Post } from '../types';
+import { PostComments } from '../PostComments/PostComments';
 
 export interface PostPagePros {
   post: Post;
   morePosts: boolean;
-  preview: boolean;
 }
 
 export const PostPage: React.FunctionComponent<PostPagePros> = ({
   post,
   morePosts,
-  preview,
 }) => {
   const router = useRouter();
   if (!router.isFallback && !post?.slug) {
     return <ErrorPage statusCode={404} />;
   }
   return (
-    <PageShell
-      preview={preview}
-      title={`${post.title} - Blog`}
-      description={post.excerpt}
-    >
+    <PageShell title={`${post.title} - Blog`} description={post.excerpt}>
       {router.isFallback ? (
         <PostTitle>Loading…</PostTitle>
       ) : (
@@ -39,6 +34,7 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({
             author={post.author}
           />
           <PostBody content={post.content} />
+          <PostComments comments={post.comments} slug={post.slug} />
         </Fragment>
       )}
     </PageShell>

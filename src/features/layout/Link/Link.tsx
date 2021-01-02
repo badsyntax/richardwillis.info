@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import STYLES from './Link.module.css';
 const classes = classNames.bind(STYLES);
 
-export type LinkVariant = 'button' | 'normal';
+export type LinkVariant = 'card-button' | 'normal';
 
 export type LinkProps = React.DetailedHTMLProps<
   React.AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -25,21 +25,29 @@ export const Link: React.FunctionComponent<LinkProps> = ({
   href,
   className,
   activeClassName,
-  variant,
-  ...props
+  variant = 'normal',
+  ...rest
 }) => {
   const router = useRouter();
+  const isInternal = href.startsWith('#');
+  const anchorProps = {
+    ...rest,
+    ...(isInternal && {
+      href,
+    }),
+  };
+
   /* eslint-disable jsx-a11y/anchor-has-content */
-  return (
-    <NextLink href={href}>
-      <a
-        {...props}
-        className={classes(
-          className,
-          hrefInPath(router.asPath, href) && activeClassName,
-          variant && `variant-${variant}`
-        )}
-      />
-    </NextLink>
+  const anchor = (
+    <a
+      {...anchorProps}
+      className={classes(
+        className,
+        hrefInPath(router.asPath, href) && activeClassName,
+        variant && `variant-${variant}`
+      )}
+    />
   );
+
+  return isInternal ? anchor : <NextLink href={href}>{anchor}</NextLink>;
 };
