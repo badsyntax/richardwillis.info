@@ -69,6 +69,8 @@ comments:
   pullRequestBody: "A new comment has been added. :tada:\n\nMerge the pull request to accept it, or close it to send it away.\n\n---\n"
 
 
+  pullRequestBody: "A new comment has been added. :tada:\n\nMerge the pull request to accept it, or close it to send it away.\n\n---\n"
+
   # List of transformations to apply to any of the fields supplied. Keys are
   # the name of the field and values are possible transformation types.
   # transforms:

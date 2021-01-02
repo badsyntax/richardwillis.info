@@ -3,17 +3,15 @@ import classNames from 'classnames/bind';
 
 import { Button } from '../../layout/Button/Button';
 import { Typography } from '../../layout/Typography/Typography';
-
 import { CommentBox } from '../../layout/CommentBox/CommentBox';
 import { FormRow } from '../../layout/FormRow/FormRow';
-
 import { Textarea } from '../../layout/Field/Textarea';
 import { Label } from '../../layout/Label/Label';
 import { Input } from '../../layout/Field/Input';
-
-import STYLES from './AddCommentForm.module.css';
 import { postComment } from '../../apiClient/apiClient';
 import { Alert, AlertSeverity } from '../../layout/Alert/Alert';
+
+import STYLES from './AddCommentForm.module.css';
 const classes = classNames.bind(STYLES);
 
 export interface AddCommentFormProps {
@@ -24,6 +22,7 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
   slug,
 }) => {
   const [error, setError] = useState<string>(null);
+  const [postSuccess, setPostSuccess] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [preview, setPreview] = useState<string>(null);
   const [isPosting, setIsPosting] = useState<boolean>(false);
@@ -37,9 +36,10 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
     postComment(formData)
       .then(
         () => {
-          // success
+          setPostSuccess(true);
         },
         (e) => {
+          setPostSuccess(false);
           setError(e.message);
         }
       )
@@ -119,6 +119,11 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
       {error && (
         <Alert severity={AlertSeverity.error} className={classes('alert')}>
           There was an error saving your comment. Please try again.
+        </Alert>
+      )}
+      {postSuccess && (
+        <Alert severity={AlertSeverity.success} className={classes('alert')}>
+          Your comment was successfully saved and is awaiting approval.
         </Alert>
       )}
       <FormRow className={classes('footer')}>
