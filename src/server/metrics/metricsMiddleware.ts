@@ -5,6 +5,7 @@ import { httpRequestDurationMicroseconds } from './client';
 
 const denyMetricsRoutes = [
   '/favicon.ico',
+  '/robots.txt',
   '/_next/static',
   '/_next/webpack-hmr',
 ];
