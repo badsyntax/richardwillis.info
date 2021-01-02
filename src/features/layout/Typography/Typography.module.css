@@ -58,3 +58,8 @@
 .variant-prose :global(h4) {
   scroll-margin-top: 5rem;
 }
+
+.variant-prose :global(pre[class*='language-']),
+.variant-prose :global(code[class*='language-']) {
+  @apply text-xs sm:text-base;
+}

@@ -27,11 +27,3 @@ export const requestCounter = new client.Counter({
 });
 
 registry.registerMetric(requestCounter);
-
-export const ttfbHistogram = new client.Histogram({
-  name: 'client_user_timing_ttfb',
-  help: 'Time to first byte',
-  labelNames: ['path'],
-});
-
-registry.registerMetric(ttfbHistogram);

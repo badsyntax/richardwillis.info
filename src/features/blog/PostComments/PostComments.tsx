@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import classNames from 'classnames/bind';
+import { FaInfo } from 'react-icons/fa';
 import { Typography } from '../../layout/Typography/Typography';
 
 import { CommentBox } from '../../layout/CommentBox/CommentBox';
@@ -7,6 +8,7 @@ import { PostComment } from '../types';
 import { AddCommentForm } from '../AddCommentForm/AddCommentForm';
 
 import STYLES from './PostComments.module.css';
+import { InfoIcon } from '../../layout/Icons/InfoIcon';
 const classes = classNames.bind(STYLES);
 
 export interface PostCommentsProps {
@@ -34,7 +36,11 @@ export const PostComments: React.FunctionComponent<PostCommentsProps> = ({
           />
         ))}
         {!comments.length && (
-          <CommentBox showHeader={false} message="No comments" />
+          <CommentBox showHeader={false} className={classes('no-comments')}>
+            {/* <FaInfo className={classes('icon')} /> */}
+            {/* <InfoIcon className={classes('icon')} /> */}
+            No comments
+          </CommentBox>
         )}
       </div>
       <AddCommentForm slug={slug} />
