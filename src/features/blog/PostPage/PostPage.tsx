@@ -14,10 +14,7 @@ export interface PostPagePros {
   morePosts: boolean;
 }
 
-export const PostPage: React.FunctionComponent<PostPagePros> = ({
-  post,
-  morePosts,
-}) => {
+export const PostPage: React.FunctionComponent<PostPagePros> = ({ post }) => {
   const router = useRouter();
   if (!router.isFallback && !post?.slug) {
     return <ErrorPage statusCode={404} />;

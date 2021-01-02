@@ -13,6 +13,7 @@ const app = next({ dev: !isProd });
 const nextRequestHandler = app.getRequestHandler();
 
 const server = express();
+server.disable('x-powered-by');
 server.use(bodyParser.json());
 
 app.prepare().then(() => {

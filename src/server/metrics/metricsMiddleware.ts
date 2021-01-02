@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { Request, Response } from 'express';
 import { parse, UrlWithParsedQuery } from 'url';
-import { httpRequestDurationMicroseconds } from './client';
+import { httpRequestDurationMicroseconds, requestCounter } from './client';
 
 const denyMetricsRoutes = [
   '/favicon.ico',
@@ -24,12 +24,17 @@ export function withRouteMetrics(
       pathname?.startsWith(denyRoute)
     );
     if (shouldRecordMetrics) {
+      requestCounter.inc({
+        path: pathname || undefined,
+        method: req.method,
+        status: res.statusCode,
+      });
       const end = httpRequestDurationMicroseconds.startTimer();
       res.on('finish', () => {
         if (res.statusCode === 200) {
           end({
             path: pathname || undefined,
-            code: res.statusCode,
+            status: res.statusCode,
             method: req.method,
           });
         }

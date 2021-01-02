@@ -2,7 +2,6 @@
   @apply flex
     items-center
     justify-center;
-  transition-property: box-shadow, border-color;
 }
 
 .variant-default {
@@ -23,6 +22,7 @@
     focus:shadow-sm
     focus:bg-gray-100
     focus:outline-none;
+    transition-property: box-shadow, border-color;
 }
 
 .variant-default:active {
@@ -51,6 +51,7 @@
     no-underline
     hover:border-gray-400
     hover:shadow-md;
+  transition-property: box-shadow, border-color;
 }
 
 .variant-card:active {
