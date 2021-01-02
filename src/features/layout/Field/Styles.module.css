@@ -13,6 +13,10 @@
     focus:bg-white;
 }
 
+.text-field:disabled {
+  @apply bg-gray-50;
+}
+
 .full-width {
   @apply w-full;
 }

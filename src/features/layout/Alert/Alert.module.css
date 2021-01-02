@@ -16,6 +16,10 @@
   @apply text-red-700;
 }
 
+.variant-success {
+  @apply text-green-700;
+}
+
 .icon {
   @apply text-xl
     mr-4

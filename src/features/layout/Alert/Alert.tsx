@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import { FaExclamationTriangle } from 'react-icons/fa';
+import { FaExclamationTriangle, FaCheck } from 'react-icons/fa';
 
 import STYLES from './Alert.module.css';
 const classes = classNames.bind(STYLES);
@@ -8,6 +8,16 @@ const classes = classNames.bind(STYLES);
 export enum AlertSeverity {
   'warn' = 'warn',
   'error' = 'error',
+  'success' = 'success',
+}
+
+function getIcon(severity: AlertSeverity) {
+  switch (severity) {
+    case AlertSeverity.error:
+      return FaExclamationTriangle;
+    case AlertSeverity.success:
+      return FaCheck;
+  }
 }
 
 export type AlertProps = React.DetailedHTMLProps<
@@ -23,12 +33,13 @@ export const Alert: React.FunctionComponent<AlertProps> = ({
   children,
   ...props
 }) => {
+  const Icon = getIcon(severity);
   return (
     <div
       className={classes('root', `variant-${severity}`, className)}
       {...props}
     >
-      <FaExclamationTriangle className={classes('icon')} />
+      <Icon className={classes('icon')} />
       {children}
     </div>
   );
