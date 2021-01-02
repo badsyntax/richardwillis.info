@@ -12,6 +12,7 @@ import { postComment } from '../../apiClient/apiClient';
 import { Alert, AlertSeverity } from '../../layout/Alert/Alert';
 
 import STYLES from './AddCommentForm.module.css';
+import { InfoIcon } from '../../layout/Icons/InfoIcon';
 const classes = classNames.bind(STYLES);
 
 export interface AddCommentFormProps {
@@ -32,6 +33,7 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
     e.preventDefault();
     setError(null);
     setIsPosting(true);
+    setPostSuccess(false);
     const formData = new FormData(e.target as HTMLFormElement);
     postComment(formData)
       .then(
@@ -128,24 +130,12 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
       )}
       <FormRow className={classes('footer')}>
         <div className={classes('info-container')}>
-          <svg
-            fill="none"
-            className={classes('info-icon')}
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
+          <InfoIcon className={classes('info-icon')} />
           <Typography as="span" className={classes('info-message')}>
             Markdown supported
           </Typography>
         </div>
-        <div className={classes('footer')}>
+        <div className={classes('buttons-container')}>
           {!preview && (
             <Button
               type="button"

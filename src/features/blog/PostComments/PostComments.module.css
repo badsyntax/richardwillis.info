@@ -1,10 +1,8 @@
 .hr {
-  @apply mt-10
-    sm:mt-16
+  @apply mt-8
+    sm:mt-12
     mb-8
     sm:mb-10;
-  margin-left: -100%;
-  margin-right: -100%;
 }
 
 .heading {
@@ -17,3 +15,13 @@
   @apply mb-10;
 }
 
+.icon {
+  @apply mr-2
+    w-5
+    h-5
+    text-gray-600;
+}
+
+.no-comments {
+  @apply flex items-center;
+}

@@ -7,13 +7,19 @@
     my-6;
 }
 
-.name {
+.header {
   @apply text-gray-500
     text-base
     font-normal
-    mb-2;
+    mt-2
+    mb-4;
 }
 
 .prose {
   @apply text-base;
+}
+
+.prose :global(pre[class*='language-']),
+.prose :global(code[class*='language-']) {
+  @apply text-xs sm:text-sm;
 }

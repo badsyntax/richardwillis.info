@@ -15,7 +15,6 @@
     rounded-lg
     tracking-wide
     duration-200
-    transform-gpu
     hover:border-gray-400
     hover:shadow-sm
     focus:border-gray-400
@@ -46,7 +45,6 @@
     border-gray-300
     text-gray-800
     duration-200
-    transform-gpu
     inline-block
     no-underline
     hover:border-gray-400

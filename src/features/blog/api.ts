@@ -19,31 +19,27 @@ export function getPostSlugs(): string[] {
 
 export function getComments(slug: string): PostComment[] {
   const rootDir = join(commentsDirectory, slug);
-  try {
-    return fs
-      .readdirSync(rootDir)
-      .map<PostComment | null>((fileName: string) => {
-        const filePath = join(rootDir, fileName);
-        try {
-          return yaml.safeLoad(
-            fs.readFileSync(filePath, 'utf8')
-          ) as PostComment;
-        } catch (e) {
-          logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
-          return null;
-        }
-      })
-      .filter((comment) => comment !== null)
-      .map((comment) => {
-        return {
-          ...comment,
-          messageHtml: markdownToSimpleHtml(comment.message),
-        };
-      });
-  } catch (e) {
-    logger.warn(`Unable to read reading comments: ${e.message}`);
+  if (!fs.existsSync(rootDir)) {
     return [];
   }
+  return fs
+    .readdirSync(rootDir)
+    .map<PostComment | null>((fileName: string) => {
+      const filePath = join(rootDir, fileName);
+      try {
+        return yaml.safeLoad(fs.readFileSync(filePath, 'utf8')) as PostComment;
+      } catch (e) {
+        logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
+        return null;
+      }
+    })
+    .filter((comment) => comment !== null)
+    .map((comment) => {
+      return {
+        ...comment,
+        messageHtml: markdownToSimpleHtml(comment.message),
+      };
+    });
 }
 
 export function getPostBySlug(slug: string, fields = []): Post {
@@ -65,15 +61,15 @@ export function getPostBySlug(slug: string, fields = []): Post {
     }
   };
 
-  const items = fields.reduce(
-    (acc: Record<string, string>, field: string) => ({
+  const post = fields.reduce(
+    (acc: Record<string, Post[keyof Post]>, field: string) => ({
       ...acc,
       [field]: getData(field),
     }),
     {}
   );
 
-  return items;
+  return post;
 }
 
 export function getAllPosts(fields = []): Post[] {

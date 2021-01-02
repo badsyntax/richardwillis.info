@@ -20,7 +20,8 @@ export const markdownToHtml = async (
     .use(autolinkHeadings, {
       properties: {
         className: 'anchor',
-        ariaHidden: true,
+        ariaHidden: 'true',
+        ariaLabel: 'Heading anchor',
         tabIndex: -1,
       },
       content: {

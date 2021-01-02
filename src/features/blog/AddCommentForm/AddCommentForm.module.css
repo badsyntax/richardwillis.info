@@ -2,16 +2,15 @@
   @apply mt-8;
 }
 
-.footer {
-  @apply flex
-    items-start
-    justify-between;
-}
-
 .heading {
   @apply text-gray-800
     font-medium
     text-lg;
+}
+
+.footer {
+  @apply flex
+  flex-col sm:flex-row items-stretch sm:items-start sm:justify-between;
 }
 
 .name-field {
@@ -38,12 +37,12 @@
     md:text-sm;
 }
 
-.footer {
-  @apply flex;
+.buttons-container {
+  @apply flex flex-col sm:flex-row mt-2 sm:mt-0;
 }
 
 .button {
-  @apply mx-1;
+  @apply mx-2 mt-4 sm:mt-0;
   transition-property: box-shadow, border-color, opacity;
 }
 
@@ -52,7 +51,7 @@
 }
 
 .button-hidden {
-  @apply opacity-0;
+  @apply opacity-0 hidden;
 }
 
 .preview {

@@ -15,7 +15,7 @@ export type CommentBoxProps = React.DetailedHTMLProps<
 > & {
   name?: string;
   date?: Date;
-  message: string;
+  message?: string;
   showHeader?: boolean;
   proseClassName?: string;
 };
@@ -26,20 +26,24 @@ export const CommentBox: React.FunctionComponent<CommentBoxProps> = ({
   className,
   proseClassName,
   message,
+  children,
   showHeader = true,
   ...props
 }) => {
   return (
     <section className={classes('root', className)} {...props}>
       {showHeader && (
-        <Typography as="h3" className={classes('name')}>
+        <Typography as="h3" className={classes('header')}>
           {name} on <Link href="#">{getFormattedDateLong(date)}</Link>
         </Typography>
       )}
-      <MarkdownContent
-        content={message}
-        className={classes('prose', proseClassName)}
-      />
+      {message && (
+        <MarkdownContent
+          content={message}
+          className={classes('prose', proseClassName)}
+        />
+      )}
+      {children}
     </section>
   );
 };
