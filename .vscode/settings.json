@@ -40,6 +40,7 @@
     "letsencrypt",
     "mapbox",
     "mkdir",
+    "nprogress",
     "opencontainers",
     "rehype",
     "richardwillis",

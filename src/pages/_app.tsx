@@ -1,7 +1,11 @@
 import React, { Fragment } from 'react';
+
 import '../styles/globals.css';
-import '../styles/prism-overrides.css';
+import '../styles/prism.css';
+import '../styles/nprogress.css';
+
 import { Meta } from '../features/layout/Meta/Meta';
+import { LoadingBar } from '../features/layout/LoadingBar/LoadingBar';
 
 export { reportWebVitals } from '../features/metrics/reportWebVitals';
 
@@ -17,6 +21,7 @@ const MyApp: React.FunctionComponent<MyAppProps> = ({
   return (
     <Fragment>
       <Meta />
+      <LoadingBar />
       <Component {...pageProps} />
     </Fragment>
   );
