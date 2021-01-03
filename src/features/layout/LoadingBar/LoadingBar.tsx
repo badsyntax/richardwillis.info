@@ -4,7 +4,12 @@ import Router from 'next/router';
 
 const { events: routerEvents } = Router;
 
-progress.configure({ showSpinner: false, trickle: true });
+progress.configure({
+  minimum: 0.1,
+  showSpinner: false,
+  trickle: true,
+  trickleSpeed: 100,
+});
 
 export const LoadingBar: React.FunctionComponent = () => {
   const handleRouteChangeStart = () => progress.start();
