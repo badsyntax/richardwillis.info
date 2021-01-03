@@ -25,6 +25,9 @@
   "files.trimTrailingWhitespace": true,
   "cSpell.language": "en-GB",
   "tailwindCSS.colorDecorators": "off",
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow": ".github/workflows/*.yml"
+  },
   "cSpell.words": [
     "Buildx",
     "Contentful",

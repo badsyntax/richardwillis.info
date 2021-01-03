@@ -1,10 +1,10 @@
-name: Publish
+name: Prod deploy
 on:
   release:
     types: [published]
 
 jobs:
-  publish-docker:
+  publish-docker-image:
     name: Publish docker image
     runs-on: ubuntu-20.04
     steps:
@@ -33,14 +33,15 @@ jobs:
           file: ./Dockerfile
           push: true
           platforms: linux/amd64
-          tags: ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/richardwillis:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
             APP_VERSION=${{ github.event.release.tag_name }}
+
   publish-s3:
-    name: Publish to S3
-    needs: [publish-docker]
+    name: Publish static assets to S3
+    needs: [publish-docker-image]
     runs-on: ubuntu-20.04
     steps:
       - name: Login to GitHub Container Registry
@@ -51,8 +52,8 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - name: Copy static files from docker image
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest
-          docker run -i --name helper ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest true
+          docker pull ghcr.io/${{ github.repository_owner }}/richardwillis:latest
+          docker run -i --name helper ghcr.io/${{ github.repository_owner }}/richardwillis:latest true
           docker cp helper:/app/.next .
           docker rm helper
       - name: Sync static assets to S3
@@ -63,25 +64,33 @@ jobs:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'eu-west-2'
+          AWS_REGION: 'us-east-1'
           SOURCE_DIR: '.next/static'
           DEST_DIR: '_next/static'
+
   deploy:
     name: Deploy app
-    needs: [publish-docker, publish-s3]
+    needs: [publish-s3]
     runs-on: ubuntu-20.04
     steps:
-      - name: Set up SSH
+      - name: Create deploy repo
+        id: deploy_repo
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DOKKU_SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.DOKKU_HOST }} >> ~/.ssh/known_hosts
-      - name: Deploy app
-        run: |
-          ssh root@${{ secrets.DOKKU_HOST }} "\\
-            docker pull ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest && \\
-            docker tag ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest dokku/${{ secrets.DOKKU_APP_NAME }}:latest && \\
-            dokku config:set --no-restart ${{ secrets.DOKKU_APP_NAME }} APP_VERSION=\"${{ github.event.release.tag_name }}\" && \\
-            dokku tags:deploy ${{ secrets.DOKKU_APP_NAME }} latest && \\
-            dokku cleanup"
+          echo "FROM $IMAGE_URL" > Dockerfile
+          git init
+          git config user.email "willis.rh@gmail.com"
+          git config user.name "Richard Willis"
+          git add Dockerfile
+          git commit -m "Add Dockerfile"
+          commit=$(git rev-parse HEAD 2>/dev/null || true)
+          echo ::set-output name=commit_sha::$commit
+        env:
+          IMAGE_URL: ghcr.io/${{ github.repository_owner }}/richardwillis:latest
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          command: deploy
+          git_remote_url: ${{ secrets.GIT_REMOTE_URL }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          git_push_flags: '--force'
+          ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}

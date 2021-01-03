@@ -1,0 +1,77 @@
+name: Staging deploy
+on:
+  pull_request:
+    types: [opened, synchronize, labeled]
+    branches: [master]
+
+jobs:
+  publish-staging-docker-image:
+    if: contains(github.event.pull_request.labels.*.name, 'staging')
+    name: Publish staging docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+      - name: Build and push docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: ghcr.io/${{ github.repository_owner }}/richardwillis:staging
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          build-args: |
+            APP_VERSION=staging-${{github.event.number}}
+            ASSET_PREFIX=/
+
+  deploy-staging-app:
+    needs: [publish-staging-docker-image]
+    if: contains(github.event.pull_request.labels.*.name, 'staging')
+    name: Deploy staging app
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Create deploy repo for dokku
+        id: deploy_repo
+        run: |
+          echo "FROM $IMAGE_URL" > Dockerfile
+          git init
+          git config user.email "willis.rh@gmail.com"
+          git config user.name "Richard Willis"
+          git add Dockerfile
+          git commit -m "Add Dockerfile"
+          commit=$(git rev-parse HEAD 2>/dev/null || true)
+          echo ::set-output name=commit_sha::$commit
+        env:
+          IMAGE_URL: ghcr.io/${{ github.repository_owner }}/richardwillis:staging
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          command: 'review-apps:create'
+          review_app_name: 'staging-richardwillis'
+          git_remote_url: ${{ secrets.GIT_REMOTE_URL }}
+          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+          git_push_flags: '--force'
+          ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.number }}
+          body: 'Staging app successfully deployed to http://staging-richardwillis.${{ secrets.DOKKU_HOST }}'

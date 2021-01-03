@@ -52,7 +52,7 @@ COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
 COPY --from=builder --chown=node:node $APP_HOME/build $APP_HOME/build
 COPY --from=builder --chown=node:node $APP_HOME/app.json $APP_HOME/app.json
 
-EXPOSE $PORT
+EXPOSE 3000
 
 USER node
 

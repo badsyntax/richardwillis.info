@@ -62,3 +62,15 @@
 .variant-prose :global(code[class*='language-']) {
   @apply text-xs sm:text-base;
 }
+
+.variant-prose :global(blockquote) {
+  @apply font-normal;
+}
+
+.variant-prose :global(blockquote) :global(p:first-of-type::before) {
+  content: no-open-quote;
+}
+
+.variant-prose :global(blockquote) :global(p:first-of-type::after) {
+  content: no-close-quote;
+}

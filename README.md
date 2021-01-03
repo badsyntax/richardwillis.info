@@ -39,6 +39,7 @@ First build & push the docker image:
 ```bash
 echo $CR_PAT | docker login ghcr.io -u badsyntax --password-stdin
 docker build -t ghcr.io/badsyntax/richardwillis:latest --build-arg ASSET_PREFIX=/ .
+docker run --publish 3000:3000 ghcr.io/badsyntax/richardwillis:latest
 docker push ghcr.io/badsyntax/richardwillis:latest
 ```
 
@@ -117,3 +118,23 @@ dokku domains:add staticman staticman.richardwillis.info
 dokku tags:deploy staticman latest
 dokku letsencrypt staticman
 ```
+
+## Github actions
+
+- AWS_ACCESS_KEY_ID
+- AWS_S3_BUCKET
+- AWS_SECRET_ACCESS_KEY
+- CR_PAT
+- DOKKU_HOST (eg dokku.example.com)
+- DOKKU_SSH_PRIVATE_KEY
+- GIT_REMOTE_URL (eg ssh://dokku@dokku.me:22/appname);
+- RELEASE_DRAFTER_TOKEN_GITHUB
+
+### Providing a SSH key
+
+```bash
+ssh-keygen -N "" -f ~/.ssh/dokkugithubactions
+cat ~/.ssh/dokkugithubactions.pub | ssh root@dokku.me dokku ssh-keys:add GITHUB_ACTIONS
+```
+
+Now provide the contents of `~/.ssh/dokkugithubactions` as `DOKKU_SSH_PRIVATE_KEY`
