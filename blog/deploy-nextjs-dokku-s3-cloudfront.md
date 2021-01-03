@@ -32,7 +32,7 @@ const isProd = process.env.NODE_ENV === 'production';
 module.exports = {
   assetPrefix: isProd ? process.env.ASSET_PREFIX || 'https://assets.example.com' : '';
   generateBuildId: () => {
-    return process.env.APP_VERSION || 'unknown-app-version';
+    return process.env.APP_VERSION || `${new Date().getTime()}`;
   },
 };
 ```

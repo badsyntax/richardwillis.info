@@ -1,6 +1,5 @@
 module.exports = {
   plugins: {
-    'postcss-nested': {},
     'postcss-flexbugs-fixes': {},
     'postcss-preset-env': {
       autoprefixer: {

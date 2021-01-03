@@ -270,6 +270,8 @@ In `package.json`:
 }
 ```
 
+View the [Next.js docs](https://nextjs.org/docs/advanced-features/customizing-postcss-config#customizing-target-browsers) for more info.
+
 <!-- ## Adding a Blog
 
 Refer to [Next.js blog starter](https://github.com/vercel/next.js/tree/canary/examples/blog-starter).
