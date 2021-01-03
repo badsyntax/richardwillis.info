@@ -8,10 +8,8 @@ import slug from 'rehype-slug';
 import autolinkHeadings from 'rehype-autolink-headings';
 import externalLinks from 'remark-external-links';
 
-export const markdownToHtml = async (
-  markdown: VFileCompatible
-): Promise<string> => {
-  const result = await unified()
+export const markdownToHtml = (markdown: VFileCompatible): string => {
+  const result = unified()
     .use(parse)
     .use(externalLinks, { target: false, rel: ['nofollow'] })
     .use(remark2rehype)
@@ -32,6 +30,6 @@ export const markdownToHtml = async (
       },
     })
     .use(html)
-    .process(markdown);
+    .processSync(markdown);
   return result.toString();
 };

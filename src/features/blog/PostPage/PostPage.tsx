@@ -30,7 +30,7 @@ export const PostPage: React.FunctionComponent<PostPagePros> = ({ post }) => {
             date={post.date}
             author={post.author}
           />
-          <PostBody content={post.content} />
+          <PostBody content={post.contentHtml} />
           <PostComments comments={post.comments} slug={post.slug} />
         </Fragment>
       )}

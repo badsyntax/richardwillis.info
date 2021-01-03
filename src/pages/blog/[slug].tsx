@@ -1,6 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { getAllPosts, getPostBySlug } from '../../features/blog/api';
-import { markdownToHtml } from '../../features/markdown/markdownToHtml';
 
 export { PostPage as default } from '../../features/blog/PostPage/PostPage';
 
@@ -15,18 +14,15 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     'slug',
     'author',
     'content',
+    'contentHtml',
     'comments',
     'excerpt',
     'ogImage',
   ]);
-  const content = await markdownToHtml(post.content || '');
 
   return {
     props: {
-      post: {
-        ...post,
-        content,
-      },
+      post,
     },
   };
 };
