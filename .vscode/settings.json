@@ -35,6 +35,8 @@
     "WORKDIR",
     "badsyntax",
     "browserslist",
+    "flexbox",
+    "flexbugs",
     "ghcr",
     "grafana",
     "letsencrypt",

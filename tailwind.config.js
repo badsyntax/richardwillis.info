@@ -1,7 +1,7 @@
 const typography = require('@tailwindcss/typography');
 
 module.exports = {
-  purge: false,
+  purge: ['./src/pages/**/*.tsx', './src/features/**/*.tsx'],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {

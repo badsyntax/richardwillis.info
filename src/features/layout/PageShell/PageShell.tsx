@@ -2,6 +2,7 @@ import React, { Fragment } from 'react';
 import Head from 'next/head';
 import classNames from 'classnames/bind';
 import { Header } from '../Header/Header';
+
 import STYLES from './PageShell.module.css';
 const classes = classNames.bind(STYLES);
 

@@ -238,7 +238,7 @@ export function getComments(slug: string): PostComment[] {
     .map<PostComment | null>((fileName: string) => {
       const filePath = join(rootDir, fileName);
       try {
-        return yaml.safeLoad(fs.readFileSync(filePath, 'utf8')) as PostComment;
+        return yaml.load(fs.readFileSync(filePath, 'utf8')) as PostComment;
       } catch (e) {
         console.error(`Error parsing blog comment ${filePath}: ${e.message}`);
         return null;

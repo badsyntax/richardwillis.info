@@ -5,8 +5,8 @@ import getConfig, { setConfig } from 'next/config';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import config from '../../next.config.js';
-setConfig(config);
+import { publicRuntimeConfig } from '../../next.config.js';
+setConfig({ publicRuntimeConfig });
 
 import { metricsHandler } from './routes/metrics';
 import { vitalsHandler } from './routes/vitals';
