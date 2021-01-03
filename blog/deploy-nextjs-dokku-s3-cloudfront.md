@@ -163,6 +163,8 @@ Refer to [Set up CloudFront & S3](/blog/setup-s3-cloudfront-cdn) to set this up.
 
 ## Continuous deployment with GitHub Actions
 
+> While this process works, I don't recommend it any more and suggest reading [Deploy a dokku App With a Remote Docker Image](/blog/deploy-dokku-app-remote-docker-image) to view alternative approaches without having to use a `root` user in CI.
+
 We'll use GitHub Actions to:
 
 1. Build the docker image and publish it to the container registry
@@ -199,7 +201,6 @@ You'll need to set the following secrets in your Github repo:
 - `AWS_S3_BUCKET`
 - `AWS_SECRET_ACCESS_KEY`
 - `CR_PAT` (GitHub Container Registry Personal Access Token)
-- `DOKKU_APP_NAME`
 - `DOKKU_HOST`
 - `DOKKU_SSH_PRIVATE_KEY`
 
@@ -249,7 +250,7 @@ jobs:
           file: ./Dockerfile
           push: true
           platforms: linux/amd64
-          tags: ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/app:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
           build-args: |
@@ -267,8 +268,8 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - name: Copy static files from docker image
         run: |
-          docker pull ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest
-          docker run -i --name helper ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest true
+          docker pull ghcr.io/${{ github.repository_owner }}/app:latest
+          docker run -i --name helper ghcr.io/${{ github.repository_owner }}/app:latest true
           docker cp helper:/app/.next .
           docker rm helper
       - name: Sync static assets to S3
@@ -296,10 +297,10 @@ jobs:
       - name: Deploy app
         run: |
           ssh root@${{ secrets.DOKKU_HOST }} "\\
-            docker pull ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest && \\
-            docker tag ghcr.io/${{ github.repository_owner }}/${{ secrets.DOKKU_APP_NAME }}:latest dokku/${{ secrets.DOKKU_APP_NAME }}:latest && \\
-            dokku config:set --no-restart ${{ secrets.DOKKU_APP_NAME }} APP_VERSION=\"${{ github.event.release.tag_name }}\" && \\
-            dokku tags:deploy ${{ secrets.DOKKU_APP_NAME }} latest && \\
+            docker pull ghcr.io/${{ github.repository_owner }}/app:latest && \\
+            docker tag ghcr.io/${{ github.repository_owner }}/app:latest dokku/app:latest && \\
+            dokku config:set --no-restart app APP_VERSION=\"${{ github.event.release.tag_name }}\" && \\
+            dokku tags:deploy app latest && \\
             dokku cleanup"
 ```
 

@@ -88,7 +88,7 @@ ENV NODE_ENV production
 
 COPY --from=builder --chown=node:node /app /app
 
-EXPOSE $PORT
+EXPOSE 3000
 
 USER node
 

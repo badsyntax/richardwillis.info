@@ -32,7 +32,7 @@ ENV PORT 3000
 
 COPY --from=builder --chown=node:node /app /app
 
-EXPOSE $PORT
+EXPOSE 3000
 
 USER node
 

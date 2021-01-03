@@ -31,7 +31,7 @@ export function getComments(slug: string): PostComment[] {
   function parseComment(fileName: string): PostComment | null {
     const filePath = join(rootDir, fileName);
     try {
-      const comment = yaml.safeLoad(
+      const comment = yaml.load(
         fs.readFileSync(filePath, 'utf8')
       ) as PostComment;
       return {

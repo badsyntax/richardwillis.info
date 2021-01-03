@@ -27,6 +27,12 @@ export const AboutPage: React.FunctionComponent = () => {
           <Link href="/projects">open-source projects</Link>).
         </p>
         <p>
+          As you can probably tell I like minimal design. I also strongly
+          believe speed plays a huge part in the usablity and user experience of
+          a product, and I put in a fair bit of effort to make this site fast
+          &amp; responsive.
+        </p>
+        <p>
           When not coding I enjoy being outdoors and love hiking and cycling.
           Sometimes I do a bit of indoor bouldering too. I grew up in South
           Africa before moving to London, then Barcelona. I recently moved back
