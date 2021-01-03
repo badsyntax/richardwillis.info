@@ -1,6 +1,6 @@
-import config from '../../config/config';
+import getConfig from 'next/config';
 
-const { staticManEndpoint, staticManRepo } = config;
+const { staticManEndpoint, staticManRepo } = getConfig().publicRuntimeConfig;
 
 export const postComment = (comment: FormData): Promise<Response> => {
   const url = `${staticManEndpoint}/v2/entry/${staticManRepo}/master/comments`;

@@ -51,8 +51,6 @@ COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.co
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
 COPY --from=builder --chown=node:node $APP_HOME/build $APP_HOME/build
 COPY --from=builder --chown=node:node $APP_HOME/app.json $APP_HOME/app.json
-COPY --from=builder --chown=node:node $APP_HOME/config.development.json $APP_HOME/config.development.json
-COPY --from=builder --chown=node:node $APP_HOME/config.production.json $APP_HOME/config.production.json
 
 EXPOSE $PORT
 

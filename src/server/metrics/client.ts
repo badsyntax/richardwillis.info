@@ -1,7 +1,7 @@
 import client from 'prom-client';
-import config from '../../config/config';
+import getConfig from 'next/config';
 
-const { appVersion, siteId } = config;
+const { appVersion, siteId } = getConfig().publicRuntimeConfig;
 
 export const registry = new client.Registry();
 

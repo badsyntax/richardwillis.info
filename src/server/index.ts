@@ -1,13 +1,18 @@
 import next from 'next';
 import express from 'express';
 import bodyParser from 'body-parser';
+import getConfig, { setConfig } from 'next/config';
 
-import config from '../config/config';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import config from '../../next.config.js';
+setConfig(config);
+
 import { metricsHandler } from './routes/metrics';
 import { vitalsHandler } from './routes/vitals';
 import { withRouteMetrics } from './metrics/metricsMiddleware';
 
-const { port, isProd } = config;
+const { port, isProd } = getConfig().publicRuntimeConfig;
 
 const app = next({ dev: !isProd });
 const nextRequestHandler = app.getRequestHandler();

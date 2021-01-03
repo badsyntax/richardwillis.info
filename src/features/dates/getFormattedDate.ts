@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import config from '../../config/config';
+import getConfig from 'next/config';
 
-const { locale } = config;
+const { locale } = getConfig().publicRuntimeConfig;
 
 export function getFormattedDate(
   date: Date,
