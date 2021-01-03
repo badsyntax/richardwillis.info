@@ -175,13 +175,13 @@ The next.js link component requires you to omit the href property on the anchor 
 ```tsx
 // Default next.js Link usage, a little weird, and shows an ally linting error as href is missing
 <Link href="/blog">
-  <a className={styles.card}>
+  <a>
     Blog
   </a>
 </Link>
 
 // New and improved composed Link component, nice and neat
-<Link href="/blog" className={styles.card}>
+<Link href="/blog">
   Blog
 </Link>
 ```

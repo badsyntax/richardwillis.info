@@ -22,6 +22,7 @@ export interface Post {
   author: Author;
   date: string;
   content: string;
+  contentHtml?: string;
   excerpt: string;
   ogImage: OGImage;
   draft: boolean;

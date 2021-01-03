@@ -76,9 +76,9 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
     <form className={classes('form')} action="" onSubmit={handleSubmit}>
       <input type="hidden" name="fields[slug]" value={slug} />
       <FormRow>
-        <label className={classes('heading')} htmlFor="comment-text">
+        <Typography as="h3" className={classes('heading')}>
           Add a new comment
-        </label>
+        </Typography>
       </FormRow>
       <FormRow>
         <Label htmlFor="comment-name" hidden>

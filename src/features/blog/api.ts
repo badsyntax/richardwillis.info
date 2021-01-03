@@ -5,6 +5,7 @@ import matter from 'gray-matter';
 import { Post, PostComment } from './types';
 import { logger } from '../logger/logger';
 import { markdownToSimpleHtml } from '../markdown/markdownToSimpleHtml';
+import { markdownToHtml } from '../markdown/markdownToHtml';
 
 const postsDirectory = join(process.cwd(), 'blog');
 const commentsDirectory = join(postsDirectory, 'comments');
@@ -54,6 +55,8 @@ export function getPostBySlug(slug: string, fields = []): Post {
         return realSlug;
       case 'content':
         return content;
+      case 'contentHtml':
+        return markdownToHtml(content);
       case 'comments':
         return getComments(realSlug);
       default:
