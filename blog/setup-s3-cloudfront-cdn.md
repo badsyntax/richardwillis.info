@@ -221,7 +221,7 @@ Resources:
               IncludeBody: false
         DefaultRootObject: 'index.html'
         Enabled: true
-        HttpVersion: 'http1.1'
+        HttpVersion: 'http2'
         IPV6Enabled: false
         Origins:
           - DomainName: !GetAtt S3Bucket.DomainName
