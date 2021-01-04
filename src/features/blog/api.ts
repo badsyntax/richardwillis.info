@@ -23,27 +23,31 @@ export function getComments(slug: string): PostComment[] {
   if (!fs.existsSync(rootDir)) {
     return [];
   }
-  return fs
-    .readdirSync(rootDir)
-    .map<PostComment | null>((fileName: string) => {
-      const filePath = join(rootDir, fileName);
-      try {
-        return yaml.safeLoad(fs.readFileSync(filePath, 'utf8')) as PostComment;
-      } catch (e) {
-        logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
-        return null;
-      }
-    })
-    .filter((comment) => comment !== null)
-    .map((comment) => {
+
+  function notNull<T>(value: T | null): value is T {
+    return value !== null;
+  }
+
+  function parseComment(fileName: string): PostComment | null {
+    const filePath = join(rootDir, fileName);
+    try {
+      const comment = yaml.safeLoad(
+        fs.readFileSync(filePath, 'utf8')
+      ) as PostComment;
       return {
         ...comment,
         messageHtml: markdownToSimpleHtml(comment.message),
       };
-    });
+    } catch (e) {
+      logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
+      return null;
+    }
+  }
+
+  return fs.readdirSync(rootDir).map(parseComment).filter(notNull);
 }
 
-export function getPostBySlug(slug: string, fields = []): Post {
+export function getPostBySlug(slug: string, fields: string[] = []): Post {
   const realSlug = slug.replace(/\.md$/, '');
   const fullPath = join(postsDirectory, `${realSlug}.md`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
@@ -64,26 +68,26 @@ export function getPostBySlug(slug: string, fields = []): Post {
     }
   };
 
-  const post = fields.reduce(
-    (acc: Record<string, Post[keyof Post]>, field: string) => ({
+  const post = fields.reduce<Partial<Post>>(
+    (acc: Partial<Post>, field: string) => ({
       ...acc,
       [field]: getData(field),
     }),
     {}
-  );
+  ) as Post;
 
   return post;
 }
 
-export function getAllPosts(fields = []): Post[] {
+export function getAllPosts(fields: string[] = []): Post[] {
   const slugs = getPostSlugs();
   const posts = slugs
     .map((slug: string) => getPostBySlug(slug, fields))
-    .sort((post1, post2) => (post1.date > post2.date ? -1 : 1));
+    .sort((post1: Post, post2: Post) => (post1.date > post2.date ? -1 : 1));
   return posts;
 }
 
-export function getAllVisiblePosts(fields = []): Post[] {
+export function getAllVisiblePosts(fields: string[] = []): Post[] {
   const fieldsWithDraftStatus = fields.slice().concat(['draft']);
   const visiblePosts = getAllPosts(fieldsWithDraftStatus).filter(
     (post: Post) => !post.draft

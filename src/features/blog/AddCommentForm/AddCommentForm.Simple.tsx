@@ -9,7 +9,7 @@ export interface AddCommentFormProps {
 export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
   slug,
 }) => {
-  const [postError, setPostError] = useState<string>(null);
+  const [postError, setPostError] = useState<string | null>(null);
   const [postSuccess, setPostSuccess] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
 

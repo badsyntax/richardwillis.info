@@ -3,10 +3,12 @@ import unified from 'unified';
 import parse from 'remark-parse';
 import remark2rehype from 'remark-rehype';
 import html from 'rehype-stringify';
-import rehypePrism from '@mapbox/rehype-prism';
 import slug from 'rehype-slug';
 import autolinkHeadings from 'rehype-autolink-headings';
 import externalLinks from 'remark-external-links';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore no types defined
+import rehypePrism from '@mapbox/rehype-prism';
 
 export const markdownToHtml = (markdown: VFileCompatible): string => {
   const result = unified()

@@ -1,4 +1,5 @@
 import React from 'react';
+import { SIZE } from './constants';
 import { SourceFormats } from './SourceFormats';
 import { getImageType, getImageSize, getResizedUrl } from './util';
 
@@ -16,8 +17,11 @@ export const Image: React.FunctionComponent<ImageProps> = ({
   alt,
   ...props
 }) => {
+  if (!src) {
+    return null;
+  }
   const type = getImageType(src);
-  const size = getImageSize(width && Number(width));
+  const size = width ? getImageSize(Number(width)) : SIZE.XL;
   const resizedSrc = getResizedUrl(src, type, size);
   return (
     <picture>

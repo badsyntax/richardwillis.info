@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 
 import { Button } from '../../layout/Button/Button';
 import { Typography } from '../../layout/Typography/Typography';
-import { CommentBox } from '../../layout/CommentBox/CommentBox';
+import { PreviewCommentBox } from '../../layout/CommentBox/CommentBox';
 import { FormRow } from '../../layout/FormRow/FormRow';
 import { Textarea } from '../../layout/Field/Textarea';
 import { Label } from '../../layout/Label/Label';
@@ -22,10 +22,10 @@ export interface AddCommentFormProps {
 export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
   slug,
 }) => {
-  const [error, setError] = useState<string>(null);
+  const [error, setError] = useState<string | null>(null);
   const [postSuccess, setPostSuccess] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-  const [preview, setPreview] = useState<string>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [isPreviewLoading, setIsPreviewLoading] = useState<boolean>(false);
 
@@ -111,11 +111,7 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
           fullWidth
         ></Textarea>
         {!!preview && (
-          <CommentBox
-            showHeader={false}
-            className={classes('preview')}
-            message={preview}
-          />
+          <PreviewCommentBox className={classes('preview')} message={preview} />
         )}
       </FormRow>
       {error && (

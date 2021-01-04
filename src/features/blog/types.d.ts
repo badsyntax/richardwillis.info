@@ -12,8 +12,8 @@ export interface PostComment {
   name: string;
   date: number;
   message: string;
+  messageHtml: string;
   slug: string;
-  messageHtml?: string;
 }
 
 export interface Post {
@@ -22,7 +22,7 @@ export interface Post {
   author: Author;
   date: string;
   content: string;
-  contentHtml?: string;
+  contentHtml: string;
   excerpt: string;
   ogImage: OGImage;
   draft: boolean;

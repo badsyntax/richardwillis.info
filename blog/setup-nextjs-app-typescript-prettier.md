@@ -10,7 +10,7 @@ ogImage:
 draft: false
 ---
 
-This post outlines the steps I take to set up a new `Next.js` project and covers the following features:
+This post outlines the steps I take to bootstrap a new `Next.js` project and covers the following features:
 
 - TypeScript support
 - Prettier for formatting
@@ -28,6 +28,8 @@ touch tsconfig.json
 npm install --save-dev typescript @types/react @types/node
 npm run dev
 ```
+
+(Next.js will populate the empty `tsconfig.json` for you. The only additional change I make is to set `"strict": true`.)
 
 Set up `eslint` and `prettier`:
 

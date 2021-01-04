@@ -4,8 +4,10 @@ import { getAllPosts, getPostBySlug } from '../../features/blog/api';
 export { PostPage as default } from '../../features/blog/PostPage/PostPage';
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  if (Array.isArray(params.slug)) {
-    return null;
+  if (!params || !params.slug || Array.isArray(params.slug)) {
+    return {
+      props: {},
+    };
   }
 
   const post = getPostBySlug(params.slug, [
