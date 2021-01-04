@@ -1,7 +1,9 @@
 import { OutputChannel } from '../OutputChannel';
 import { LogType } from '../types';
 
-function getConsoleLogger(type: LogType) {
+function getConsoleLogger(
+  type: LogType
+): (message?: unknown, ...optionalParams: unknown[]) => void {
   switch (type) {
     case LogType.debug:
       return console.debug;
