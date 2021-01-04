@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import classNames from 'classnames/bind';
 import { MdClose, MdMenu } from 'react-icons/md';
 
-import { Link } from '../Link/Link';
 import { Nav } from '../Nav/Nav';
 
 import STYLES from './MobileNav.module.css';

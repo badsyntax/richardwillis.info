@@ -70,7 +70,7 @@ export const nextRouteChangeRenderHistogram = new client.Histogram({
 
 registry.registerMetric(nextRouteChangeRenderHistogram);
 
-function getHistogram(metricName: string): client.Histogram<any> | null {
+function getHistogram(metricName: string): client.Histogram<string> | null {
   switch (metricName) {
     case 'TTFB':
       return ttfbHistogram;

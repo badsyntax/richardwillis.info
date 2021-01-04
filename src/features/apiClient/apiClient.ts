@@ -4,7 +4,9 @@ const { staticManEndpoint, staticManRepo } = getConfig().publicRuntimeConfig;
 
 export const postComment = (comment: FormData): Promise<Response> => {
   const url = `${staticManEndpoint}/v2/entry/${staticManRepo}/master/comments`;
-  const searchParams = new URLSearchParams(comment as any);
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const searchParams = new URLSearchParams(comment);
   return fetch(url, {
     body: searchParams,
     method: 'POST',

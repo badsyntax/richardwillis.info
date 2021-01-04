@@ -5,15 +5,12 @@ import { Link } from '../Link/Link';
 import STYLES from './Nav.module.css';
 const classes = classNames.bind(STYLES);
 
-export interface NavProps {
-  className?: string;
-  itemClassName?: string;
-}
+export type NavProps = React.DetailedHTMLProps<
+  React.HTMLAttributes<HTMLElement>,
+  HTMLElement
+>;
 
-export const Nav: React.FunctionComponent<NavProps> = ({
-  className,
-  itemClassName,
-}) => {
+export const Nav: React.FunctionComponent<NavProps> = ({ className }) => {
   const classNames = {
     className: classes('nav-item'),
     activeClassName: classes('active'),

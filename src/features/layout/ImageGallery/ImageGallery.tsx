@@ -25,23 +25,27 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
   width,
   height,
 }) => {
-  const [selectedImage, setSelectedImage] = useState<Image>(null);
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const onModalClose = () => setSelectedImage(null);
-  const onItemClick = (image: Image) => (e) => {
-    return;
-    // e.preventDefault();
-    // setSelectedImage(image);
-  };
+  // const onItemClick = (image: Image) => (
+  //   e: React.MouseEvent<HTMLAnchorElement>
+  // ) => {
+  //   return;
+  //   // e.preventDefault();
+  //   // setSelectedImage(image);
+  // };
   return (
     <Fragment>
       <Modal open={!!selectedImage} onClose={onModalClose}>
-        <ImageLoader
-          src={selectedImage?.src}
-          alt={selectedImage?.alt}
-          layout="responsive"
-          width={400}
-          height={300}
-        />
+        {selectedImage && (
+          <ImageLoader
+            src={selectedImage.src}
+            alt={selectedImage.alt}
+            layout="responsive"
+            width={400}
+            height={300}
+          />
+        )}
       </Modal>
       <ul className={classes('root')}>
         {images.map((image, i) => {
@@ -51,7 +55,7 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
                 href={image.src}
                 target="_blank"
                 rel="noopener"
-                onClick={onItemClick(image)}
+                // onClick={onItemClick(image)}
               >
                 <Image
                   src={image.src}

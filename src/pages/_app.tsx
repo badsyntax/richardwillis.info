@@ -11,7 +11,7 @@ export { reportWebVitals } from '../features/metrics/reportWebVitals';
 
 export interface MyAppProps {
   Component: React.FunctionComponent | React.ComponentClass;
-  pageProps: unknown;
+  pageProps: Record<string, unknown>;
 }
 
 const MyApp: React.FunctionComponent<MyAppProps> = ({

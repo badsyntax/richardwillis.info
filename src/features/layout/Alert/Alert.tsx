@@ -11,12 +11,14 @@ export enum AlertSeverity {
   'success' = 'success',
 }
 
-function getIcon(severity: AlertSeverity) {
+function getIcon(severity: AlertSeverity): React.ElementType {
   switch (severity) {
     case AlertSeverity.error:
       return FaExclamationTriangle;
     case AlertSeverity.success:
       return FaCheck;
+    default:
+      throw new Error('No icon');
   }
 }
 

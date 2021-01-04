@@ -10,15 +10,11 @@ ogImage:
 draft: false
 ---
 
-[Staticman](https://staticman.net/) is a service that provides static-file user-generated content to your project via pull requests.
+[Staticman](https://staticman.net/) is a service that provides static file user-generated content (as `yaml` or `json` files) to your project via GitHub pull requests.
 
-Unlike other static blog comment solutions, it does not provide any front-end implementation. You have full control over how you render your comments, and can seamlessly integrate `staticman` into your existing static website build (eg huge/jekyll/gatsby/nextjs etc).
+`Staticman` doesn't provide any front-end implementation, it just validates requests (eg to prevent spam) and creates pull requests. It's mainly targetted towards static website build systems (eg hugo/jekyll/gatsby/nextjs etc) which already have a build process in place, but it's entirely up to you to integrate it into your project. One obvious big benefit of this approach is you have absolute control over the front-end, and don't need to load any 3rd party JavaScript or CSS.
 
-The integration of `staticman` into your Next.js project involves:
-
-- Deploying a self-hosted `staticman` instance to your `dokku` server.
-- Building a `html` form that either `post`'s or sends a `xhr`/`fetch` request to the `staticman` endpoint
-- Reading and parsing the static markdown files
+You can use the [hosted version](https://staticman.net/docs/getting-started.html) or self-host it yourself. I decided to self-host as it's really not a large project and was easy to setup. I can also then monitor and optmise the service better.
 
 ## Create the self-hosted staticman service
 
@@ -105,7 +101,7 @@ You can test this by building and running the image locally:
 # Create a private key with an empty passphrase
 ssh-keygen -m PEM -t rsa -b 4096 -C "staticman key" -f ~/.ssh/staticman -q -N ""
 docker build -t dokku/staticman:latest .
-docker run --publish 3000:3000 -e "RSA_PRIVATE_KEY=$(cat .ssh/staticman_key)" dokku/staticman:latest
+docker run --publish 3000:3000 -e "RSA_PRIVATE_KEY=$(cat ~/.ssh/staticman_key)" dokku/staticman:latest
 ```
 
 ### Deploy docker Image to dokku Server
@@ -166,9 +162,15 @@ If all goes well you should see:
 
 ## Integrate staticman Into Your Next.js Project
 
-The following assumes you have already built a blog system into your Next.js project. View this [example blog starter](https://github.com/vercel/next.js/tree/canary/examples/blog-starter) to see how to set that up.
+At a high-level you need to:
 
-### Reading the Comment yaml Files
+- Read and parse the static markdown files and provide this data to the page component
+- Render a list of comments
+- Render a `html` form that either `post`'s or sends a `xhr`/`fetch` request to the `staticman` endpoint
+
+The following assumes you have already built a blog system into your Next.js project. (View this [example blog starter](https://github.com/vercel/next.js/tree/canary/examples/blog-starter) to see how to set that up.)
+
+### Read & Parse the Comment yaml Files
 
 Here's an example blog api witten in `TypeScript` that uses `remark` & `rehype` to parse the markdown blog posts, and `js-yaml` to parse the blog comments:
 

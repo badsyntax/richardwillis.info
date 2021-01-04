@@ -14,7 +14,6 @@ export interface PostPreviewProps {
 
 export const PostPreview: React.FunctionComponent<PostPreviewProps> = ({
   title,
-  date,
   excerpt,
   author,
   slug,

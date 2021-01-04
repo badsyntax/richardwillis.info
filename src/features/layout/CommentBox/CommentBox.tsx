@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import classNames from 'classnames/bind';
 
 import { Typography } from '../Typography/Typography';
@@ -34,7 +34,12 @@ export const CommentBox: React.FunctionComponent<CommentBoxProps> = ({
     <section className={classes('root', className)} {...props}>
       {showHeader && (
         <Typography as="h3" className={classes('header')}>
-          {name} on <Link href="#">{getFormattedDateLong(date)}</Link>
+          {name}{' '}
+          {date && (
+            <Fragment>
+              on <Link href="#">{getFormattedDateLong(date)}</Link>
+            </Fragment>
+          )}
         </Typography>
       )}
       {message && (
@@ -46,4 +51,10 @@ export const CommentBox: React.FunctionComponent<CommentBoxProps> = ({
       {children}
     </section>
   );
+};
+
+export const PreviewCommentBox: React.FunctionComponent<CommentBoxProps> = (
+  props
+) => {
+  return <CommentBox showHeader={false} {...props} />;
 };

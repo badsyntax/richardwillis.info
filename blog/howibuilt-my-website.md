@@ -15,16 +15,18 @@ Checklist
 - [x] http/2 support on all requests
   - [x] requests from nodejs
   - [x] requests from CDN (CloudFront)
-- [x] Correct cache headers on immutable assets
-- [x] Correct CORS headers on immutable assets
+- [x] Immutable assets served from CDN (js,css,images etc)
+  - [x] Correct cache headers on immutable assets
+  - [x] Correct CORS headers on immutable assets
 - [x] robots.txt
 - [x] favicon.ico
 - [x] Automated & versioned deployments
-  - [ ] Immutable assets uploaded to S3
+  - [x] Immutable assets uploaded to S3
   - [ ] Tests (layout & functional)
   - [x] App previews on pull request
 - [x] Monitoring
   - [x] Server metrics
   - [x] Client metrics (including web-vitals)
-- [ ] Responsive images
+- [x] Responsive images
 - [ ] Budgets added (see web.dev & lighthouse)
+- [ ] Sub-100ms response times for server side responses

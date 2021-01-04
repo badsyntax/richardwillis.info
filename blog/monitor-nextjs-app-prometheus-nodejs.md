@@ -93,7 +93,7 @@ touch /var/lib/dokku/data/storage/prometheus/config/{alert.rules,prometheus.yml}
 chown -R nobody:nogroup /var/lib/dokku/data/storage/prometheus
 ```
 
-Set the docker command to set tsdb config (to prevent a lockfile being saved to allow us to re-deploy without errors):
+Set prometheus config:
 
 ```bash
 dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
@@ -103,6 +103,8 @@ dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prome
   --web.enable-lifecycle
   --storage.tsdb.no-lockfile"
 ```
+
+We need to prevent tsdb from creating a lockfile to allow us to re-deploy without data read errors.
 
 #### Prometheus Networking
 

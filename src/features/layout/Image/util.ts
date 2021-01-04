@@ -33,6 +33,9 @@ export function getResizedUrl(
 ): string {
   const urlParts = src.split('/');
   const filename = urlParts.pop();
+  if (!filename) {
+    throw new Error(`invalid image path: ${src}`);
+  }
   const filenameParts = filename.split('.');
   filenameParts.pop();
   const filenameWithWidth = `${filenameParts.join('.')}-${width}`;
@@ -52,7 +55,15 @@ export function getImageSize(width: number): SIZE {
 }
 
 export function getImageType(src: string): SourceFormatType {
+  function isValidSourceFormatType(
+    value: string
+  ): value is keyof typeof SourceFormatType {
+    return value in SourceFormatType;
+  }
   const extension = src.split('.').pop();
+  if (!extension || !isValidSourceFormatType(extension)) {
+    throw new Error(`invalid image extension: ${src}`);
+  }
   return SourceFormatType[extension];
 }
 
@@ -62,6 +73,8 @@ export function getImageContentType(type: SourceFormatType): string {
       return `image/jpg`;
     case 'webp':
       return `image/webp`;
+    default:
+      throw new Error(`Unsupported image type: ${type}`);
   }
 }
 

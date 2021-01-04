@@ -1,13 +1,13 @@
 import React from 'react';
-import classNames from 'classnames/bind';
+// import classNames from 'classnames/bind';
 
 import { PageShell } from '../../layout/PageShell/PageShell';
 import { Post } from '../types';
 import { PostsIndex } from '../PostsIndex/PostsIndex';
 import { Typography } from '../../layout/Typography/Typography';
 
-import STYLES from './BlogPage.module.css';
-const classes = classNames.bind(STYLES);
+// import STYLES from './BlogPage.module.css';
+// const classes = classNames.bind(STYLES);
 
 export interface BlogPageProps {
   allPosts: Post[];

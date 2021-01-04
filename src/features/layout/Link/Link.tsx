@@ -16,7 +16,7 @@ export type LinkProps = React.DetailedHTMLProps<
     variant?: LinkVariant;
   };
 
-const hrefInPath = (pathname, href): boolean => {
+const hrefInPath = (pathname: string, href: string): boolean => {
   const pathSplit = pathname.split('/');
   return href.split('/').every((part, i) => pathSplit[i] === part);
 };
