@@ -25,8 +25,14 @@ Checklist
   - [ ] Tests (layout & functional)
   - [x] App previews on pull request
 - [x] Monitoring
-  - [x] Server metrics
+  - [x] Runtime server metrics
   - [x] Client metrics (including web-vitals)
+  - [x] Docker container metrics
+  - [x] Host server metrics
+  - [x] Graphs UI
+- [ ] Logs
+  - [ ] Indexed in elasticsearch
+  - [ ] Log viewing UI
 - [x] Responsive images
 - [ ] Budgets added (see web.dev & lighthouse)
 - [ ] Sub-100ms response times for server side responses

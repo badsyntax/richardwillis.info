@@ -42,6 +42,7 @@
     "letsencrypt",
     "mapbox",
     "mkdir",
+    "nocheck",
     "nprogress",
     "opencontainers",
     "rehype",
