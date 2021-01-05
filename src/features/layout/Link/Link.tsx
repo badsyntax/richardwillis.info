@@ -29,11 +29,16 @@ export const Link: React.FunctionComponent<LinkProps> = ({
   ...rest
 }) => {
   const router = useRouter();
-  const isInternal = href.startsWith('#');
+  const isInPage = href.startsWith('#');
+  const isExternal = !href.startsWith('/');
+
   const anchorProps = {
     ...rest,
-    ...(isInternal && {
+    ...((isInPage || isExternal) && {
       href,
+    }),
+    ...(isExternal && {
+      rel: 'nofollow',
     }),
   };
 
@@ -49,5 +54,9 @@ export const Link: React.FunctionComponent<LinkProps> = ({
     />
   );
 
-  return isInternal ? anchor : <NextLink href={href}>{anchor}</NextLink>;
+  return isInPage || isExternal ? (
+    anchor
+  ) : (
+    <NextLink href={href}>{anchor}</NextLink>
+  );
 };

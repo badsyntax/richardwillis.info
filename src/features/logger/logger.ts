@@ -3,7 +3,10 @@ import { OutputChannel } from './OutputChannel';
 import { LogType } from './types';
 
 export class Logger {
-  constructor(private readonly channels: OutputChannel[]) {}
+  constructor(
+    private readonly channels: OutputChannel[],
+    private readonly prefix?: string
+  ) {}
 
   public info(...messages: string[]): void {
     this.log(messages.join(' '), LogType.info);
@@ -31,7 +34,7 @@ export class Logger {
   }
 
   private format(message: string, type: LogType): string {
-    return `[${type}] ${message}`;
+    return (this.prefix ? `[${this.prefix}] ` : '') + `[${type}] ${message}`;
   }
 }
 
