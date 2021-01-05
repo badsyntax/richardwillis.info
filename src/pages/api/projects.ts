@@ -3,11 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import NodeCache from 'node-cache';
 import { ConsoleChannel } from '../../features/logger/channels/ConsoleChannel';
 import { Logger } from '../../features/logger/logger';
-
-interface Repo {
-  name: string;
-  stars: number;
-}
+import { Repo } from '../../types/types';
 
 type GitHubRepos = RestEndpointMethodTypes['repos']['listForOrg']['response']['data'];
 

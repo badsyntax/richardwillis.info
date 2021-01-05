@@ -42,14 +42,19 @@
     p-4
     rounded-xl
     border
-    border-gray-300
+    border-gray-200
     text-gray-800
     duration-200
     inline-block
-    no-underline
-    hover:border-gray-400
-    hover:shadow-md;
+    no-underline;
   transition-property: box-shadow, border-color;
+}
+
+.variant-card:hover,
+.variant-card:focus {
+  @apply border-gray-400
+    shadow-md
+    outline-none;
 }
 
 .variant-card:active {
