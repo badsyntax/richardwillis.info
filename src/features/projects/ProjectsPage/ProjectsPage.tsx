@@ -1,23 +1,17 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import classNames from 'classnames/bind';
 
 import { PageShell } from '../../layout/PageShell/PageShell';
 
 import { Typography } from '../../layout/Typography/Typography';
-import { ProjectsIndex } from '../ProjectsIndex/ProjectsIndex';
+import { ProjectsList } from '../ProjectsList/ProjectsList';
 import { projects } from './projects';
 
 import STYLES from './ProjectsPage.module.css';
 import { Link } from '../../layout/Link/Link';
-import { getRepos } from './gitHub';
 const classes = classNames.bind(STYLES);
 
 export const ProjectsPage: React.FunctionComponent = () => {
-  useEffect(() => {
-    getRepos('badsyntax').then((repos) => {
-      console.log('repos', repos);
-    });
-  }, []);
   return (
     <PageShell
       title="Projects"
@@ -36,7 +30,9 @@ export const ProjectsPage: React.FunctionComponent = () => {
           .
         </p>
       </Typography>
-      <ProjectsIndex projects={projects} />
+      <ProjectsList projects={projects} />
+      {/* <Typography as="h2">GitHub Stats</Typography> */}
+      {/* <p>Some of my GitHub stats here</p> */}
     </PageShell>
   );
 };

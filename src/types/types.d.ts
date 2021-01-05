@@ -4,3 +4,8 @@ export interface VitalsMetric {
   path: string;
   metric: NextWebVitalsMetric;
 }
+
+export interface Repo {
+  name: string;
+  stars: number;
+}
