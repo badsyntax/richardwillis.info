@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames/bind';
+import { FaGithub } from 'react-icons/fa';
 import { Project } from '../types';
 import { Card } from '../../layout/Card/Card';
 
@@ -18,7 +19,10 @@ export const ProjectsIndex: React.FunctionComponent<ProjectsIndexProps> = ({
       {projects.map((project, i) => {
         return (
           <Card href={project.repoUrl} className={classes('card')} key={i}>
-            <Card.Title>{project.title}</Card.Title>
+            <Card.Title className={classes('title')}>
+              <FaGithub className={classes('icon')} />
+              {project.title}
+            </Card.Title>
             <Card.Content>{project.description}</Card.Content>
             <Card.Content className={classes('tags')}>
               {project.tags.map((tag, i) => (
