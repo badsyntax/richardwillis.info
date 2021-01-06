@@ -91,6 +91,6 @@ jobs:
         with:
           command: deploy
           git_remote_url: ${{ secrets.GIT_REMOTE_URL }}
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
           git_push_flags: '--force'
           ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}
