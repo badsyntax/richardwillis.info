@@ -1,7 +1,7 @@
 # RichardWillis.info
 
 ![Analyze](https://github.com/badsyntax/richardwillis.info/workflows/Analyze/badge.svg)
-![Publish](https://github.com/badsyntax/richardwillis.info/workflows/Publish/badge.svg)
+![Prod deploy](https://github.com/badsyntax/richardwillis.info/workflows/Prod%20deploy/badge.svg)
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
