@@ -1,8 +1,28 @@
-const { ASSET_PREFIX, APP_VERSION, PORT, NODE_ENV } = process.env;
+const fs = require('fs');
 
+function getAppVersion() {
+  // We store app version on disk (as part of the docker build phase) due to limitations on
+  // setting env vars as part of the deploy phase (see dokku/github-action)
+  const defaultVersion = new Date().getTime().toString();
+  try {
+    const version = fs.readFileSync('./VERSION', 'utf8').trim();
+    if (!version) {
+      throw new Error('No version specified in VERSION');
+    }
+    return version;
+  } catch (e) {
+    console.warn(
+      `[warn] Using default version (${defaultVersion}), because:`,
+      e.message
+    );
+    return defaultVersion;
+  }
+}
+
+const { ASSET_PREFIX, PORT, NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
-
-const appVersion = APP_VERSION || `${new Date().getTime()}`;
+const appVersion = getAppVersion();
+const port = Number(PORT || '3000');
 
 module.exports = {
   assetPrefix:
@@ -16,7 +36,7 @@ module.exports = {
       appVersion,
       siteId: 'richardwillis',
       locale: 'en-GB',
-      port: Number(PORT || '3000'),
+      port,
       isProd,
     },
     isProd
