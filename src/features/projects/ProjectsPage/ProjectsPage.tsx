@@ -20,7 +20,7 @@ export const ProjectsPage: React.FunctionComponent = () => {
       <Typography as="div" variant="prose" className={classes('content')}>
         <h1>Projects</h1>
         <p>
-          I enjoy working with related tech like TypeScript, Node.js, Python
+          I enjoy working with web related tech like TypeScript, Node.js, Python
           &amp; Java. I try to contribute to Open Source where I can, and mostly
           all of my personal code is released as OSS.
         </p>

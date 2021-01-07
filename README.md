@@ -25,7 +25,7 @@ Add new entries as markdown files to [blog/](./blog).
 Build & run the Node.js image:
 
 ```bash
-docker build -t badsyntax/richardwillis .
+docker build -t badsyntax/richardwillis --build-arg ASSET_PREFIX=/ .
 docker run --publish 3000:3000 badsyntax/richardwillis
 
 # or
