@@ -4,7 +4,10 @@ FROM base AS builder
 
 WORKDIR /app
 
-RUN apk update && apk add curl
+RUN apk add curl=7.67.0-r3 --no-cache
+
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 RUN curl -sf https://gobinaries.com/tj/node-prune | sh
 
 ARG APP_VERSION

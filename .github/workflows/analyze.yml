@@ -26,9 +26,11 @@ jobs:
     name: Lint dockerfile
     steps:
       - uses: actions/checkout@v1
-      - uses: brpaz/hadolint-action@v1.2.1
+      - name: Lint app dockerfile
+        uses: brpaz/hadolint-action@v1.2.1
         with:
           dockerfile: Dockerfile
-      - uses: brpaz/hadolint-action@v1.2.1
+      - name: Lint staticman dockerfile
+        uses: brpaz/hadolint-action@v1.2.1
         with:
           dockerfile: staticman/Dockerfile

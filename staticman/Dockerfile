@@ -1,6 +1,6 @@
 FROM node:14.15.3-alpine as builder
 
-RUN apk add --no-cache python3 make git
+RUN apk add --no-cache python3=3.8.2-r1 make=4.2.1-r2 git=2.24.3-r0
 
 WORKDIR /app
 
