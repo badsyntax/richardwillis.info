@@ -6,20 +6,18 @@ import { Post, PostComment } from './types';
 import { logger } from '../logger/logger';
 import { markdownToSimpleHtml } from '../markdown/markdownToSimpleHtml';
 import { markdownToHtml } from '../markdown/markdownToHtml';
-
-const postsDirectory = join(process.cwd(), 'blog');
-const commentsDirectory = join(postsDirectory, 'comments');
+import { COMMENTS_DIRECTORY, POSTS_DIRECTORY } from '../../constants/constants';
 
 export function getPostSlugs(): string[] {
   return fs
-    .readdirSync(postsDirectory)
+    .readdirSync(POSTS_DIRECTORY)
     .filter(
-      (file: string) => !fs.lstatSync(join(postsDirectory, file)).isDirectory()
+      (file: string) => !fs.lstatSync(join(POSTS_DIRECTORY, file)).isDirectory()
     );
 }
 
 export function getComments(slug: string): PostComment[] {
-  const rootDir = join(commentsDirectory, slug);
+  const rootDir = join(COMMENTS_DIRECTORY, slug);
   if (!fs.existsSync(rootDir)) {
     return [];
   }
@@ -47,10 +45,15 @@ export function getComments(slug: string): PostComment[] {
   return fs.readdirSync(rootDir).map(parseComment).filter(notNull);
 }
 
+export function getContentsForSlug(slug: string): string {
+  const fullPath = join(POSTS_DIRECTORY, `${slug}.md`);
+  const fileContents = fs.readFileSync(fullPath, 'utf8');
+  return fileContents;
+}
+
 export function getPostBySlug(slug: string, fields: string[] = []): Post {
   const realSlug = slug.replace(/\.md$/, '');
-  const fullPath = join(postsDirectory, `${realSlug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
+  const fileContents = getContentsForSlug(realSlug);
   const { data, content } = matter(fileContents);
 
   const getData = (key: string): Post[keyof Post] => {

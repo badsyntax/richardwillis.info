@@ -6,11 +6,15 @@
     text-gray-500;
 }
 
-.back-link {
+.action-link {
   @apply text-sm
     sm:text-base
     mb-6
     sm:mb-8
     inline-block
     font-medium;
+}
+
+.page-actions {
+  @apply flex justify-between;
 }
