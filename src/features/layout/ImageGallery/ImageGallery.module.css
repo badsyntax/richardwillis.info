@@ -7,8 +7,7 @@
 }
 
 .item {
-  @apply rounded-xl
-    m-5
+  @apply m-5
     sm:m-10
     overflow-hidden;
   line-height: 0;

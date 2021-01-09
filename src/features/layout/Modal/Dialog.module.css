@@ -1,15 +1,13 @@
 .root {
   @apply flex
     flex-col
-    bg-white
-    rounded-lg
     text-left
     overflow-hidden
+    border
+    border-gray-700
     shadow-xl
-    transform
-    transition-all
     sm:align-middle
-    sm:max-w-6xl
+    sm:max-w-full
     sm:max-h-full
     mx-auto
     my-10;
@@ -38,7 +36,6 @@
     shadow-sm
     px-4
     py-2
-    bg-white
     text-base
     font-medium
     text-gray-700
@@ -54,12 +51,7 @@
 }
 
 .body {
-  @apply bg-white
-    mx-4
-    mt-5
-    mb-4
-    sm:m-6
-    overflow-hidden
+  @apply overflow-hidden
     relative
     h-full;
 }

@@ -1,5 +1,8 @@
 .root {
   @apply fixed
+    flex
+    items-center
+    justify-center
     z-10
     inset-0
     overflow-y-auto;

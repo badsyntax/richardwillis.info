@@ -2,7 +2,7 @@
   @apply fixed
     inset-0
     transition-opacity
-    bg-gray-500
+    bg-gray-800
     opacity-75
     z-10;
 }

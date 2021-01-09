@@ -1,0 +1,4 @@
+.hidden {
+  /* composes: sr-hidden from '../../../styles/helpers.module.css'; */
+  @apply w-auto h-auto;
+}
