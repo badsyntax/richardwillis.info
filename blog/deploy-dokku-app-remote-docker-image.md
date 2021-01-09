@@ -10,7 +10,7 @@ ogImage:
 draft: false
 ---
 
-There's a couple ways to deploy your app to dokku. The most common workflow being the heroku style `git push`. This approach is convenient, but means app builds take place on your server. This is perhaps not a problem for most people, but was quite a big problem for me as I'm deploying apps with complicated builds (using webpack) that take long time to complete and require a lot of machine resources (like a LOT of RAM and a decent amount of processing power). These builds ultimately kill my runtime server and my running apps are unresponsive while a build is taking place. Sure, I could throw more RAM and CPU at the problem, but I'm still on a budget and conceptually I don't like the idea of builds taking place on my runtime server.
+There's a couple ways 22 to deploy your app to dokku. The most common workflow being the heroku style `git push`. This approach is convenient, but means app builds take place on your server. This is perhaps not a problem for most people, but was quite a big problem for me as I'm deploying apps with complicated builds (using webpack) that take long time to complete and require a lot of machine resources (like a LOT of RAM and a decent amount of processing power). These builds ultimately kill my runtime server and my running apps are unresponsive while a build is taking place. Sure, I could throw more RAM and CPU at the problem, but I'm still on a budget and conceptually I don't like the idea of builds taking place on my runtime server.
 
 ## Deploy a pre-built App
 

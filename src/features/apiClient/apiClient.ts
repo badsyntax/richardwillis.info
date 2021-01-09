@@ -32,10 +32,21 @@ export function postComment(comment: FormData): Promise<Response> {
 export async function getGithubRepos(): Promise<Repo[]> {
   const url = `/api/projects`;
   const res = await makeRequest(url, {
+    method: 'GET',
     headers: new Headers({
-      method: 'GET',
       Accept: 'application/json',
     }),
   });
   return await res.json();
+}
+
+export async function getBlogPostContents(slug: string): Promise<string> {
+  const url = `/api/blog/contents?slug=${slug}`;
+  const res = await makeRequest(url, {
+    method: 'POST',
+    headers: new Headers({
+      Accept: 'text/html',
+    }),
+  });
+  return await res.text();
 }

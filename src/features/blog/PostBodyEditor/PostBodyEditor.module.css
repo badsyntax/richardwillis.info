@@ -1,0 +1,7 @@
+.root {
+}
+
+.editor {
+  @apply border border-gray-300 p-2 block w-full;
+  min-height: 10rem;
+}
