@@ -30,7 +30,7 @@ export const Link: React.FunctionComponent<LinkProps> = ({
 }) => {
   const router = useRouter();
   const isInPage = href.startsWith('#');
-  const isExternal = !href.startsWith('/');
+  const isExternal = !isInPage && !href.startsWith('/');
 
   const anchorProps = {
     ...rest,
