@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useLayoutEffect } from 'react';
 import classNames from 'classnames/bind';
 
 import { Overlay } from './Overlay';
@@ -17,7 +17,8 @@ export const Modal: React.FunctionComponent<ModalProps> = ({
   onClose,
   children,
 }) => {
-  useEffect(() => {
+  useLayoutEffect(() => {
+    console.log('I am about to render!');
     document.body.classList[open ? 'add' : 'remove'](classes('no-scroll'));
   }, [open]);
   return open ? (

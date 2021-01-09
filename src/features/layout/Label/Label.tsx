@@ -20,7 +20,7 @@ export const Label: React.FunctionComponent<LabelProps> = ({
 }) => {
   return (
     <label
-      className={classes(hidden && 'sr-hidden', className)}
+      className={classes(hidden && 'hidden', className)}
       {...props}
     ></label>
   );

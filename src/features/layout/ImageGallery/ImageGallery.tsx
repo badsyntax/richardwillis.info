@@ -4,9 +4,9 @@ import classNames from 'classnames/bind';
 import { Link } from '../Link/Link';
 import { Modal } from '../Modal/Modal';
 import { Image } from '../Image/Image';
+import { FullScreenImage } from '../FullScreenImage/FullScreenImage';
 
 import STYLES from './ImageGallery.module.css';
-import { ImageLoader } from '../ImageLoader/ImageLoader';
 const classes = classNames.bind(STYLES);
 
 export interface Image {
@@ -27,23 +27,22 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
   const onModalClose = () => setSelectedImage(null);
-  // const onItemClick = (image: Image) => (
-  //   e: React.MouseEvent<HTMLAnchorElement>
-  // ) => {
-  //   return;
-  //   // e.preventDefault();
-  //   // setSelectedImage(image);
-  // };
+  const onItemClick = (image: Image) => (
+    e: React.MouseEvent<HTMLAnchorElement>
+  ) => {
+    console.log('image', image);
+    // return;
+    e.preventDefault();
+    setSelectedImage(image);
+  };
   return (
     <Fragment>
       <Modal open={!!selectedImage} onClose={onModalClose}>
         {selectedImage && (
-          <ImageLoader
+          <FullScreenImage
+            showLoader
             src={selectedImage.src}
             alt={selectedImage.alt}
-            layout="responsive"
-            width={400}
-            height={300}
           />
         )}
       </Modal>
@@ -55,7 +54,7 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
                 href={image.src}
                 target="_blank"
                 rel="noopener"
-                // onClick={onItemClick(image)}
+                onClick={onItemClick(image)}
               >
                 <Image
                   src={image.src}
