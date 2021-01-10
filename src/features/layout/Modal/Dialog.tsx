@@ -1,7 +1,9 @@
 import React from 'react';
 import classNames from 'classnames/bind';
+import { CgClose } from 'react-icons/cg';
 
 import STYLES from './Dialog.module.css';
+import { DialogButton } from './DialogButton';
 const classes = classNames.bind(STYLES);
 
 export interface DialogProps {
@@ -14,15 +16,9 @@ export const Dialog: React.FunctionComponent<DialogProps> = ({
 }) => {
   return (
     <div className={classes('root')} role="dialog" aria-modal="true">
-      <div className={classes('header')}>
-        <button
-          type="button"
-          className={classes('close-button')}
-          onClick={onClose}
-        >
-          X
-        </button>
-      </div>
+      <DialogButton className={classes('close-button')} onClick={onClose}>
+        <CgClose />
+      </DialogButton>
       <div className={classes('body')}>{children}</div>
     </div>
   );

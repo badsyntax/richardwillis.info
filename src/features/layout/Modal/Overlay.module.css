@@ -1,8 +1,18 @@
 .root {
   @apply fixed
     inset-0
-    transition-opacity
     bg-gray-800
     opacity-75
     z-10;
+  animation-name: fadeIn;
+  animation-duration: 200ms;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    @apply opacity-75;
+  }
 }

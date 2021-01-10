@@ -18,7 +18,6 @@ export const Modal: React.FunctionComponent<ModalProps> = ({
   children,
 }) => {
   useLayoutEffect(() => {
-    console.log('I am about to render!');
     document.body.classList[open ? 'add' : 'remove'](classes('no-scroll'));
   }, [open]);
   return open ? (
