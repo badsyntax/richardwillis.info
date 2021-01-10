@@ -1,4 +1,35 @@
-.hidden {
-  /* composes: sr-hidden from '../../../styles/helpers.module.css'; */
-  @apply w-auto h-auto;
+.root {
+  @apply relative;
+}
+
+.image {
+  @apply border
+    border-gray-700
+    shadow-xl;
+  max-height: calc(100vh - 4rem);
+  max-width: calc(100vw - 2rem);
+}
+
+.footer {
+  @apply text-center
+    font-normal
+    pt-2
+    px-4;
+}
+
+.description {
+  @apply text-white opacity-0;
+  animation-name: fadeIn;
+  animation-duration: 420ms;
+  animation-fill-mode: forwards;
+  animation-delay: 200ms;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    @apply opacity-100;
+  }
 }

@@ -2,7 +2,7 @@
   @apply fixed
     inset-0
     bg-gray-800
-    opacity-75
+    opacity-90
     z-10;
   animation-name: fadeIn;
   animation-duration: 200ms;
@@ -13,6 +13,6 @@
     opacity: 0;
   }
   to {
-    @apply opacity-75;
+    @apply opacity-90;
   }
 }

@@ -6,13 +6,12 @@ export function getSizes(size: SIZE): SIZE[] {
 
 export function getImageSizes(size: SIZE): string {
   const sizes = getSizes(size);
-  const lastSize = sizes.pop();
-  return sizes
-    .map((sourceSize) => {
-      return `(max-width: ${sourceSize}px) ${sourceSize}px`;
-    })
-    .concat([`${lastSize}px`])
-    .join(',\n');
+  const defaultSize = sizes.pop();
+  const mediaQuerySizes = sizes.map(
+    (sourceSize) => `(max-width: ${sourceSize}px) ${sourceSize}px`
+  );
+  mediaQuerySizes.push(`${defaultSize}px`);
+  return mediaQuerySizes.join(',\n');
 }
 
 export function getImageSrcSet(
@@ -28,9 +27,12 @@ export function getImageSrcSet(
 export function getResizedUrl(
   src: string,
   type: SourceFormatType,
-  width: SIZE = SIZE.XL,
+  size: SIZE = SIZE.MAX,
   pathPrefix = 'resized'
 ): string {
+  if (size === SIZE.MAX) {
+    return src;
+  }
   const urlParts = src.split('/');
   const filename = urlParts.pop();
   if (!filename) {
@@ -38,7 +40,7 @@ export function getResizedUrl(
   }
   const filenameParts = filename.split('.');
   filenameParts.pop();
-  const filenameWithWidth = `${filenameParts.join('.')}-${width}`;
+  const filenameWithWidth = `${filenameParts.join('.')}-${size}`;
   const newFilename = `${filenameWithWidth}.${type}`;
   urlParts.push(pathPrefix);
   return urlParts.concat([newFilename]).join('/');
