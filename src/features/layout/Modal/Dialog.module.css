@@ -1,40 +1,9 @@
 .root {
-  @apply flex
-    flex-col
-    text-left
-    border
-    border-gray-700
-    shadow-xl
-    relative
-    /* sm:align-middle */
-    /* sm:max-w-full */
-    /* sm:max-h-full */
-    m-4;
+  @apply m-4;
 }
-
-/* .header {
-  @apply fixed
-    z-10
-    right-2
-    top-4
-    px-4
-    py-3
-    sm:px-6
-    sm:flex
-    sm:flex-row-reverse;
-} */
 
 .close-button {
   @apply fixed
     top-6
     right-8;
-
-}
-
-.body {
-  @apply overflow-hidden
-    relative
-    h-full
-    flex
-    items-center;
 }

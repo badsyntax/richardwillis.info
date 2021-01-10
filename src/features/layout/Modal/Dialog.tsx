@@ -19,7 +19,7 @@ export const Dialog: React.FunctionComponent<DialogProps> = ({
       <DialogButton className={classes('close-button')} onClick={onClose}>
         <CgClose />
       </DialogButton>
-      <div className={classes('body')}>{children}</div>
+      {children}
     </div>
   );
 };

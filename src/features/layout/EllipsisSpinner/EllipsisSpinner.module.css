@@ -1,0 +1,63 @@
+.ellipsis {
+  @apply inline-block
+    relative
+    h-4
+    w-16;
+}
+
+.ellipsis :global(div) {
+  @apply absolute
+    w-3
+    h-3
+    top-1
+    bg-white;
+  border-radius: 50%;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.ellipsis :global(div:nth-child(1)) {
+  @apply left-0;
+  animation: ellipsis1 0.6s infinite;
+}
+
+.ellipsis :global(div:nth-child(2)) {
+  @apply left-0;
+  animation: ellipsis2 0.6s infinite;
+}
+
+.ellipsis :global(div:nth-child(3)) {
+  @apply left-6;
+  animation: ellipsis2 0.6s infinite;
+}
+
+.ellipsis :global(div:nth-child(4)) {
+  @apply left-12;
+  animation: ellipsis3 0.6s infinite;
+}
+
+@keyframes ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(1.5rem, 0);
+  }
+}

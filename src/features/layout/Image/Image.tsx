@@ -11,17 +11,26 @@ export type ImageProps = Omit<
   'loading'
 > & {
   onLoad?: () => void;
-  fullSize?: boolean;
+  size?: SIZE;
 };
 
 export const Image = React.forwardRef<HTMLImageElement, ImageProps>(
-  ({ src, width, alt, fullSize = false, ...props }, imageRef) => {
+  (
+    {
+      src,
+      width,
+      alt,
+      size = width ? getImageSize(Number(width)) : SIZE.MAX,
+      ...props
+    },
+    imageRef
+  ) => {
     if (!src) {
       return null;
     }
     const type = getImageType(src);
-    const size = width ? getImageSize(Number(width)) : SIZE.XL;
-    const resizedSrc = fullSize ? src : getResizedUrl(src, type, size);
+    // const size = width ? getImageSize(Number(width)) : SIZE.XL;
+    const resizedSrc = getResizedUrl(src, type, size);
 
     return (
       <picture>
