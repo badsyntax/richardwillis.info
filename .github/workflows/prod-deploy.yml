@@ -73,6 +73,32 @@ jobs:
     needs: [publish-s3]
     runs-on: ubuntu-20.04
     steps:
+      - name: Create deployment
+        id: create_deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments
+          repository: ${{ github.repository }}
+          ref: ${{ github.event.release.tag_name }}
+          environment: production
+          required_contexts: '[]'
+          production_environment: true
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Set deployment status to in progress
+        id: start_deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          environment: production
+          environment_url: https://richardwillis.info
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          state: in_progress
+          mediaType: '{"previews": ["flash", "ant-man"]}'
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Create deploy repo
         id: deploy_repo
         run: |
@@ -94,3 +120,32 @@ jobs:
           ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
           git_push_flags: '--force'
           ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}
+      - name: Set deployment status to success
+        id: successful_deployment
+        uses: octokit/request-action@v2.x
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          environment: production
+          environment_url: https://richardwillis.info
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          mediaType: '{"previews": ["ant-man"]}'
+          state: success
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Set deployment status to failure
+        id: failed_deployment
+        uses: octokit/request-action@v2.x
+        if: failure()
+        with:
+          route: POST /repos/:repository/deployments/:deployment/statuses
+          repository: ${{ github.repository }}
+          deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
+          environment: production
+          environment_url: https://richardwillis.info
+          log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          mediaType: '{"previews": ["ant-man"]}'
+          state: failure
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
