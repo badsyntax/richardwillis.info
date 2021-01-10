@@ -1,10 +1,4 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { Fragment, useCallback, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { Image, ImageProps } from '../Image/Image';
@@ -14,11 +8,9 @@ const classes = classNames.bind(STYLES);
 
 export type FullScreenImageProps = Omit<ImageProps, 'onLoad'> & {
   src: string;
-  showLoader: boolean;
 };
 
 export const FullScreenImage: React.FunctionComponent<FullScreenImageProps> = ({
-  showLoader,
   ...props
 }) => {
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
@@ -32,7 +24,7 @@ export const FullScreenImage: React.FunctionComponent<FullScreenImageProps> = ({
   console.log('imageLoaded', imageLoaded);
   return (
     <Fragment>
-      <Image {...props} ref={ref} onLoad={onImageLoad} />
+      <Image {...props} ref={ref} onLoad={onImageLoad} fullSize />
       {/* {showLoader && !imageLoaded && (
         <svg
           className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-800"

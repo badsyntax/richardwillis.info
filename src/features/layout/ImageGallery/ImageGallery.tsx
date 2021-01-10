@@ -1,4 +1,6 @@
 import React, { Fragment, useState } from 'react';
+import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+
 import classNames from 'classnames/bind';
 
 import { Link } from '../Link/Link';
@@ -7,6 +9,7 @@ import { Image } from '../Image/Image';
 import { FullScreenImage } from '../FullScreenImage/FullScreenImage';
 
 import STYLES from './ImageGallery.module.css';
+import { DialogButton } from '../Modal/DialogButton';
 const classes = classNames.bind(STYLES);
 
 export interface Image {
@@ -30,20 +33,43 @@ export const ImageGallery: React.FunctionComponent<ImageGalleryProps> = ({
   const onItemClick = (image: Image) => (
     e: React.MouseEvent<HTMLAnchorElement>
   ) => {
-    console.log('image', image);
-    // return;
     e.preventDefault();
     setSelectedImage(image);
   };
+  const onNextButtonClick = () => {
+    if (!selectedImage) {
+      return;
+    }
+    const curIndex = images.indexOf(selectedImage);
+    setSelectedImage(images[curIndex + 1]);
+  };
+  const onPrevButtonClick = () => {
+    if (!selectedImage) {
+      return;
+    }
+    const curIndex = images.indexOf(selectedImage);
+    setSelectedImage(images[curIndex - 1]);
+  };
+  const prevButtonVisible = selectedImage && images.indexOf(selectedImage) > 0;
+  const nextButtonVisible =
+    selectedImage && images.indexOf(selectedImage) < images.length - 1;
   return (
     <Fragment>
       <Modal open={!!selectedImage} onClose={onModalClose}>
         {selectedImage && (
-          <FullScreenImage
-            showLoader
-            src={selectedImage.src}
-            alt={selectedImage.alt}
-          />
+          <Fragment>
+            <FullScreenImage src={selectedImage.src} alt={selectedImage.alt} />
+            {prevButtonVisible && (
+              <DialogButton className={classes('arrow-left')}>
+                <FiArrowLeft onClick={onPrevButtonClick} />
+              </DialogButton>
+            )}
+            {nextButtonVisible && (
+              <DialogButton className={classes('arrow-right')}>
+                <FiArrowRight onClick={onNextButtonClick} />
+              </DialogButton>
+            )}
+          </Fragment>
         )}
       </Modal>
       <ul className={classes('root')}>

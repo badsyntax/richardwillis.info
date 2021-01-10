@@ -1,0 +1,21 @@
+.root {
+  @apply  text-xl
+    sm:text-3xl
+    bg-black
+    rounded-xl
+    p-1
+    sm:rounded-3xl
+    bg-opacity-10
+    hover:bg-opacity-50
+    focus:outline-none
+    focus:border-white
+    text-gray-200;
+}
+
+.root:active {
+  @apply bg-opacity-90
+}
+
+.root :global(path) {
+  stroke: inherit;
+}
