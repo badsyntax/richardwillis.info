@@ -73,7 +73,12 @@ jobs:
     needs: [publish-s3]
     runs-on: ubuntu-20.04
     steps:
-      - name: Create deployment
+      - name: Save deploy start time
+        id: deploy_start
+        run: |
+          start=$(date +%s%N | cut -b1-13)
+          echo ::set-output name=start_time::$start
+      - name: Create GitHub deployment
         id: create_deployment
         uses: octokit/request-action@v2.x
         with:
@@ -85,7 +90,7 @@ jobs:
           production_environment: true
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Set deployment status to in progress
+      - name: Set GitHub deployment status to in progress
         id: start_deployment
         uses: octokit/request-action@v2.x
         with:
@@ -120,6 +125,26 @@ jobs:
           ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
           git_push_flags: '--force'
           ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}
+      - name: Set Grafana deployment
+        run: |
+          end=$(date +%s%N | cut -b1-13)
+          curl -X POST https://grafana.$DOKKU_HOST/api/annotations \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $AUTH_TOKEN" \
+            --data @- << EOF
+            {
+              "dashboardId":2,
+              "time":$TIME_START,
+              "timeEnd":$end,
+              "tags":["deployment","production"],
+              "text":"App version $APP_VERSION deployed to <a href=\"https://richardwillis.info\">https://richardwillis.info</a>"
+            }
+          EOF
+        env:
+          AUTH_TOKEN: '${{ secrets.GRAFANA_AUTH_TOKEN }}'
+          DOKKU_HOST: '${{ secrets.DOKKU_HOST }}'
+          TIME_START: ${{ steps.deploy_start.outputs.start_time }}
+          APP_VERSION: '${{ github.event.release.tag_name }}'
       - name: Set deployment status to success
         id: successful_deployment
         uses: octokit/request-action@v2.x
