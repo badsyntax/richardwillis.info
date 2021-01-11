@@ -54,20 +54,41 @@ async function getAllRepos(username: string): Promise<GitHubRepos> {
   return allRepos;
 }
 
-async function getAndCacheRepos(): Promise<Repo[]> {
-  let repos = cache.get<Repo[]>(CACHE_KEY);
-  if (repos === undefined) {
+let globalRepos: Repo[] = [];
+
+async function setRepos(): Promise<void> {
+  const repos = cache.get<Repo[]>(CACHE_KEY);
+  if (!repos) {
     const allRepos = await getAllRepos(GITHUB_USER);
-    repos = allRepos
+    globalRepos = allRepos
       .filter((repoResponse) => !repoResponse.fork)
       .map((repoResponse) => ({
         name: repoResponse.name,
         stars: Number(repoResponse.stargazers_count),
       }));
-    cache.set(CACHE_KEY, repos);
     logger.info('Cache set for', CACHE_KEY);
+    cache.set(CACHE_KEY, globalRepos);
   }
-  return repos;
+}
+
+setInterval(async () => {
+  console.log('refersh');
+  setRepos();
+}, 5000);
+
+async function getAndCacheRepos(): Promise<Repo[]> {
+  // let repos = cache.get<Repo[]>(CACHE_KEY);
+  if (globalRepos === null) {
+    // const allRepos = await getAllRepos(GITHUB_USER);
+    // globalRepos = allRepos
+    //   .filter((repoResponse) => !repoResponse.fork)
+    //   .map((repoResponse) => ({
+    //     name: repoResponse.name,
+    //     stars: Number(repoResponse.stargazers_count),
+    //   }));
+    await setRepos();
+  }
+  return globalRepos;
 }
 
 export default async (

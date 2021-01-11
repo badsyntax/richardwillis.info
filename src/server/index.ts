@@ -2,6 +2,7 @@ import next from 'next';
 import express from 'express';
 import bodyParser from 'body-parser';
 import getConfig, { setConfig } from 'next/config';
+import cron from 'node-cron';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -20,6 +21,10 @@ const nextRequestHandler = app.getRequestHandler();
 const server = express();
 server.disable('x-powered-by');
 server.use(bodyParser.json());
+
+cron.schedule('* * * * *', function () {
+  console.log('running a task every minute');
+});
 
 app.prepare().then(() => {
   server.get('/metrics', metricsHandler);
