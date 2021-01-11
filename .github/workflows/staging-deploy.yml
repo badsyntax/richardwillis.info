@@ -67,11 +67,9 @@ jobs:
           route: POST /repos/:repository/deployments/:deployment/statuses
           repository: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          environment: staging
           environment_url: http://staging-richardwillis.${{ secrets.DOKKU_HOST }}
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           state: in_progress
-          mediaType: '{"previews": ["flash", "ant-man"]}'
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Create deploy repo for dokku
@@ -103,10 +101,8 @@ jobs:
           route: POST /repos/:repository/deployments/:deployment/statuses
           repository: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          environment: staging
           environment_url: http://staging-richardwillis.${{ secrets.DOKKU_HOST }}
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          mediaType: '{"previews": ["ant-man"]}'
           state: success
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
@@ -118,10 +114,8 @@ jobs:
           route: POST /repos/:repository/deployments/:deployment/statuses
           repository: ${{ github.repository }}
           deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-          environment: staging
           environment_url: http://staging-richardwillis.${{ secrets.DOKKU_HOST }}
           log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          mediaType: '{"previews": ["ant-man"]}'
           state: failure
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
