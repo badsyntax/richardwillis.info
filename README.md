@@ -129,6 +129,7 @@ dokku letsencrypt staticman
 - DOKKU_SSH_PRIVATE_KEY
 - GIT_REMOTE_URL (eg ssh://dokku@dokku.me:22/appname);
 - RELEASE_DRAFTER_TOKEN_GITHUB
+- GRAFANA_AUTH_TOKEN (deploy annotations)
 
 ### Providing a SSH key
 

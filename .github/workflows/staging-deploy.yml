@@ -48,7 +48,12 @@ jobs:
     name: Deploy staging app
     runs-on: ubuntu-20.04
     steps:
-      - name: Create deployment
+      - name: Save deploy start time
+        id: deploy_start
+        run: |
+          start=$(date +%s%N | cut -b1-13)
+          echo ::set-output name=start_time::$start
+      - name: Create GitHub deployment
         id: create_deployment
         uses: octokit/request-action@v2.x
         with:
@@ -60,7 +65,7 @@ jobs:
           production_environment: false
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Set deployment status to in progress
+      - name: Set GitHub deployment status to in progress
         id: start_deployment
         uses: octokit/request-action@v2.x
         with:
@@ -96,7 +101,27 @@ jobs:
           ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
           git_push_flags: '--force'
           ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}
-      - name: Set deployment status to success
+      - name: Set Grafana deployment
+        run: |
+          end=$(date +%s%N | cut -b1-13)
+          curl -X POST https://grafana.$DOKKU_HOST/api/annotations \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $AUTH_TOKEN" \
+            --data @- << EOF
+            {
+              "dashboardId":2,
+              "time":$TIME_START,
+              "timeEnd":$end,
+              "tags":["deployment","staging"],
+              "text":"Staging version \"$APP_VERSION\" deployed to <a href=\"http://staging-richardwillis.$DOKKU_HOST\">http://staging-richardwillis.$DOKKU_HOST</a>"
+            }
+          EOF
+        env:
+          AUTH_TOKEN: '${{ secrets.GRAFANA_AUTH_TOKEN }}'
+          DOKKU_HOST: '${{ secrets.DOKKU_HOST }}'
+          TIME_START: ${{ steps.deploy_start.outputs.start_time }}
+          APP_VERSION: '${{ github.event.pull_request.head.ref }}'
+      - name: Set GitHub deployment status to success
         id: successful_deployment
         uses: octokit/request-action@v2.x
         with:
@@ -110,7 +135,7 @@ jobs:
           state: success
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Set deployment status to failure
+      - name: Set GitHub deployment status to failure
         id: failed_deployment
         uses: octokit/request-action@v2.x
         if: failure()
