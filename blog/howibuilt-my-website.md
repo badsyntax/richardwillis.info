@@ -18,12 +18,13 @@ Checklist
 - [x] Immutable assets served from CDN (js,css,images etc)
   - [x] Correct cache headers on immutable assets
   - [x] Correct CORS headers on immutable assets
-- [x] robots.txt
-- [x] favicon.ico
+- [x] robots.txt (explicitly allow/disallow search engines)
+- [x] favicon.ico (to prevent 404 requests)
 - [x] Automated & versioned deployments
   - [x] Immutable assets uploaded to S3
   - [ ] Tests (layout & functional)
-  - [x] App previews on pull request
+  - [x] App previews (eg staging/sandbox deploy)
+  - [x] GitHub deploys (optional)
 - [x] Monitoring
   - [x] Runtime server metrics
   - [x] Client metrics (including web-vitals)

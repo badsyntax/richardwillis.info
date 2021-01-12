@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { Fragment, useEffect, useLayoutEffect } from 'react';
 import classNames from 'classnames/bind';
 
@@ -12,18 +14,21 @@ export interface ModalProps {
   onClose: () => void;
 }
 
+const layoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 export const Modal: React.FunctionComponent<ModalProps> = ({
   open,
   onClose,
   children,
 }) => {
-  useLayoutEffect(() => {
+  layoutEffect(() => {
     document.body.classList[open ? 'add' : 'remove'](classes('no-scroll'));
   }, [open]);
   return open ? (
     <Fragment>
       <Overlay />
-      <div className={classes('root')}>
+      <div className={classes('root')} onClick={onClose}>
         <Dialog children={children} onClose={onClose} />
       </div>
     </Fragment>
