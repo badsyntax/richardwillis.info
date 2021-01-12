@@ -63,6 +63,7 @@ jobs:
           environment: staging
           required_contexts: '[]'
           production_environment: false
+          auto_merge: false
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       - name: Set GitHub deployment status to in progress
