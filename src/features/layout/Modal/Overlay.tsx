@@ -4,6 +4,14 @@ import classNames from 'classnames/bind';
 import STYLES from './Overlay.module.css';
 const classes = classNames.bind(STYLES);
 
-export const Overlay: React.FunctionComponent = () => {
-  return <div className={classes('root')} aria-hidden="true" />;
+export type OverlayProps = React.DetailedHTMLProps<
+  React.ImgHTMLAttributes<HTMLDivElement>,
+  HTMLDivElement
+>;
+
+export const Overlay: React.FunctionComponent<OverlayProps> = ({
+  className,
+  ...props
+}) => {
+  return <div className={classes('root', className)} {...props} />;
 };

@@ -1,12 +1,13 @@
 .root {
   @apply  text-xl
-    sm:text-3xl
+    sm:text-2xl
+    md:text-3xl
     bg-black
-    rounded-xl
     p-1
+    rounded-2xl
     sm:rounded-3xl
-    bg-opacity-10
-    hover:bg-opacity-50
+    bg-opacity-30
+    hover:bg-opacity-60
     focus:outline-none
     focus:border-white
     text-gray-200;

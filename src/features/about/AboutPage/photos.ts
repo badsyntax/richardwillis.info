@@ -9,11 +9,11 @@ export const photos = [
   },
   {
     src: 'https://assets.richardwillis.info/photos/n-yorkshire-3.jpg',
-    alt: 'Top of the bank. Ceswick, North Yorkshire, UK',
+    alt: 'Top of the bank. Kepwick, North Yorkshire, UK',
   },
   {
     src: 'https://assets.richardwillis.info/photos/n-yorkshire-4.jpg',
-    alt: 'A typical english bridleway. Thirks, North Yorkshire, UK',
+    alt: 'A typical english bridleway. Thirsk, North Yorkshire, UK',
   },
   {
     src: 'https://assets.richardwillis.info/photos/boltby-forest.jpg',

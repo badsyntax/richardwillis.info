@@ -4,6 +4,10 @@
 
 .close-button {
   @apply fixed
-    top-6
-    right-8;
+    top-2
+    sm:top-4
+    md:top-6
+    right-2
+    sm:right-4
+    md:right-8;
 }
