@@ -59,6 +59,7 @@
     "tsdb",
     "ttfb",
     "vfile",
-    "webp"
+    "webp",
+    "worldmap"
   ]
 }

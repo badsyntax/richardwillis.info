@@ -372,6 +372,11 @@ scrape_configs:
         labels:
           job: varlogs
           __path__: /var/log/*log
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          __path__: /var/log/nginx/*log
 ```
 
 #### Deploy promtail
@@ -387,6 +392,21 @@ The following endpoints should be available:
 - [http://promtail.dokku.me/ready](http://promtail.dokku.me/ready)
 - [http://promtail.dokku.me/metrics](http://promtail.dokku.me/metrics)
 
+#### Monitoring nginx logs
+
+First signup to maxmind to get your licence key: https://www.maxmind.com/en/geolite2/signup
+
+Install the geoip database:
+
+```bash
+mkdir /etc/nginx/geoip
+cd /etc/nginx/geoip
+curl -o GeoLite2-City.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=MAXMIND_LICENSE_KEY&suffix=tar.gz"
+curl -o GeoLite2-Country.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=MAXMIND_LICENSE_KEY&suffix=tar.gz"
+tar -xzf GeoLite2-City.tar.gz
+tar -xzf GeoLite2-Country.tar.gz
+```
+
 ### Set up Grafana
 
 Create the dokku app and set the ports:
@@ -400,7 +420,7 @@ dokku proxy:ports-remove grafana http:3000:3000
 Mount the data & config directories:
 
 ```bash
-mkdir -p /var/lib/dokku/data/storage/grafana/{config,data}
+mkdir -p /var/lib/dokku/data/storage/grafana/{config,data,plugins}
 mkdir -p /var/lib/dokku/data/storage/grafana/config/provisioning/datasources
 chown -R 472:472 /var/lib/dokku/data/storage/grafana
 
@@ -444,6 +464,15 @@ Add Grafana to the `prometheus-bridge` network:
 dokku network:set grafana attach-post-deploy prometheus-bridge
 ```
 
+Add the WorldMap plugin:
+
+```bash
+apt-get install -y unzip
+curl -o grafana-worldmap-panel.zip -L https://grafana.com/api/plugins/grafana-worldmap-panel/versions/0.3.2/download
+unzip grafana-worldmap-panel.zip -d /var/lib/dokku/data/storage/grafana/plugins/
+rm -f grafana-worldmap-panel.zip
+```
+
 Deploy Grafana:
 
 ```bash
@@ -458,14 +487,16 @@ TODO: grafana config eg smtp
 https://medium.com/better-programming/node-js-application-monitoring-with-prometheus-and-grafana-b08deaf0efe3
 https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
 
-#### Add the Prometheus & Loki data source
+#### Data sources
 
-Head on over to `http://grafana.dokku.me` and add the following data sources:
+By default the following data sources should be enabled:
 
 - `http://prometheus.web:9090`
 - `http://loki.web:3100`
 
-To see the `loki` logs, click `Explore` on the sidebar, select the `Loki` datasource in the top-left dropdown, and then choose a log stream using the `Log labels` button.
+To explore the `loki` logs, click `Explore` on the sidebar, select the `Loki` datasource in the top-left dropdown, and then choose a log stream using the `Log labels` button.
+
+
 
 ## Recording App Metrics
 
