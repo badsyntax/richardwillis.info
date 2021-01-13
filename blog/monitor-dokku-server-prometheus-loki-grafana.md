@@ -10,30 +10,33 @@ ogImage:
 draft: true
 ---
 
-Monitoring service health is important for ensuring uptime and discovering bugs early. At a high level you want to:
+Monitoring service health is important for ensuring uptime and discovering issues early. At a high level you want to:
 
 - Store metrics in a time series database
 - Visualise those metrics
 - Alert on those metrics
 
-There are various tools to help achieve this but Prometheus & Grafana are a good fit and a popular setup.
+There are various tools to help achieve this but Prometheus, Loki & Grafana are a good fit and a popular choice.
 
 - Prometheus is a monitoring and alerting toolkit and provides time series database and features to scrape (pull) metrics from applications.
+- Loki is a set of components that can be composed into a fully featured logging stack.
 - Grafana is a useful tool for visualising and alerting on metrics.
 
-We'll use these 2 tools to create a monitoring & alerting platform on a dokku server, then setup our Next.js application to provide both runtime Node.js and Browser metrics. These metrics will ultimately allow us to identify performance issues & fine-tune our Next.js app so it runs well.
+We'll use these 3 tools (and others) to create a monitoring & alerting platform on a single `dokku` server, then setup our Next.js application to provide both runtime Node.js and Browser metrics. These metrics will ultimately allow us to identify performance issues & fine-tune our Next.js app so it runs well.
 
-Adding a monitoring solution to your dokku server increases the required resources. Once all the tools are setup you'll be able to have metrics to identify whether you need to add more server resources to accommodate the monitoring solution. I settled on 4vCPU's and 8GB RAM hosted with Hetzner.
+Adding a full monitoring solution to your dokku server increases the required resources but once the tools are setup you'll have metrics to identify whether you need additional resources. I settled on 4vCPU's and 8GB RAM hosted with Hetzner for my single dokku server.
 
 ## Set up dokku
 
-We'll be running 5 different dokku apps:
+We'll be running 7 different dokku apps:
 
 - Next.js application container (`next-app`) - provides application metrics
 - Node-exporter container (`node-advisor`) - provides metrics about the host machine
 - cAdvisor container (`cadvisor`) - provides metrics about running containers
 - Prometheus container (`prometheus`) - read & index metrics from `next-app`, `node-advisor` & `cadvisor`
-- Grafana container (`grafana`) - read & graph time series data from `prometheus`
+- Loki container (`loki`) - index application logs
+- Promtail container (`loki`) - ships the contents of local logs to loki
+- Grafana container (`grafana`) - read & graph time series data from `prometheus` & `loki`
 
 Make sure you've already [setup and deployed your Next.js app](/blog/deploy-nextjs-dokku-s3-cloudfront) to your dokku server.
 
@@ -44,34 +47,25 @@ dokku plugin:install https://github.com/dokku/dokku-http-auth.git
 dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
 ```
 
-<!--
-<details><summary>Here's how you can achieve the above with `docker-compose`.</summary>
+See: https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
 
-```yaml
-version: '3'
-services:
-  nextapp:
-    container_name: 'next-app.web'
-    build: ./
-    ports:
-      - 3000:3000
-  prometheus:
-    container_name: 'prometheus.web'
-    image: prom/prometheus
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
-  grafana:
-    container_name: 'grafana.web'
-    image: grafana/grafana:latest
-    ports:
-      - 3001:3000
+### Networking
+
+We'll use a private docker network to allow the apps to communicate with each other in a private network.
+
+Create a bridged network called `prometheus-bridge`:
+
+```bash
+dokku network:create prometheus-bridge
 ```
 
-</details> -->
+Later on, we'll attach apps to this network, for example:
 
-See: https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
+```bash
+dokku network:set fancy-app attach-post-deploy prometheus-bridge
+
+# once attached, the hostname "fancy-app.web" is available on the network.
+```
 
 ### Set up Prometheus
 
@@ -96,7 +90,7 @@ chown -R nobody:nogroup /var/lib/dokku/data/storage/prometheus
 Set prometheus config:
 
 ```bash
-dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
+dokku config:set --no-restart prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prometheus/prometheus.yml
   --storage.tsdb.path=/prometheus
   --web.console.libraries=/usr/share/prometheus/console_libraries
   --web.console.templates=/usr/share/prometheus/consoles
@@ -104,27 +98,17 @@ dokku config:set prometheus DOKKU_DOCKERFILE_START_CMD="--config.file=/etc/prome
   --storage.tsdb.no-lockfile"
 ```
 
-We need to prevent tsdb from creating a lockfile to allow us to re-deploy without data read errors.
+(We set `--storage.tsdb.no-lockfile` to prevent tsdb from creating a lockfile to allow us to re-deploy without data read errors.)
 
-#### Prometheus Networking
-
-Prometheus needs access to the apps in order to scrape metrics and by default dokku apps can't communicate with each other, but you can achieve this with either docker networking or via public endpoints.
-
-If you want prometheus to connect to apps on the local network, you can create a new bridge network and attach `prometheus` and other apps to that network:
+Attach `prometheus` to the `prometheus-bridge` network:
 
 ```bash
-dokku network:create prometheus-bridge
 dokku network:set prometheus attach-post-deploy prometheus-bridge
-dokku network:set next-app attach-post-deploy prometheus-bridge
-
-# These hostnames will be available to both apps: next-app.web, prometheus.web
 ```
-
-If you want prometheus to connect to public endpoints you should ensure the endpoints are secured with `http-auth`.
 
 #### Prometheus Config
 
-The following example shows how to use both local and public app hostnames.
+The following example shows how to use both local and public app hostnames. We have to use a public endpoint for `node-exporter` as it's using the host network and cannot be attached to the `prometheus-bridge` network. TODO
 
 You'll need to create the prometheus configuration file at location `/var/lib/dokku/data/storage/prometheus/config/prometheus.yml`.
 
@@ -139,31 +123,23 @@ scrape_configs:
   - job_name: 'prometheus'
     scrape_interval: 15s
     static_configs:
-      - targets: ['localhost:9090']
+      - targets:
+          - 'localhost:9090'
   - job_name: node-exporter
     scrape_interval: 15s
     scheme: https
     basic_auth:
-      username: <supersecret>
-      password: <supersecret>
+      username: <username>
+      password: <password>
     static_configs:
       - targets:
           - 'node-exporter.dokku.me'
   - job_name: cadvisor
     scrape_interval: 15s
-    scheme: https
-    basic_auth:
-      username: <supersecret>
-      password: <supersecret>
+    scheme: http
     static_configs:
       - targets:
-          - 'cadvisor.dokku.me'
-  - job_name: 'next-app'
-    scrape_interval: 30s
-    metrics_path: '/metrics'
-    static_configs:
-      - targets:
-          - 'next-app.web:3000'
+          - 'cadvisor.web:8080'
 ```
 
 Deploy the prometheus app and secure it with `http-auth`:
@@ -189,7 +165,7 @@ dokku apps:create node-exporter
 docker image pull prom/node-exporter:latest
 docker image tag prom/node-exporter:latest dokku/node-exporter:latest
 
-dokku config:set node-exporter DOKKU_DOCKERFILE_START_CMD="--collector.textfile.directory=/data --path.procfs=/host/proc --path.sysfs=/host/sys"
+dokku config:set --no-restart node-exporter DOKKU_DOCKERFILE_START_CMD="--collector.textfile.directory=/data --path.procfs=/host/proc --path.sysfs=/host/sys"
 
 dokku storage:mount node-exporter /proc:/host/proc:ro
 dokku storage:mount node-exporter /:/rootfs:ro
@@ -216,18 +192,199 @@ dokku apps:create cadvisor
 docker image pull gcr.io/google-containers/cadvisor:latest
 docker image tag gcr.io/google-containers/cadvisor:latest dokku/cadvisor:latest
 
-dokku config:set cadvisor DOKKU_DOCKERFILE_START_CMD="--docker_only --housekeeping_interval=10s --max_housekeeping_interval=60s"
+dokku config:set --no-restart cadvisor DOKKU_DOCKERFILE_START_CMD="--docker_only --housekeeping_interval=10s --max_housekeeping_interval=60s"
 
 dokku storage:mount cadvisor /:/rootfs:ro
 dokku storage:mount cadvisor /sys:/sys:ro
 dokku storage:mount cadvisor /var/lib/docker:/var/lib/docker:ro
 dokku storage:mount cadvisor /var/run:/var/run:rw
+dokku network:set cadvisor attach-post-deploy prometheus-bridge
 
 dokku tags:deploy cadvisor latest
 dokku proxy:ports-set cadvisor http:80:8080
 dokku letsencrypt cadvisor
 dokku http-auth:on cadvisor <username> <password>
 ```
+
+### Set up loki
+
+Create the app and set the app config:
+
+```bash
+dokku apps:create loki
+dokku proxy:ports-add loki http:80:3100
+dokku proxy:ports-remove loki http:3100:3100
+dokku config:set --no-restart loki DOKKU_DOCKERFILE_START_CMD="-config.file=/etc/loki/loki-config.yaml"
+```
+
+Set the `loki` config file mounts:
+
+```bash
+mkdir -p /var/lib/dokku/data/storage/loki/config
+touch /var/lib/dokku/data/storage/loki/config/loki-config.yml
+chown -R nobody:nogroup /var/lib/dokku/data/storage/loki
+dokku storage:mount loki /var/lib/dokku/data/storage/loki/config:/etc/loki
+```
+
+#### Loki Networking
+
+Add loki to the prometheus bridge network:
+
+```bash
+dokku network:set loki attach-post-deploy prometheus-bridge
+```
+
+#### Loki Config
+
+Create the `loki` configuration file at location `/var/lib/dokku/data/storage/loki/config/loki-config.yaml`.
+
+```yaml
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+
+ingester:
+  lifecycler:
+    address: 127.0.0.1
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_idle_period: 1h # Any chunk not receiving new logs in this time will be flushed
+  max_chunk_age: 1h # All chunks will be flushed when they hit this age, default is 1h
+  chunk_target_size: 1048576 # Loki will attempt to build chunks up to 1.5MB, flushing first if chunk_idle_period or max_chunk_age is reached first
+  chunk_retain_period: 30s # Must be greater than index read cache TTL if using an index cache (Default index read cache TTL is 5m)
+  max_transfer_retries: 0 # Chunk transfers disabled
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  boltdb_shipper:
+    active_index_directory: /tmp/loki/boltdb-shipper-active
+    cache_location: /tmp/loki/boltdb-shipper-cache
+    cache_ttl: 24h # Can be increased for faster performance over longer query periods, uses more disk space
+    shared_store: filesystem
+  filesystem:
+    directory: /tmp/loki/chunks
+
+compactor:
+  working_directory: /tmp/loki/boltdb-shipper-compactor
+  shared_store: filesystem
+
+limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
+chunk_store_config:
+  max_look_back_period: 0s
+
+table_manager:
+  retention_deletes_enabled: false
+  retention_period: 0s
+
+ruler:
+  storage:
+    type: local
+    local:
+      directory: /tmp/loki/rules
+  rule_path: /tmp/loki/rules-temp
+  alertmanager_url: http://localhost:9093
+  ring:
+    kvstore:
+      store: inmemory
+  enable_api: true
+```
+
+#### Deploy loki
+
+```bash
+docker image pull grafana/loki:2.0.0
+docker image tag grafana/loki:2.0.0 dokku/loki:latest
+dokku tags:deploy loki latest
+```
+
+The following endpoints should be available:
+
+- [http://loki.dokku.me/ready](http://loki.dokku.me/ready)
+- [http://loki.dokku.me/metrics](http://loki.dokku.me/metrics)
+
+### Set up Promtail
+
+`Promtail` will read logs and push to `loki`.
+
+Create the app and set the app config:
+
+```bash
+dokku apps:create promtail
+dokku config:set --no-restart promtail DOKKU_DOCKERFILE_START_CMD="-config.file=/etc/promtail/promtail-config.yaml"
+dokku checks:disable promtail
+```
+
+Set the `promtail` volume mounts:
+
+```bash
+mkdir -p /var/lib/dokku/data/storage/promtail/config
+touch /var/lib/dokku/data/storage/promtail/config/promtail-config.yml
+chown -R nobody:nogroup /var/lib/dokku/data/storage/promtail
+dokku storage:mount promtail /var/lib/dokku/data/storage/promtail/config:/etc/promtail
+dokku storage:mount promtail /var/log:/var/log
+```
+
+#### Promtail Networking
+
+Add `promtail` to the `prometheus` bridge network:
+
+```bash
+dokku network:set promtail attach-post-deploy prometheus-bridge
+```
+
+#### Promtail Config
+
+Create the `promtail` configuration file at location `/var/lib/dokku/data/storage/promtail/config/promtail-config.yaml`.
+
+```yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki.web:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+```
+
+#### Deploy promtail
+
+```bash
+docker image pull grafana/promtail:2.0.0
+docker image tag grafana/promtail:2.0.0 dokku/promtail:latest
+dokku tags:deploy promtail latest
+```
+
+The following endpoints should be available:
+
+- [http://promtail.dokku.me/ready](http://promtail.dokku.me/ready)
+- [http://promtail.dokku.me/metrics](http://promtail.dokku.me/metrics)
 
 ### Set up Grafana
 
@@ -244,7 +401,7 @@ Set the volume mounts for persistent storage:
 ```bash
 mkdir -p /var/lib/dokku/data/storage/grafana
 chown 472:472 /var/lib/dokku/data/storage/grafana
-dokku storage:mount grafana "/var/lib/dokku/data/storage/grafana:/var/lib/grafana"
+dokku storage:mount grafana /var/lib/dokku/data/storage/grafana:/var/lib/grafana
 ```
 
 If using a private network, add Grafana to the `prometheus-bridge` network:
@@ -267,9 +424,14 @@ TODO: grafana config eg smtp
 https://medium.com/better-programming/node-js-application-monitoring-with-prometheus-and-grafana-b08deaf0efe3
 https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
 
-#### Add the Prometheus data source
+#### Add the Prometheus & Loki data source
 
-Head on over to `http://grafana.dokku.me` and add the prometheus data source (eg `http://prometheus.web:9090` or `https://prometheus.dokke.me` depending on your network setup).
+Head on over to `http://grafana.dokku.me` and add the following data sources:
+
+- `http://prometheus.web:9090`
+- `http://loki.web:3100`
+
+To see the `loki` logs, click `Explore` on the sidebar, select the `Loki` datasource in the top-left dropdown, and then choose a log stream using the `Log labels` button.
 
 ## Recording App Metrics
 
@@ -503,3 +665,7 @@ If using a Dockerfile for deployment, we'll need to place an `app.json` within t
 (Also don't forget to add this file to your docker image with `COPY` or `ADD`!)
 
 https://frederic-hemberger.de/notes/grafana/annotate-dashboards-with-deployments/
+
+## Supporting Documentation
+
+I recommend reading [Getting started with server monitoring and alerting](https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/)t as a compliment to this article, as it goes into a little more detail about the tools we're using.
