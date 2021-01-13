@@ -1,20 +1,20 @@
 {
   "__inputs": [
     {
-        "name": "DS_PROMETHEUS",
-        "label": "Prometheus data source",
-        "description": "",
-        "type": "datasource",
-        "pluginId": "prometheus",
-        "pluginName": "Prometheus"
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus data source",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
     }
   ],
   "__requires": [
     {
-        "type": "datasource",
-        "id": "prometheus",
-        "name": "Prometheus",
-        "version": "2.0.0"
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "2.0.0"
     }
   ],
   "annotations": {
@@ -272,9 +272,7 @@
       "options": {
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -349,9 +347,7 @@
       "options": {
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -812,17 +808,11 @@
         "conditions": [
           {
             "evaluator": {
-              "params": [
-                1.25
-              ],
+              "params": [1.25],
               "type": "gt"
             },
             "query": {
-              "params": [
-                "A",
-                "5m",
-                "now"
-              ]
+              "params": ["A", "5m", "now"]
             },
             "reducer": {
               "params": [],
@@ -957,17 +947,11 @@
         "conditions": [
           {
             "evaluator": {
-              "params": [
-                35000000000
-              ],
+              "params": [35000000000],
               "type": "gt"
             },
             "query": {
-              "params": [
-                "A",
-                "5m",
-                "now"
-              ]
+              "params": ["A", "5m", "now"]
             },
             "reducer": {
               "params": [],
@@ -1114,17 +1098,11 @@
         "conditions": [
           {
             "evaluator": {
-              "params": [
-                2000000000
-              ],
+              "params": [2000000000],
               "type": "gt"
             },
             "query": {
-              "params": [
-                "A",
-                "5m",
-                "now"
-              ]
+              "params": ["A", "5m", "now"]
             },
             "reducer": {
               "params": [],
@@ -2110,10 +2088,7 @@
           ],
           "decimals": 2,
           "pattern": "/.*/",
-          "thresholds": [
-            "10000000",
-            " 25000000"
-          ],
+          "thresholds": ["10000000", " 25000000"],
           "type": "number",
           "unit": "decbytes"
         }
@@ -2194,10 +2169,7 @@
           ],
           "decimals": 2,
           "pattern": "/.*/",
-          "thresholds": [
-            "10000000",
-            " 25000000"
-          ],
+          "thresholds": ["10000000", " 25000000"],
           "type": "number",
           "unit": "decbytes"
         }
@@ -2279,10 +2251,7 @@
           ],
           "decimals": 2,
           "pattern": "/.*/",
-          "thresholds": [
-            "80",
-            "90"
-          ],
+          "thresholds": ["80", "90"],
           "type": "number",
           "unit": "percent"
         }
@@ -2502,17 +2471,7 @@
       "2h",
       "1d"
     ],
-    "time_options": [
-      "5m",
-      "15m",
-      "1h",
-      "6h",
-      "12h",
-      "24h",
-      "2d",
-      "7d",
-      "30d"
-    ]
+    "time_options": ["5m", "15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
   },
   "timezone": "browser",
   "title": "Docker and system monitoring",
