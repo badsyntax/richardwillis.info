@@ -80,11 +80,12 @@ dokku proxy:ports-remove prometheus http:9090:9090
 Set the volume mounts for persistent storage:
 
 ```bash
-dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/config:/etc/prometheus
-dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/data:/prometheus
 mkdir -p /var/lib/dokku/data/storage/prometheus/{config,data}
 touch /var/lib/dokku/data/storage/prometheus/config/{alert.rules,prometheus.yml}
 chown -R nobody:nogroup /var/lib/dokku/data/storage/prometheus
+
+dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/config:/etc/prometheus
+dokku storage:mount prometheus /var/lib/dokku/data/storage/prometheus/data:/prometheus
 ```
 
 Set prometheus config:
@@ -396,15 +397,48 @@ dokku proxy:ports-add grafana http:80:3000
 dokku proxy:ports-remove grafana http:3000:3000
 ```
 
-Set the volume mounts for persistent storage:
+Mount the data & config directories:
 
 ```bash
-mkdir -p /var/lib/dokku/data/storage/grafana
-chown 472:472 /var/lib/dokku/data/storage/grafana
-dokku storage:mount grafana /var/lib/dokku/data/storage/grafana:/var/lib/grafana
+mkdir -p /var/lib/dokku/data/storage/grafana/{config,data}
+mkdir -p /var/lib/dokku/data/storage/grafana/config/provisioning/datasources
+chown -R 472:472 /var/lib/dokku/data/storage/grafana
+
+dokku storage:mount grafana /var/lib/dokku/data/storage/grafana/config/provisioning/datasources:/etc/grafana/provisioning/datasources
+dokku storage:mount grafana /var/lib/dokku/data/storage/grafana/data:/var/lib/grafana
 ```
 
-If using a private network, add Grafana to the `prometheus-bridge` network:
+Set Prometheus data source in `/var/lib/dokku/data/storage/grafana/config/provisioning/datasources/prometheus.yml`:
+
+```yaml
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    orgId: 1
+    url: http://prometheus.web:9090
+    basicAuth: false
+    isDefault: true
+    version: 1
+    editable: true
+```
+
+Set the loki data source in `/var/lib/dokku/data/storage/grafana/config/provisioning/datasources/loki.yml`:
+
+```yaml
+datasources:
+  - name: Loki
+    type: loki
+    access: proxy
+    orgId: 1
+    url: http://loki.web:3100
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: true
+```
+
+Add Grafana to the `prometheus-bridge` network:
 
 ```bash
 dokku network:set grafana attach-post-deploy prometheus-bridge
@@ -668,4 +702,6 @@ https://frederic-hemberger.de/notes/grafana/annotate-dashboards-with-deployments
 
 ## Supporting Documentation
 
-I recommend reading [Getting started with server monitoring and alerting](https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/)t as a compliment to this article, as it goes into a little more detail about the tools we're using.
+I recommend reading [Getting started with server monitoring and alerting](https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/)t as a compliment to this article, as it goes into a little more detail on a lot the tools we're using (except for `loki`).
+
+https://blog.ruanbekker.com/blog/2020/08/13/getting-started-on-logging-with-loki-using-docker/
