@@ -1,12 +1,12 @@
 {
   "__inputs": [
     {
-        "name": "DS_LOKI",
-        "label": "Loki V2 data source",
-        "description": "",
-        "type": "datasource",
-        "pluginId": "loki",
-        "pluginName": "Loki"
+      "name": "DS_LOKI",
+      "label": "Loki V2 data source",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "loki",
+      "pluginName": "Loki"
     },
     {
       "name": "NGINX_LOGFILE",
@@ -14,14 +14,14 @@
       "description": "",
       "type": "constant",
       "value": "/var/log/nginx/appname-json-access.log"
-  }
+    }
   ],
   "__requires": [
     {
-        "type": "datasource",
-        "id": "loki",
-        "name": "Loki",
-        "version": "2.0.0"
+      "type": "datasource",
+      "id": "loki",
+      "name": "Loki",
+      "version": "2.0.0"
     }
   ],
   "annotations": {
@@ -94,9 +94,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         },
@@ -152,9 +150,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         },
@@ -217,9 +213,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -277,9 +271,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "last"
-          ],
+          "calcs": ["last"],
           "fields": "",
           "values": false
         },
@@ -346,9 +338,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "fields": "",
           "values": false
         },
@@ -417,9 +407,7 @@
         "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "sum"
-          ],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         },
@@ -440,9 +428,7 @@
         {
           "id": "reduce",
           "options": {
-            "reducers": [
-              "sum"
-            ]
+            "reducers": ["sum"]
           }
         },
         {
@@ -461,11 +447,7 @@
     {
       "circleMaxSize": "50",
       "circleMinSize": "15",
-      "colors": [
-        "#96D98D",
-        "#37872D",
-        "#19730E"
-      ],
+      "colors": ["#96D98D", "#37872D", "#19730E"],
       "datasource": "${DS_LOKI}",
       "decimals": null,
       "description": "",
@@ -1020,9 +1002,7 @@
         {
           "id": "reduce",
           "options": {
-            "reducers": [
-              "sum"
-            ]
+            "reducers": ["sum"]
           }
         },
         {
@@ -1112,9 +1092,7 @@
         {
           "id": "reduce",
           "options": {
-            "reducers": [
-              "sum"
-            ]
+            "reducers": ["sum"]
           }
         },
         {
@@ -1202,9 +1180,7 @@
         {
           "id": "reduce",
           "options": {
-            "reducers": [
-              "sum"
-            ]
+            "reducers": ["sum"]
           }
         },
         {
@@ -1281,9 +1257,7 @@
         {
           "id": "reduce",
           "options": {
-            "reducers": [
-              "sum"
-            ]
+            "reducers": ["sum"]
           }
         }
       ],

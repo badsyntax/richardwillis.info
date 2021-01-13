@@ -496,8 +496,6 @@ By default the following data sources should be enabled:
 
 To explore the `loki` logs, click `Explore` on the sidebar, select the `Loki` datasource in the top-left dropdown, and then choose a log stream using the `Log labels` button.
 
-
-
 ## Recording App Metrics
 
 We'll be recording both back-end and front-end metrics.
