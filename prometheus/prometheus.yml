@@ -5,25 +5,23 @@ scrape_configs:
   - job_name: 'prometheus'
     scrape_interval: 15s
     static_configs:
-      - targets: ['localhost:9090']
+      - targets:
+          - 'localhost:9090'
   - job_name: node-exporter
     scrape_interval: 15s
     scheme: https
     basic_auth:
-      username: <supersecret>
-      password: <supersecret>
+      username: <secret>
+      password: <secret>
     static_configs:
       - targets:
           - 'node-exporter.dokku.proxima-web.com'
   - job_name: cadvisor
     scrape_interval: 15s
-    scheme: https
-    basic_auth:
-      username: <supersecret>
-      password: <supersecret>
+    scheme: http
     static_configs:
       - targets:
-          - 'cadvisor.dokku.proxima-web.com'
+          - 'cadvisor.web:8080'
   - job_name: 'richardwillis-nodejs'
     scrape_interval: 30s
     metrics_path: '/metrics'
