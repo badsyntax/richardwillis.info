@@ -7,7 +7,7 @@ author:
   picture: '/assets/blog/authors/richard.jpg'
 ogImage:
   url: '/assets/blog/hello-world/cover.jpg'
-draft: true
+draft: false
 ---
 
 This post outlines how I setup a full monitoring stack on my single `dokku` server. While it's a pretty long post, it's not very detailed and just covers the absolute basics of setting up the various services.
