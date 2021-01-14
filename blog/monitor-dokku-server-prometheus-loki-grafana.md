@@ -679,8 +679,6 @@ Now _finally_ to put it all together. We'll set up the following Grafana dashboa
 
 Click on each of the links above to view the corresponding `json` files for each dashboard. You can import these json files into Grafana by visiting http://grafana.dokku.me/dashboards and clicking on "Import".
 
-## Supporting Documentation
+## Supporting Articles
 
-I recommend reading [Getting started with server monitoring and alerting](https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/)t as a compliment to this article, as it goes into a little more detail on a lot the tools we're using (except for `loki`).
-
-https://blog.ruanbekker.com/blog/2020/08/13/getting-started-on-logging-with-loki-using-docker/
+- [Getting started with server monitoring and alerting](https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/)
