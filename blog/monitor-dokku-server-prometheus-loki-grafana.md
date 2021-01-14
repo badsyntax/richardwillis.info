@@ -1,7 +1,7 @@
 ---
-title: 'Monitor a dokku Next.js app with Prometheus & Grafana'
-excerpt: 'How to use the picture HTML element to provide responsive images.'
-date: '2020-12-28T05:35:07.322Z'
+title: 'Monitor a dokku server with Prometheus, Grafana & Loki'
+excerpt: 'How to setup a full monitoring stack on your dokku server using Prometheus, Loki & Grafana.'
+date: '2021-01-14T05:35:07.322Z'
 author:
   name: Richard Willis
   picture: '/assets/blog/authors/richard.jpg'
@@ -10,35 +10,22 @@ ogImage:
 draft: true
 ---
 
-Monitoring service health is important for ensuring uptime and discovering issues early. At a high level you want to:
+This post outlines how I setup a full monitoring stack on my single `dokku` server. While it's a pretty long post, it's not very detailed and just covers the absolute basics of setting up the various services.
 
-- Store metrics in a time series database
-- Visualise those metrics
-- Alert on those metrics
+## Services Overview
 
-There are various tools to help achieve this but Prometheus, Loki & Grafana are a good fit and a popular choice.
+We'll set up 6 different services as dokku apps:
 
-- Prometheus is a monitoring and alerting toolkit and provides time series database and features to scrape (pull) metrics from applications.
-- Loki is a set of components that can be composed into a fully featured logging stack.
-- Grafana is a useful tool for visualising and alerting on metrics.
+- `prometheus` - monitoring and alerting toolkit
+- `loki` - application logs indexer
+- `promtail` - ships the contents of local logs to `loki`
+- `grafana` - read & graph time series data from `loki` & `prometheus`
+- `node-exporter` - provides metrics about the host machine
+- `cadvisor` - provides metrics about running docker containers
 
-We'll use these 3 tools (and others) to create a monitoring & alerting platform on a single `dokku` server, then setup our Next.js application to provide both runtime Node.js and Browser metrics. These metrics will ultimately allow us to identify performance issues & fine-tune our Next.js app so it runs well.
+## Requirements
 
-Adding a full monitoring solution to your dokku server increases the required resources but once the tools are setup you'll have metrics to identify whether you need additional resources. I settled on 4vCPU's and 8GB RAM hosted with Hetzner for my single dokku server.
-
-## Set up dokku
-
-We'll be running 7 different dokku apps:
-
-- Next.js application container (`next-app`) - provides application metrics
-- Node-exporter container (`node-advisor`) - provides metrics about the host machine
-- cAdvisor container (`cadvisor`) - provides metrics about running containers
-- Prometheus container (`prometheus`) - read & index metrics from `next-app`, `node-advisor` & `cadvisor`
-- Loki container (`loki`) - index application logs
-- Promtail container (`loki`) - ships the contents of local logs to loki
-- Grafana container (`grafana`) - read & graph time series data from `prometheus` & `loki`
-
-Make sure you've already [setup and deployed your Next.js app](/blog/deploy-nextjs-dokku-s3-cloudfront) to your dokku server.
+You'll need `dokku` installed on a single server running `Ubuntu 20.04`. I've tested these instructions on `dokku` version `v0.22.8` but they'll probably work on other versions too.
 
 Public endpoints are secured with `http-auth` and `tls` so you'll need to make sure you have the relevant plugins installed:
 
@@ -47,9 +34,9 @@ dokku plugin:install https://github.com/dokku/dokku-http-auth.git
 dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
 ```
 
-See: https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
+Adding a full monitoring solution increases the required resources for your server, but once the tools are set up you'll have metrics to identify whether you need any additional resources.
 
-### Networking
+## Networking
 
 We'll use a private docker network to allow the apps to communicate with each other in a private network.
 
@@ -59,22 +46,13 @@ Create a bridged network called `prometheus-bridge`:
 dokku network:create prometheus-bridge
 ```
 
-Later on, we'll attach apps to this network, for example:
-
-```bash
-dokku network:set fancy-app attach-post-deploy prometheus-bridge
-
-# once attached, the hostname "fancy-app.web" is available on the network.
-```
-
-### Set up Prometheus
+## Set up Prometheus
 
 Create the prometheus dokku app and set the ports:
 
 ```bash
 dokku apps:create prometheus
 dokku proxy:ports-add prometheus http:80:9090
-dokku proxy:ports-remove prometheus http:9090:9090
 ```
 
 Set the volume mounts for persistent storage:
@@ -107,14 +85,9 @@ Attach `prometheus` to the `prometheus-bridge` network:
 dokku network:set prometheus attach-post-deploy prometheus-bridge
 ```
 
-#### Prometheus Config
+### Prometheus Config
 
-The following example shows how to use both local and public app hostnames. We have to use a public endpoint for `node-exporter` as it's using the host network and cannot be attached to the `prometheus-bridge` network. TODO
-
-You'll need to create the prometheus configuration file at location `/var/lib/dokku/data/storage/prometheus/config/prometheus.yml`.
-
-<!-- # old -->
-<!-- Create the prometheus configuration file at location `/home/dokku/prometheus/prometheus.yml`: -->
+Create the config file at location `/var/lib/dokku/data/storage/prometheus/config/prometheus.yml`:
 
 ```yaml
 global:
@@ -143,6 +116,10 @@ scrape_configs:
           - 'cadvisor.web:8080'
 ```
 
+Ideally we only want to use local hostnames available within the private `prometheus-bridge` network, but we have to use a public endpoint for `node-exporter` as it's using the host network and cannot be attached to the `prometheus-bridge` network.
+
+### Deploy Prometheus
+
 Deploy the prometheus app and secure it with `http-auth`:
 
 ```bash
@@ -154,71 +131,102 @@ dokku letsencrypt prometheus
 dokku http-auth:on prometheus USER PASSWORD
 ```
 
-Once the prometheus app is deployed visit [https://prometheus.dokku.me/targets](https://prometheus.dokku.me/targets) to confirm prometheus can connect to localhost, but other targets should all be down.
+Visit [https://prometheus.dokku.me/targets](https://prometheus.dokku.me/targets) to confirm prometheus can connect to localhost (and other targets should all be down).
 
-### Set up Node-exporter
+## Set up Node-exporter
 
-Node exporter provides metrics about the host machine.
+Node exporter provides metrics on the host machine.
+
+Create the app and set the config:
 
 ```bash
 dokku apps:create node-exporter
-
-docker image pull prom/node-exporter:latest
-docker image tag prom/node-exporter:latest dokku/node-exporter:latest
-
+dokku proxy:ports-set node-exporter http:80:9100
 dokku config:set --no-restart node-exporter DOKKU_DOCKERFILE_START_CMD="--collector.textfile.directory=/data --path.procfs=/host/proc --path.sysfs=/host/sys"
+```
+
+Set the storage mounts:
+
+```bash
+mkdir -p /var/lib/dokku/data/storage/node-exporter
+chown nobody:nogroup /var/lib/dokku/data/storage/node-exporter
 
 dokku storage:mount node-exporter /proc:/host/proc:ro
 dokku storage:mount node-exporter /:/rootfs:ro
 dokku storage:mount node-exporter /sys:/host/sys:ro
 dokku storage:mount node-exporter /var/lib/dokku/data/storage/node-exporter:/data
+```
 
-mkdir -p /var/lib/dokku/data/storage/node-exporter
-chown nobody:nogroup /var/lib/dokku/data/storage/node-exporter
+Add `node-exporter` to the host network:
 
+```bash
 dokku docker-options:add node-exporter deploy "--net=host"
+```
+
+Disable zero-downtime checks:
+
+```bash
 dokku checks:disable node-exporter
+```
+
+Deploy the app:
+
+```bash
+docker image pull prom/node-exporter:latest
+docker image tag prom/node-exporter:latest dokku/node-exporter:latest
 
 dokku tags:deploy node-exporter latest
-dokku proxy:ports-set node-exporter http:80:9100
 dokku letsencrypt node-exporter
 dokku http-auth:on node-exporter <username> <password>
 ```
 
 ### Set up cAdvisor
 
+Create the app and set the config:
+
 ```bash
 dokku apps:create cadvisor
-
-docker image pull gcr.io/google-containers/cadvisor:latest
-docker image tag gcr.io/google-containers/cadvisor:latest dokku/cadvisor:latest
-
+dokku proxy:ports-set cadvisor http:80:8080
 dokku config:set --no-restart cadvisor DOKKU_DOCKERFILE_START_CMD="--docker_only --housekeeping_interval=10s --max_housekeeping_interval=60s"
+```
 
+Set the storage mounts:
+
+```bash
 dokku storage:mount cadvisor /:/rootfs:ro
 dokku storage:mount cadvisor /sys:/sys:ro
 dokku storage:mount cadvisor /var/lib/docker:/var/lib/docker:ro
 dokku storage:mount cadvisor /var/run:/var/run:rw
+```
+
+Attach to the `prometheus-bridge` network:
+
+```bash
 dokku network:set cadvisor attach-post-deploy prometheus-bridge
+```
+
+Deploy the app:
+
+```bash
+docker image pull gcr.io/google-containers/cadvisor:latest
+docker image tag gcr.io/google-containers/cadvisor:latest dokku/cadvisor:latest
 
 dokku tags:deploy cadvisor latest
-dokku proxy:ports-set cadvisor http:80:8080
 dokku letsencrypt cadvisor
 dokku http-auth:on cadvisor <username> <password>
 ```
 
-### Set up loki
+## Set up loki
 
-Create the app and set the app config:
+Create the app and set the config:
 
 ```bash
 dokku apps:create loki
 dokku proxy:ports-add loki http:80:3100
-dokku proxy:ports-remove loki http:3100:3100
 dokku config:set --no-restart loki DOKKU_DOCKERFILE_START_CMD="-config.file=/etc/loki/loki-config.yaml"
 ```
 
-Set the `loki` config file mounts:
+Set the storage mounts:
 
 ```bash
 mkdir -p /var/lib/dokku/data/storage/loki/config
@@ -227,17 +235,15 @@ chown -R nobody:nogroup /var/lib/dokku/data/storage/loki
 dokku storage:mount loki /var/lib/dokku/data/storage/loki/config:/etc/loki
 ```
 
-#### Loki Networking
-
-Add loki to the prometheus bridge network:
+Attach to the `prometheus-bridge` network:
 
 ```bash
 dokku network:set loki attach-post-deploy prometheus-bridge
 ```
 
-#### Loki Config
+### Loki Config
 
-Create the `loki` configuration file at location `/var/lib/dokku/data/storage/loki/config/loki-config.yaml`.
+Create the configuration file at location `/var/lib/dokku/data/storage/loki/config/loki-config.yaml`:
 
 ```yaml
 auth_enabled: false
@@ -306,32 +312,33 @@ ruler:
   enable_api: true
 ```
 
-#### Deploy loki
+### Deploy loki
 
 ```bash
 docker image pull grafana/loki:2.0.0
 docker image tag grafana/loki:2.0.0 dokku/loki:latest
 dokku tags:deploy loki latest
+dokku letsencrypt loki
+dokku http-auth:on loki <username> <password>
 ```
 
 The following endpoints should be available:
 
-- [http://loki.dokku.me/ready](http://loki.dokku.me/ready)
-- [http://loki.dokku.me/metrics](http://loki.dokku.me/metrics)
+- [https://loki.dokku.me/ready](http://loki.dokku.me/ready)
+- [https://loki.dokku.me/metrics](http://loki.dokku.me/metrics)
 
-### Set up Promtail
+## Set up Promtail
 
 `Promtail` will read logs and push to `loki`.
 
-Create the app and set the app config:
+Create the app and set the config:
 
 ```bash
 dokku apps:create promtail
 dokku config:set --no-restart promtail DOKKU_DOCKERFILE_START_CMD="-config.file=/etc/promtail/promtail-config.yaml"
-dokku checks:disable promtail
 ```
 
-Set the `promtail` volume mounts:
+Set the storage mounts:
 
 ```bash
 mkdir -p /var/lib/dokku/data/storage/promtail/config
@@ -341,17 +348,15 @@ dokku storage:mount promtail /var/lib/dokku/data/storage/promtail/config:/etc/pr
 dokku storage:mount promtail /var/log:/var/log
 ```
 
-#### Promtail Networking
-
-Add `promtail` to the `prometheus` bridge network:
+Attach to the `prometheus-bridge` network:
 
 ```bash
 dokku network:set promtail attach-post-deploy prometheus-bridge
 ```
 
-#### Promtail Config
+### Promtail Config
 
-Create the `promtail` configuration file at location `/var/lib/dokku/data/storage/promtail/config/promtail-config.yaml`.
+Create the configuration file at location `/var/lib/dokku/data/storage/promtail/config/promtail-config.yaml`.
 
 ```yaml
 server:
@@ -379,42 +384,22 @@ scrape_configs:
           __path__: /var/log/nginx/*log
 ```
 
-#### Deploy promtail
+### Deploy promtail
 
 ```bash
 docker image pull grafana/promtail:2.0.0
 docker image tag grafana/promtail:2.0.0 dokku/promtail:latest
 dokku tags:deploy promtail latest
+dokku domains:disable promtail
 ```
 
-The following endpoints should be available:
-
-- [http://promtail.dokku.me/ready](http://promtail.dokku.me/ready)
-- [http://promtail.dokku.me/metrics](http://promtail.dokku.me/metrics)
-
-#### Monitoring nginx logs
-
-First signup to maxmind to get your licence key: https://www.maxmind.com/en/geolite2/signup
-
-Install the geoip database:
-
-```bash
-mkdir /etc/nginx/geoip
-cd /etc/nginx/geoip
-curl -o GeoLite2-City.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=MAXMIND_LICENSE_KEY&suffix=tar.gz"
-curl -o GeoLite2-Country.tar.gz "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=MAXMIND_LICENSE_KEY&suffix=tar.gz"
-tar -xzf GeoLite2-City.tar.gz
-tar -xzf GeoLite2-Country.tar.gz
-```
-
-### Set up Grafana
+## Set up Grafana
 
 Create the dokku app and set the ports:
 
 ```bash
 dokku apps:create grafana
 dokku proxy:ports-add grafana http:80:3000
-dokku proxy:ports-remove grafana http:3000:3000
 ```
 
 Mount the data & config directories:
@@ -426,9 +411,10 @@ chown -R 472:472 /var/lib/dokku/data/storage/grafana
 
 dokku storage:mount grafana /var/lib/dokku/data/storage/grafana/config/provisioning/datasources:/etc/grafana/provisioning/datasources
 dokku storage:mount grafana /var/lib/dokku/data/storage/grafana/data:/var/lib/grafana
+dokku storage:mount grafana /var/lib/dokku/data/storage/grafana/plugins:/var/lib/grafana/plugins
 ```
 
-Set Prometheus data source in `/var/lib/dokku/data/storage/grafana/config/provisioning/datasources/prometheus.yml`:
+Set the `prometheus` data source in `/var/lib/dokku/data/storage/grafana/config/provisioning/datasources/prometheus.yml`:
 
 ```yaml
 datasources:
@@ -443,7 +429,7 @@ datasources:
     editable: true
 ```
 
-Set the loki data source in `/var/lib/dokku/data/storage/grafana/config/provisioning/datasources/loki.yml`:
+Set the `loki` data source in `/var/lib/dokku/data/storage/grafana/config/provisioning/datasources/loki.yml`:
 
 ```yaml
 datasources:
@@ -458,13 +444,13 @@ datasources:
     editable: true
 ```
 
-Add Grafana to the `prometheus-bridge` network:
+Attach to the `prometheus-bridge` network:
 
 ```bash
 dokku network:set grafana attach-post-deploy prometheus-bridge
 ```
 
-Add the WorldMap plugin:
+Add the WorldMap plugin (required for the web-analytics dashboard):
 
 ```bash
 apt-get install -y unzip
@@ -487,7 +473,7 @@ TODO: grafana config eg smtp
 https://medium.com/better-programming/node-js-application-monitoring-with-prometheus-and-grafana-b08deaf0efe3
 https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
 
-#### Data sources
+### Data sources
 
 By default the following data sources should be enabled:
 
@@ -496,238 +482,202 @@ By default the following data sources should be enabled:
 
 To explore the `loki` logs, click `Explore` on the sidebar, select the `Loki` datasource in the top-left dropdown, and then choose a log stream using the `Log labels` button.
 
-## Recording App Metrics
+## Monitor nginx access logs
 
-We'll be recording both back-end and front-end metrics.
+We can use `loki` and `promtail` to index nginx access logs and display them as metrics in `grafana`, but we first need to configure nginx to output logs in a particular format, and use the geoip2 module to map ip addresses to locations.
 
-Before continuing, ensure you've deployed your app, then add it to the `prometheus-bridge` network:
+### Configure nginx
 
-```bash
-dokku network:set next-app attach-post-deploy prometheus-bridge
-```
-
-### Back-end Metrics
-
-Goals:
-
-- The server should provide a prometheus compatible endpoint (`/metrics`) that provides metrics of the running Node.js app
-- Metrics should include useful Node.js metrics like event loop lag, memory usage etc
-- Metrics should include server request timings
-
-We can use the popular `prom-client` library to generate default Node.js metrics as well as our own custom performance metrics.
-
-Integrating `prom-client` into Next.js was a bit of pain. The webpack server `Hot Module Replacing` interferes with the initialisation of `prom-client`, and there's no way to configure this behaviour in Next.js (at time of writing). This means you need to use a custom server and build your metrics endpoint outside of `pages/api`, which is rather inconvenient.
-
-Here's an example custom `server.ts` using `express`:
-
-```ts
-import next from 'next';
-import express, { Request, Response } from 'express';
-import { IncomingMessage, ServerResponse } from 'http';
-import url from 'url';
-import { httpRequestDurationMicroseconds, registry } from './prometheus/client';
-
-const PORT = 3000;
-const dev = process.env.NODE_ENV !== 'production';
-
-const app = next({ dev });
-const handle = app.getRequestHandler();
-const server = express();
-
-const handleWithTiming = async (req: IncomingMessage, res: ServerResponse) => {
-  const route = url.parse(req.url).pathname;
-  const end = httpRequestDurationMicroseconds.startTimer();
-  await handle(req, res);
-  end({ route, code: res.statusCode, method: req.method });
-};
-
-app.prepare().then(() => {
-  server.get('/metrics', async (_: Request, res: Response) => {
-    res.type(registry.contentType);
-    return res.send(await registry.metrics());
-  });
-
-  server.all('*', async (req: Request, res: Response) => {
-    const route = url.parse(req.url).pathname;
-    const isStaticRoute =
-      route.startsWith('/_next/static') || route.startsWith('/favicon.ico');
-    const handler = isStaticRoute ? handle : handleWithTiming;
-    handler(req, res);
-  });
-
-  server.listen(PORT, () => {
-    console.log(`🚀 http application ready on http://localhost:${PORT}`);
-  });
-});
-```
-
-And here's the Prometheus client:
-
-```ts
-import client from 'prom-client';
-import { APP_VERSION } from '../../config/config';
-
-export const registry = new client.Registry();
-
-registry.setDefaultLabels({
-  app: 'example-nodejs-app',
-  version: APP_VERSION,
-});
-
-client.collectDefaultMetrics({ register: registry });
-
-export const httpRequestDurationMicroseconds = new client.Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP request in microseconds',
-  labelNames: ['method', 'route', 'code'],
-});
-
-registry.registerMetric(httpRequestDurationMicroseconds);
-```
-
-The server is written in TypeScript and is not part of the Next.js build, so we need a new build setup for compiling the server.
-
-Install a base tsconfig for Node 14:
+Install the [maxmind tools](https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa):
 
 ```bash
-npm i @tsconfig/node14 --save-dev
+add-apt-repository -y ppa:maxmind/ppa
+apt-get update
+apt-get install -y geoipupdate libmaxminddb0 libmaxminddb-dev mmdb-bin
 ```
 
-Create a new directory called `server` and create a new file at `server/tsconfig.json` with:
+### Download geoip database
 
-```json
-{
-  "extends": "@tsconfig/node14/tsconfig.json",
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
-    "isolatedModules": false,
-    "noEmit": false
-  },
-  "include": ["**/*.ts"]
-}
+[Sign up for GeoLite2](https://dev.maxmind.com/geoip/geoip2/geolite2/) (it's free) and create a new license key.
+
+Update `/etc/GeoIP.conf`:
+
+```nginx
+AccountID YOUR_ACCOUNT_ID_HERE
+LicenseKey YOUR_LICENSE_KEY_HERE
+EditionIDs GeoLite2-City GeoLite2-Country
 ```
 
-(Placing the `tsconfig.json` in a nested folder provides better compatibility for IDE intellisense, and this approach works well in VS Code.)
+Update the geoip database:
 
-Adjust your `npm` run scripts in `package.json` to compile the server and adjust the start script:
-
-```json
-{
-  "scripts": {
-    "dev": "npm run build:server && npm start",
-    "build:server": "tsc -p server --outDir build",
-    "build": "npm run build:server && next build",
-    "start": "node build/server"
-  }
-}
+```bash
+geoipupdate
 ```
 
-After running `npm run dev` you should see metrics available at [http://localhost:3000/metrics](http://localhost:3000/metrics).
+List the geoip databases:
 
-## Front-end Metrics
-
-[Real User Monitoring](https://en.wikipedia.org/wiki/Real_user_monitoring) (RUM) data captures the performance experienced by a site's actual users.
-
-A standard Next.js app uses the `User Timing API` to mark various performance metrics of your app. These performance marks are known as [web vitals](https://web.dev/vitals/).
-
-You can see the marks by running `performance.getEntries()` in the Browser console. These marks can be read by analysis tools such as lighthouse and others to monitor the performance of your application.
-
-Next.js offers a way to record performance marks (using whatever tool you want) by sending the metrics to an HTTP endpoint:
-
-```js
-export function reportWebVitals(metric) {
-  const body = JSON.stringify(metric);
-  const endpointUrl = '/vitals';
-
-  // Use `navigator.sendBeacon()` if available, falling back to `fetch()`.
-  if (navigator.sendBeacon) {
-    const blob = new Blob([body], { type: 'application/json' });
-    navigator.sendBeacon(endpointUrl, blob);
-  } else {
-    fetch(endpointUrl, {
-      body,
-      method: 'POST',
-      headers: new Headers({ 'Content-Type': 'application/json' }),
-      keepalive: true,
-    });
-  }
-}
+```bash
+ls -l /usr/share/GeoIP/
 ```
 
-We'll use this technique to publish performance metrics to Prometheus and we'll need to create an endpoint (`/vitals`) to process metrics sent from the client.
+### Install the nginx geoip2 module
 
-### Create the vitals endpoint
+Adding new modules to nginx requires you to build from source but Ubuntu 20.04 ships with a package called `nginx-full` that configures nginx to use the `mod-http-geoip2` dynamic module (amongst other).
 
-Register a new metrics provider with your prometheus client:
+For convenience we'll use this package and disable the dynamic modules we don't need.
 
-```ts
-export const ttfbHistogram = new client.Histogram({
-  name: 'client_user_timing_ttfb',
-  help: 'Time to first byte',
-  labelNames: ['path'],
-});
+Install `nginx-full`:
 
-registry.registerMetric(ttfbHistogram);
+```bash
+apt-get install -y nginx-full
 ```
 
-Create the `/vitals` endpoint to record the metric:
+Inspect the configure arguments to check the `http-geoip2` is installed correctly:
 
-```ts
-import { Request, Response } from 'express';
-import { Vital } from '../types/types';
-import { ttfbHistogram } from './metrics/client';
+```bash
+nginx -V
+```
 
-export const vitalsHandler = (
-  req: Request,
-  res: Response
-): Response<string> => {
-  if (req.headers['content-type'] !== 'application/json') {
-    return res.status(415).send('Invalid content-type');
-  }
-  const vital = req.body as Vital;
-  switch (vital.metric.name) {
-    case 'TTFB': {
-      ttfbHistogram.observe(
-        {
-          path: vital.path,
-        },
-        vital.metric.value
-      );
-      break;
+You should see something like:
+
+```nginx
+--add-dynamic-module=/build/nginx-5J5hor/nginx-1.18.0/debian/modules/http-geoip2
+```
+
+Disable the modules we don't need:
+
+```bash
+rm /etc/nginx/modules-enabled/50-mod-http-auth-pam.conf
+rm /etc/nginx/modules-enabled/50-mod-http-dav-ext.conf
+rm /etc/nginx/modules-enabled/50-mod-http-echo.conf
+rm /etc/nginx/modules-enabled/50-mod-http-geoip.conf
+rm /etc/nginx/modules-enabled/50-mod-http-subs-filter.conf
+rm /etc/nginx/modules-enabled/50-mod-http-upstream-fair.conf
+```
+
+List the enabled modules:
+
+```bash
+ls -l /etc/nginx/modules-enabled
+```
+
+You should see:
+
+```shell-session
+50-mod-http-geoip2.conf -> /usr/share/nginx/modules-available/mod-http-geoip2.conf
+50-mod-http-image-filter.conf -> /usr/share/nginx/modules-available/mod-http-image-filter.conf
+50-mod-http-xslt-filter.conf -> /usr/share/nginx/modules-available/mod-http-xslt-filter.conf
+50-mod-mail.conf -> /usr/share/nginx/modules-available/mod-mail.conf
+50-mod-stream.conf -> /usr/share/nginx/modules-available/mod-stream.conf
+```
+
+The `mod-http-image-filter`, `mod-http-xslt-filter`, `mod-mail` and `mod-stream` modules are the default modules enabled with the default dokku nginx installation. We're only enabling one additional dynamic module (`mod-http-geoip2`).
+
+Update `/etc/nginx/nginx.conf` to load the geoip databases:
+
+```nginx
+http {
+    ...
+
+    geoip2 /usr/share/GeoIP/GeoLite2-Country.mmdb {
+        auto_reload 60m;
+        $geoip2_metadata_country_build metadata build_epoch;
+        $geoip2_data_country_code country iso_code;
+        $geoip2_data_country_name country names en;
     }
-    default:
-      break;
-  }
-  return res.status(200).send('ok');
-};
+
+    geoip2 /usr/share/GeoIP/GeoLite2-City.mmdb {
+        auto_reload 60m;
+        $geoip2_metadata_city_build metadata build_epoch;
+        $geoip2_data_city_name city names en;
+    }
+
+    ...
+}
+```
+
+Restart nginx:
+
+```bash
+nginx -t
+service nginx reload
+```
+
+### Update application log format
+
+Update your app nginx configuration capture additional metrics and store in json format.
+
+For example in file `/home/dokku/my-app/nginx.conf`:
+
+```nginx
+log_format json_analytics escape=json '{'
+  '"msec": "$msec", ' # request unixtime in seconds with a milliseconds resolution
+  '"connection": "$connection", ' # connection serial number
+  '"connection_requests": "$connection_requests", ' # number of requests made in connection
+  '"pid": "$pid", ' # process pid
+  '"request_id": "$request_id", ' # the unique request id
+  '"request_length": "$request_length", ' # request length (including headers and body)
+  '"remote_addr": "$remote_addr", ' # client IP
+  '"remote_user": "$remote_user", ' # client HTTP username
+  '"remote_port": "$remote_port", ' # client port
+  '"time_local": "$time_local", '
+  '"time_iso8601": "$time_iso8601", ' # local time in the ISO 8601 standard format
+  '"request": "$request", ' # full path no arguments if the request
+  '"request_uri": "$request_uri", ' # full path and arguments if the request
+  '"args": "$args", ' # args
+  '"status": "$status", ' # response status code
+  '"body_bytes_sent": "$body_bytes_sent", ' # the number of body bytes exclude headers sent to a client
+  '"bytes_sent": "$bytes_sent", ' # the number of bytes sent to a client
+  '"http_referer": "$http_referer", ' # HTTP referer
+  '"http_user_agent": "$http_user_agent", ' # user agent
+  '"http_x_forwarded_for": "$http_x_forwarded_for", ' # http_x_forwarded_for
+  '"http_host": "$http_host", ' # the request Host: header
+  '"server_name": "$server_name", ' # the name of the vhost serving the request
+  '"request_time": "$request_time", ' # request processing time in seconds with msec resolution
+  '"upstream": "$upstream_addr", ' # upstream backend server for proxied requests
+  '"upstream_connect_time": "$upstream_connect_time", ' # upstream handshake time incl. TLS
+  '"upstream_header_time": "$upstream_header_time", ' # time spent receiving upstream headers
+  '"upstream_response_time": "$upstream_response_time", ' # time spend receiving upstream body
+  '"upstream_response_length": "$upstream_response_length", ' # upstream response length
+  '"upstream_cache_status": "$upstream_cache_status", ' # cache HIT/MISS where applicable
+  '"ssl_protocol": "$ssl_protocol", ' # TLS protocol
+  '"ssl_cipher": "$ssl_cipher", ' # TLS cipher
+  '"scheme": "$scheme", ' # http or https
+  '"request_method": "$request_method", ' # request method
+  '"server_protocol": "$server_protocol", ' # request protocol, like HTTP/1.1 or HTTP/2.0
+  '"pipe": "$pipe", ' # "p" if request was pipelined, "." otherwise
+  '"gzip_ratio": "$gzip_ratio", '
+  '"http_cf_ray": "$http_cf_ray",'
+  '"geoip_country_code": "$geoip2_data_country_code"'
+  '}';
+
+server {
+  ...
+
+  access_log  /var/log/nginx/my-app-access.log;
+  access_log  /var/log/nginx/my-app-json-access.log json_analytics;
+  error_log   /var/log/nginx/my-app-error.log;
+
+  ...
+}
+```
+
+Restart nginx:
+
+```bash
+nginx -t
+service nginx reload
 ```
 
 ## Grafana Dashboards
 
-Import the following dashboards:
+Now _finally_ to put it all together. We'll set up the following Grafana dashboards:
 
-- [Prometheus internal metrics](https://grafana.com/grafana/dashboards/3662)
+- Host Metrics dashboard
+- Container Metrics dashboard
+- Application Nginx Metrics dashboard
 
-## Add Deploy Annotations to Grafana
-
-We can use dokku [deployment tasks](http://dokku.viewdocs.io/dokku~v0.22.4/advanced-usage/deployment-tasks/) to record a deployment with Grafana each time the app is deployed, and display that deployment as an annotation on your Grafana graphs. This is useful to understand if metrics changes as a result of a new deployment.
-
-If using a Dockerfile for deployment, we'll need to place an `app.json` within the docker `WORKDIR` (typically the root of your application):
-
-```json
-{
-  "scripts": {
-    "dokku": {
-      "postdeploy": "echo 'hello from post deploy'"
-    }
-  }
-}
-```
-
-(Also don't forget to add this file to your docker image with `COPY` or `ADD`!)
-
-https://frederic-hemberger.de/notes/grafana/annotate-dashboards-with-deployments/
+Click on each of the links above to view the corresponding `json` files for each dashboard. You can import these json files into Grafana by visiting http://grafana.dokku.me/dashboards and clicking on "Import".
 
 ## Supporting Documentation
 
