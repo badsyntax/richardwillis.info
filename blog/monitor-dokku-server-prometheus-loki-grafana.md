@@ -10,22 +10,22 @@ ogImage:
 draft: false
 ---
 
-This post outlines how I setup a full monitoring stack on my single `dokku` server. While it's a pretty long post, it's not very detailed and just covers the absolute basics of setting up the various services.
+This post outlines how I set up a full monitoring stack on my single [`dokku`](http://dokku.viewdocs.io/dokku/) server. While it's a pretty long post, it's not very detailed and just covers the absolute basics of setting up the various services. I will update this post over time with any improvements I make to my stack.
 
 ## Services Overview
 
-We'll set up 6 different services as dokku apps:
+We'll set up 6 different services as `dokku` apps:
 
-- `prometheus` - monitoring and alerting toolkit
-- `loki` - application logs indexer
-- `promtail` - ships the contents of local logs to `loki`
-- `grafana` - read & graph time series data from `loki` & `prometheus`
-- `node-exporter` - provides metrics about the host machine
-- `cadvisor` - provides metrics about running docker containers
+- [`prometheus`](https://prometheus.io/) - monitoring and alerting toolkit
+- [`loki`](https://grafana.com/oss/loki/) - application logs indexer
+- [`promtail`](https://grafana.com/docs/loki/latest/clients/promtail/) - ships the contents of local logs to `loki`
+- [`grafana`](https://grafana.com/) - read & graph time series data from `loki` & `prometheus`
+- [`node-exporter`](https://github.com/prometheus/node_exporter) - provides metrics about the host machine
+- [`cadvisor`](https://github.com/google/cadvisor) - provides metrics about running docker containers
 
 ## Requirements
 
-You'll need `dokku` installed on a single server running `Ubuntu 20.04`. I've tested these instructions on `dokku` version `v0.22.8` but they'll probably work on other versions too.
+You'll need `dokku` installed on a single server running `Ubuntu 20.04`. I've tested these instructions on `dokku` version `v0.22.8`, but they'll probably work on other versions too.
 
 Public endpoints are secured with `http-auth` and `tls` so you'll need to make sure you have the relevant plugins installed:
 
@@ -133,6 +133,8 @@ dokku http-auth:on prometheus USER PASSWORD
 
 Visit [https://prometheus.dokku.me/targets](https://prometheus.dokku.me/targets) to confirm prometheus can connect to localhost (and other targets should all be down).
 
+---
+
 ## Set up Node-exporter
 
 Node exporter provides metrics on the host machine.
@@ -180,6 +182,8 @@ dokku letsencrypt node-exporter
 dokku http-auth:on node-exporter <username> <password>
 ```
 
+---
+
 ### Set up cAdvisor
 
 Create the app and set the config:
@@ -215,6 +219,8 @@ dokku tags:deploy cadvisor latest
 dokku letsencrypt cadvisor
 dokku http-auth:on cadvisor <username> <password>
 ```
+
+---
 
 ## Set up loki
 
@@ -327,6 +333,8 @@ The following endpoints should be available:
 - [https://loki.dokku.me/ready](http://loki.dokku.me/ready)
 - [https://loki.dokku.me/metrics](http://loki.dokku.me/metrics)
 
+---
+
 ## Set up Promtail
 
 `Promtail` will read logs and push to `loki`.
@@ -392,6 +400,8 @@ docker image tag grafana/promtail:2.0.0 dokku/promtail:latest
 dokku tags:deploy promtail latest
 dokku domains:disable promtail
 ```
+
+---
 
 ## Set up Grafana
 
@@ -468,11 +478,6 @@ dokku tags:deploy grafana latest
 dokku letsencrypt grafana
 ```
 
-TODO: grafana config eg smtp
-
-https://medium.com/better-programming/node-js-application-monitoring-with-prometheus-and-grafana-b08deaf0efe3
-https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/
-
 ### Data sources
 
 By default the following data sources should be enabled:
@@ -482,11 +487,13 @@ By default the following data sources should be enabled:
 
 To explore the `loki` logs, click `Explore` on the sidebar, select the `Loki` datasource in the top-left dropdown, and then choose a log stream using the `Log labels` button.
 
-## Monitor nginx access logs
+---
 
-We can use `loki` and `promtail` to index nginx access logs and display them as metrics in `grafana`, but we first need to configure nginx to output logs in a particular format, and use the geoip2 module to map ip addresses to locations.
+## Monitor Nginx Access Logs
 
-### Configure nginx
+We can use `loki` and `promtail` to index the dokku `nginx` reverse proxy access logs and display them as metrics in `grafana`. To do this we need to configure `nginx` to output logs in a particular format and enable the [`geoip2` module](https://github.com/leev/ngx_http_geoip2_module) to map ip addresses to locations.
+
+### Configure Nginx
 
 Install the [maxmind tools](https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa):
 
@@ -496,7 +503,7 @@ apt-get update
 apt-get install -y geoipupdate libmaxminddb0 libmaxminddb-dev mmdb-bin
 ```
 
-### Download geoip database
+### Download `geoip` Database
 
 [Sign up for GeoLite2](https://dev.maxmind.com/geoip/geoip2/geolite2/) (it's free) and create a new license key.
 
@@ -508,23 +515,28 @@ LicenseKey YOUR_LICENSE_KEY_HERE
 EditionIDs GeoLite2-City GeoLite2-Country
 ```
 
-Update the geoip database:
+Update the `geoip` database:
 
 ```bash
 geoipupdate
 ```
 
-List the geoip databases:
+List the `geoip` databases:
 
 ```bash
 ls -l /usr/share/GeoIP/
 ```
 
-### Install the nginx geoip2 module
+You should see both the Country and City databases:
 
-Adding new modules to nginx requires you to build from source but Ubuntu 20.04 ships with a package called `nginx-full` that configures nginx to use the `mod-http-geoip2` dynamic module (amongst other).
+```shell-session
+GeoLite2-City.mmdb
+GeoLite2-Country.mmdb
+```
 
-For convenience we'll use this package and disable the dynamic modules we don't need.
+### Install the Nginx `geoip2` Module
+
+Adding new modules to nginx requires you to build from source but Ubuntu 20.04 ships with a package called `nginx-full` with the `mod-http-geoip2` module enabled (amongst others). For convenience we'll use this package and disable the dynamic modules we don't need.
 
 Install `nginx-full`:
 
@@ -532,7 +544,7 @@ Install `nginx-full`:
 apt-get install -y nginx-full
 ```
 
-Inspect the configure arguments to check the `http-geoip2` is installed correctly:
+Inspect the `configure arguments` to confirm support for the `http-geoip2` module is enabled:
 
 ```bash
 nginx -V
@@ -571,8 +583,6 @@ You should see:
 50-mod-stream.conf -> /usr/share/nginx/modules-available/mod-stream.conf
 ```
 
-The `mod-http-image-filter`, `mod-http-xslt-filter`, `mod-mail` and `mod-stream` modules are the default modules enabled with the default dokku nginx installation. We're only enabling one additional dynamic module (`mod-http-geoip2`).
-
 Update `/etc/nginx/nginx.conf` to load the geoip databases:
 
 ```nginx
@@ -603,7 +613,7 @@ nginx -t
 service nginx reload
 ```
 
-### Update application log format
+### Update Application Log Format
 
 Update your app nginx configuration capture additional metrics and store in json format.
 
@@ -669,16 +679,23 @@ nginx -t
 service nginx reload
 ```
 
+You might want to use the nginx template instead of directly editing the application nginx file. View the [dokku nginx configuration docs](http://dokku.viewdocs.io/dokku/configuration/nginx/#customizing-the-nginx-configuration) for more info.
+
+---
+
 ## Grafana Dashboards
 
 Now _finally_ to put it all together. We'll set up the following Grafana dashboards:
 
-- Host Metrics dashboard
-- Container Metrics dashboard
-- Application Nginx Metrics dashboard
+- [Host Metrics dashboard](https://github.com/badsyntax/richardwillis.info/blob/master/grafana/dashboards/host.json)
+- [Container Metrics dashboard](https://github.com/badsyntax/richardwillis.info/blob/master/grafana/dashboards/containers.json)
+- [Web Analytics (nginx) dashboard](https://github.com/badsyntax/richardwillis.info/blob/master/grafana/dashboards/web-analytics.json)
+- [Prometheus dashboard](https://github.com/badsyntax/richardwillis.info/blob/master/grafana/dashboards/prometheus.json)
 
-Click on each of the links above to view the corresponding `json` files for each dashboard. You can import these json files into Grafana by visiting http://grafana.dokku.me/dashboards and clicking on "Import".
+Click on each of the links above to view the corresponding `json` files for each dashboard. You can import these json files into Grafana by visiting [http://grafana.dokku.me/dashboards](http://grafana.dokku.me/dashboards) and clicking on "Import".
 
 ## Supporting Articles
+
+Articles I referred to when setting this all up:
 
 - [Getting started with server monitoring and alerting](https://www.milanvit.net/post/getting-started-with-server-monitoring-and-alerting/)
