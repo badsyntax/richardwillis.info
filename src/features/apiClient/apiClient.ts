@@ -1,7 +1,7 @@
 import getConfig from 'next/config';
 import { Repo } from '../../types/types';
 
-const { staticManEndpoint, staticManRepo } = getConfig().publicRuntimeConfig;
+const { staticManEndpoint, staticManGitProvider, staticManRepo } = getConfig().publicRuntimeConfig;
 
 async function makeRequest(
   url: string,
@@ -15,7 +15,7 @@ async function makeRequest(
 }
 
 export function postComment(comment: FormData): Promise<Response> {
-  const url = `${staticManEndpoint}/v2/entry/${staticManRepo}/master/comments`;
+  const url = `${staticManEndpoint}/v3/entry/${staticManGitProvider}/${staticManRepo}/master/comments`;
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const searchParams = new URLSearchParams(comment);
