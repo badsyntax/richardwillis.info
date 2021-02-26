@@ -42,10 +42,12 @@ module.exports = {
     isProd
       ? {
           staticManRepo: 'badsyntax/richardwillis.info',
+          staticManGitProvider: 'github',
           staticManEndpoint: 'https://staticman.richardwillis.info',
         }
       : {
           staticManRepo: 'badsyntax/richardwillis.info',
+          staticManGitProvider: 'github',
           staticManEndpoint: 'http://localhost:3002',
         }
   ),
