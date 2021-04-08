@@ -1,4 +1,4 @@
-FROM node:14.15.4-alpine as builder
+FROM node:14.16.1-alpine as builder
 
 RUN apk add --no-cache python3=3.8.2-r1 make=4.2.1-r2 git=2.24.3-r0
 
@@ -15,7 +15,7 @@ ENV NODE_ENV production
 RUN npm ci --only=production
 
 
-FROM node:14.15.4-alpine
+FROM node:14.16.1-alpine
 
 LABEL maintainer=willis.rh@gmail.com
 LABEL org.opencontainers.image.source=https://github.com/badsyntax/richardwillis.info
