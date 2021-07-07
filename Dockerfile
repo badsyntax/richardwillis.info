@@ -4,7 +4,7 @@ FROM base AS builder
 
 WORKDIR /app
 
-RUN apk add curl=7.67.0-r3 --no-cache
+RUN apk add curl --no-cache
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
