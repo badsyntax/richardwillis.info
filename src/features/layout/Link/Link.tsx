@@ -2,7 +2,7 @@ import { default as NextLink, LinkProps as NextLinkProps } from 'next/link';
 import classNames from 'classnames/bind';
 import { useRouter } from 'next/router';
 
-import STYLES from './Link.module.css';
+import STYLES from './Link.module.scss';
 const classes = classNames.bind(STYLES);
 
 export type LinkVariant = 'card-button' | 'normal';
@@ -21,7 +21,7 @@ const hrefInPath = (pathname: string, href: string): boolean => {
   return href.split('/').every((part, i) => pathSplit[i] === part);
 };
 
-export const Link: React.FunctionComponent<LinkProps> = ({
+export const Link: React.FC<LinkProps> = ({
   href,
   className,
   activeClassName,
@@ -47,6 +47,7 @@ export const Link: React.FunctionComponent<LinkProps> = ({
     <a
       {...anchorProps}
       className={classes(
+        'root',
         className,
         hrefInPath(router.asPath, href) && activeClassName,
         variant && `variant-${variant}`

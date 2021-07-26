@@ -5,7 +5,7 @@ import { LinkProps } from '../../layout/Link/Link';
 import { Card } from '../../layout/Card/Card';
 import { getFormattedDateMedium } from '../../dates/getFormattedDate';
 
-import STYLES from './BlogPostCard.module.css';
+import STYLES from './BlogPostCard.module.scss';
 const classes = classNames.bind(STYLES);
 
 export interface BlogPostCardProps {
@@ -16,9 +16,7 @@ export interface BlogPostCardProps {
   titleClassName?: string;
 }
 
-export const BlogPostCard: React.FunctionComponent<
-  BlogPostCardProps & LinkProps
-> = ({
+export const BlogPostCard: React.FC<BlogPostCardProps & LinkProps> = ({
   title,
   date,
   excerpt,
@@ -27,6 +25,7 @@ export const BlogPostCard: React.FunctionComponent<
   titleClassName,
   ...props
 }) => {
+  console.log('DATE', date);
   return (
     <Card className={className} {...props}>
       <Card.Title className={classes(titleClassName)}>{title}</Card.Title>

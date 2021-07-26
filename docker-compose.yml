@@ -1,59 +1,138 @@
-version: '3'
-
-networks:
-  loki:
+version: '3.8'
 
 services:
-  richardwillis:
-    container_name: 'richardwillis'
-    build: ./
-    ports:
-      - 3000:3000
-
-  prometheus:
-    container_name: 'prometheus'
-    image: prom/prometheus
+  postgres:
+    image: postgres:13.3-alpine
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    ports:
-      - 9090:9090
-
-  grafana:
-    container_name: 'grafana'
-    image: grafana/grafana:latest
-    ports:
-      - 3001:3000
+      - postgres-data:/var/lib/postgresql/data
     networks:
-      - loki
-
-  loki:
-    image: grafana/loki:latest
+      - richardwillis
     ports:
-      - '3100:3100'
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - loki
-
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - /var/log:/var/log
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - loki
-
-  staticman:
-    container_name: 'staticman'
-    build: ./staticman/
-    ports:
-      - 3002:3000
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD', 'pg_isready']
     environment:
-      NODE_ENV: production
-      PORT: 3000
-      GITHUB_TOKEN: #insert your GitHub token here
-      RSA_PRIVATE_KEY: |
+      - POSTGRES_DB=strapi
+      - POSTGRES_USER_FILE=/run/secrets/richardwillis-postgres-user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/richardwillis-postgres-password
+    secrets:
+      - richardwillis-postgres-password
+      - richardwillis-postgres-user
+    deploy:
+      mode: replicated
+      replicas: 1
 
-#        RSA private key to encrypt sensitive configuration parameters with.
-#        the correct format starts with "-----BEGIN RSA PRIVATE KEY-----"
+  # actions_proxy:
+  #   image: ghcr.io/badsyntax/strapi-webhook-actions-proxy:latest
+  #   networks:
+  #     - richardwillis
+  #   secrets:
+  #     - source: richardwillis-actions-proxy-env
+  #       target: /app/.env
+  #       uid: '0'
+  #       gid: '0'
+  #       mode: 444
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 2
+
+  # nextjs:
+  #   image: ghcr.io/badsyntax/richardwillis:latest
+  #   networks:
+  #     - traefik-public
+  #   healthcheck:
+  #     test:
+  #       ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
+  #   ports:
+  #     - '3000:3000'
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 2
+  #     labels:
+  #       - 'traefik.http.routers.richardwillis.entrypoints=web'
+  #       - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
+  #       - 'traefik.http.services.richardwillis-service.loadbalancer.server.port=3000'
+  #       - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.permanent=true'
+  #       - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.scheme=https'
+  #       - 'traefik.http.routers.richardwillis.middlewares=richardwillis-redirectscheme'
+  #       - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
+  #       - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
+  #       - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
+
+  strapi:
+    image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info-strapi:latest
+    networks:
+      - traefik-public
+      - richardwillis
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
+    volumes:
+      - strapi-uploads:/app/public/uploads
+    secrets:
+      - source: richardwillis-strapi-config
+        target: /app/.env
+        uid: '0'
+        gid: '0'
+        mode: 444
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - 'traefik.http.routers.strapi.entrypoints=web'
+        - 'traefik.http.routers.strapi.rule=Host(`strapi.docker-box.richardwillis.info`)'
+        - 'traefik.http.services.strapi-service.loadbalancer.server.port=3000'
+        - 'traefik.http.middlewares.strapi-redirectscheme.redirectscheme.permanent=true'
+        - 'traefik.http.middlewares.strapi-redirectscheme.redirectscheme.scheme=https'
+        - 'traefik.http.routers.strapi.middlewares=strapi-redirectscheme'
+        - 'traefik.http.routers.strapi-secure.entrypoints=websecure'
+        - 'traefik.http.routers.strapi-secure.rule=Host(`strapi.docker-box.richardwillis.info`)'
+        - 'traefik.http.routers.strapi-secure.tls.certresolver=letsencrypt'
+
+  # staticman:
+  #   image: ghcr.io/badsyntax/richardwillis-staticman:latest
+  #   networks:
+  #     - traefik-public
+  #   healthcheck:
+  #     test:
+  #       ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
+  #   secrets:
+  #     - source: richardwillis-staticman-config
+  #       target: /app/config.production.json
+  #       uid: '0'
+  #       gid: '0'
+  #       mode: 444
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 2
+  #     labels:
+  #       - 'traefik.http.routers.staticman.entrypoints=web'
+  #       - 'traefik.http.routers.staticman.rule=Host(`staticman.docker-box.richardwillis.info`)'
+  #       - 'traefik.http.services.staticman-service.loadbalancer.server.port=3000'
+  #       - 'traefik.http.middlewares.staticman-redirectscheme.redirectscheme.permanent=true'
+  #       - 'traefik.http.middlewares.staticman-redirectscheme.redirectscheme.scheme=https'
+  #       - 'traefik.http.routers.staticman.middlewares=staticman-redirectscheme'
+  #       - 'traefik.http.routers.staticman-secure.entrypoints=websecure'
+  #       - 'traefik.http.routers.staticman-secure.rule=Host(`staticman.docker-box.richardwillis.info`)'
+  #       - 'traefik.http.routers.staticman-secure.tls.certresolver=letsencrypt'
+
+networks:
+  traefik-public:
+    external: true
+  richardwillis:
+    driver: overlay
+    attachable: true
+
+secrets:
+  richardwillis-staticman-config:
+    external: true
+  richardwillis-postgres-password:
+    external: true
+  richardwillis-postgres-user:
+    external: true
+  richardwillis-strapi-config:
+    external: true
+
+volumes:
+  postgres-data:
+  strapi-uploads:

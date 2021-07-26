@@ -1,20 +1,17 @@
-FROM node:14.15.4-alpine as base
+FROM node:16-alpine as base
 
 FROM base AS builder
 
 WORKDIR /app
 
-RUN apk add curl --no-cache
-
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
-
-RUN curl -sf https://gobinaries.com/tj/node-prune | sh
-
 ARG APP_VERSION
 ARG ASSET_PREFIX
+ARG STRAPI_ENDPOINT
 
 ENV APP_VERSION $APP_VERSION
 ENV ASSET_PREFIX $ASSET_PREFIX
+ENV STRAPI_ENDPOINT $STRAPI_ENDPOINT
+
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
@@ -28,7 +25,6 @@ COPY . .
 RUN echo "$APP_VERSION" > VERSION
 RUN NODE_ENV=production npm run build
 RUN npm prune --production
-RUN node-prune node_modules
 
 
 FROM base
@@ -56,8 +52,6 @@ COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.co
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
 COPY --from=builder --chown=node:node $APP_HOME/build $APP_HOME/build
 COPY --from=builder --chown=node:node $APP_HOME/VERSION $APP_HOME/VERSION
-
-EXPOSE 3000
 
 USER node
 

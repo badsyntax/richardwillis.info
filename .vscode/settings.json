@@ -3,11 +3,11 @@
     ".next": false,
     "package-lock.json": false
   },
-  "typescript.tsc.autoDetect": "off",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "typescript.tsdk": "./node_modules/typescript/lib",
   "eslint.validate": ["javascript", "typescript"],
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
     "source.organizeImports": false
@@ -24,42 +24,6 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "cSpell.language": "en-GB",
-  "tailwindCSS.colorDecorators": "off",
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-workflow": ".github/workflows/*.yml"
-  },
-  "cSpell.words": [
-    "Buildx",
-    "Contentful",
-    "DOKKU",
-    "LOGLEVEL",
-    "Linkedin",
-    "Octokit",
-    "Promtail",
-    "QEMU",
-    "WORKDIR",
-    "badsyntax",
-    "browserslist",
-    "checkperiod",
-    "flexbox",
-    "flexbugs",
-    "ghcr",
-    "grafana",
-    "letsencrypt",
-    "mapbox",
-    "mkdir",
-    "nocheck",
-    "nogroup",
-    "nprogress",
-    "opencontainers",
-    "rehype",
-    "richardwillis",
-    "srcset",
-    "tailwindcss",
-    "tsdb",
-    "ttfb",
-    "vfile",
-    "webp",
-    "worldmap"
-  ]
+  "cSpell.words": ["govuk", "strapi"],
+  "git.ignoreLimitWarning": true
 }

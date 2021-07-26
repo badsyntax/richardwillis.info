@@ -1,0 +1,13 @@
+@import '../../../styles/theme';
+
+.root {
+}
+
+.main {
+  max-width: 64rem;
+  margin-right: auto;
+  margin-left: auto;
+  /* FIXME */
+  scroll-margin-top: 10rem;
+  padding-top: $theme-spacing-lg;
+}

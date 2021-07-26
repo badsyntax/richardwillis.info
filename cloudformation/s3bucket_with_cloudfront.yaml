@@ -16,7 +16,7 @@ Parameters:
     Description: Name of S3 bucket to create (ending with the region name)
   S3AllowedOrigins:
     Type: CommaDelimitedList
-    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com
+    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com, https://richardwillis.docker-box.richardwillis.info
     Description: A list of allowed domains to request resources from CloudFront
   RootDomain:
     Type: CommaDelimitedList

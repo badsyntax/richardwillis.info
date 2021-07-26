@@ -3,6 +3,7 @@ name: Analyze
 on:
   push:
     branches: [master]
+
   pull_request:
     branches: [master]
 
@@ -12,12 +13,15 @@ jobs:
     name: Lint app
     steps:
       - uses: actions/checkout@v2.3.4
+
       - name: Set up Node.js
         uses: actions/setup-node@v2.1.4
         with:
           node-version: 14.15.4
+
       - name: Install NPM Packages
         run: npm ci
+
       - name: Lint
         run: npm run lint
 
@@ -26,11 +30,8 @@ jobs:
     name: Lint dockerfile
     steps:
       - uses: actions/checkout@v2.3.4
+
       - name: Lint app dockerfile
         uses: brpaz/hadolint-action@v1.3.1
         with:
           dockerfile: Dockerfile
-      - name: Lint staticman dockerfile
-        uses: brpaz/hadolint-action@v1.3.1
-        with:
-          dockerfile: staticman/Dockerfile

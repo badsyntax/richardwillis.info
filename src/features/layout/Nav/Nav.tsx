@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames/bind';
 
 import { Link } from '../Link/Link';
-import STYLES from './Nav.module.css';
+import STYLES from './Nav.module.scss';
 const classes = classNames.bind(STYLES);
 
 export type NavProps = React.DetailedHTMLProps<
@@ -10,7 +10,7 @@ export type NavProps = React.DetailedHTMLProps<
   HTMLElement
 >;
 
-export const Nav: React.FunctionComponent<NavProps> = ({ className }) => {
+export const Nav: React.FC<NavProps> = ({ className }) => {
   const classNames = {
     className: classes('nav-item'),
     activeClassName: classes('active'),

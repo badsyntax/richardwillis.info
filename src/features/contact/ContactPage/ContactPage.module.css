@@ -1,8 +1,0 @@
-.social-link {
-  @apply inline-flex items-center;
-  @apply m-0 !important;
-}
-
-.icon {
-  @apply mr-2;
-}

@@ -1,0 +1,33 @@
+@import '../../../styles/theme';
+
+.card {
+  border-color: #333;
+  border-width: 1px;
+  border-radius: 10px;
+  border-style: solid;
+  padding: $theme-spacing-md;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: stretch;
+  margin-bottom: $theme-spacing-lg;
+  margin-top: $theme-spacing-lg;
+  text-decoration: none;
+  transition-duration: 0.4s;
+  transition-property: box-shadow, border-color;
+  &:hover {
+    border-color: $theme-heading-color;
+  }
+  & :last-child {
+    margin-bottom: 0;
+  }
+}
+.title {
+  margin-bottom: $theme-spacing-md;
+  color: $theme-link-color;
+}
+.content {
+  margin-bottom: $theme-spacing-md;
+  // @apply my-1;
+  // color: #ce9178;
+}

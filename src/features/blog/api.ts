@@ -1,96 +1,58 @@
-import fs from 'fs';
-import yaml from 'js-yaml';
-import { join } from 'path';
-import matter from 'gray-matter';
 import { Post, PostComment } from './types';
-import { logger } from '../logger/logger';
-import { markdownToSimpleHtml } from '../markdown/markdownToSimpleHtml';
 import { markdownToHtml } from '../markdown/markdownToHtml';
-
-const postsDirectory = join(process.cwd(), 'blog');
-const commentsDirectory = join(postsDirectory, 'comments');
-
-export function getPostSlugs(): string[] {
-  return fs
-    .readdirSync(postsDirectory)
-    .filter(
-      (file: string) => !fs.lstatSync(join(postsDirectory, file)).isDirectory()
-    );
-}
+import { apiClient } from '../api/apiClient';
+import { Article } from '../api/strapi';
 
 export function getComments(slug: string): PostComment[] {
-  const rootDir = join(commentsDirectory, slug);
-  if (!fs.existsSync(rootDir)) {
-    return [];
-  }
-
-  function notNull<T>(value: T | null): value is T {
-    return value !== null;
-  }
-
-  function parseComment(fileName: string): PostComment | null {
-    const filePath = join(rootDir, fileName);
-    try {
-      const comment = yaml.load(
-        fs.readFileSync(filePath, 'utf8')
-      ) as PostComment;
-      return {
-        ...comment,
-        messageHtml: markdownToSimpleHtml(comment.message),
-      };
-    } catch (e) {
-      logger.error(`Error parsing blog comment ${filePath}: ${e.message}`);
-      return null;
-    }
-  }
-
-  return fs.readdirSync(rootDir).map(parseComment).filter(notNull);
+  return [];
 }
 
-export function getPostBySlug(slug: string, fields: string[] = []): Post {
-  const realSlug = slug.replace(/\.md$/, '');
-  const fullPath = join(postsDirectory, `${realSlug}.md`);
-  const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-
-  const getData = (key: string): Post[keyof Post] => {
+export function getBlogPost(article: Article, fields: string[] = []): Post {
+  function getPostData(article: Article, key: string): Article[keyof Article] {
     switch (key) {
-      case 'slug':
-        return realSlug;
-      case 'content':
-        return content;
+      case 'date':
+        return article.publishedAt?.toISOString();
+      case 'excerpt':
+        return article.excerpt || '';
+      case 'author':
+        return article.author || '';
       case 'contentHtml':
-        return markdownToHtml(content);
+        return markdownToHtml(article.content || '');
       case 'comments':
-        return getComments(realSlug);
+        return [];
+      case 'ogImage':
+        return '';
       default:
-        return data[key];
+        return (article as any)[key];
     }
-  };
+  }
 
-  const post = fields.reduce<Partial<Post>>(
+  const blogPost = fields.reduce<Partial<Post>>(
     (acc: Partial<Post>, field: string) => ({
       ...acc,
-      [field]: getData(field),
+      [field]: getPostData(article, field),
     }),
     {}
   ) as Post;
 
-  return post;
+  return blogPost;
 }
 
-export function getAllPosts(fields: string[] = []): Post[] {
-  const slugs = getPostSlugs();
-  const posts = slugs
-    .map((slug: string) => getPostBySlug(slug, fields))
-    .sort((post1: Post, post2: Post) => (post1.date > post2.date ? -1 : 1));
-  return posts;
+export async function getPostBySlug(
+  slug: string,
+  fields: string[] = []
+): Promise<Post> {
+  const article = await apiClient.articleApi.articlesSlugGet({
+    slug,
+  });
+  return getBlogPost(article, fields);
 }
 
-export function getAllVisiblePosts(fields: string[] = []): Post[] {
-  const fieldsWithDraftStatus = fields.slice().concat(['draft']);
-  const visiblePosts = getAllPosts(fieldsWithDraftStatus).filter(
-    (post: Post) => !post.draft
-  );
-  return visiblePosts;
+export async function getAllPosts(fields: string[] = []): Promise<Post[]> {
+  const articles = await apiClient.articleApi.articlesGet({});
+  return articles.map((article) => getBlogPost(article, fields));
+}
+
+export function getAllVisiblePosts(fields: string[] = []): Promise<Post[]> {
+  return getAllPosts(fields);
 }

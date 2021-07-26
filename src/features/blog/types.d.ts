@@ -21,10 +21,10 @@ export interface Post {
   title: string;
   author: Author;
   date: string;
-  content: string;
-  contentHtml: string;
+  content?: string;
+  contentHtml?: string;
   excerpt: string;
-  ogImage: OGImage;
+  ogImage?: OGImage;
   draft: boolean;
-  comments: PostComment[];
+  comments?: PostComment[];
 }
