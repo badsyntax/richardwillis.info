@@ -3,7 +3,7 @@ import Head from 'next/head';
 import classNames from 'classnames/bind';
 import { Header } from '../Header/Header';
 
-import STYLES from './PageShell.module.css';
+import STYLES from './PageShell.module.scss';
 const classes = classNames.bind(STYLES);
 
 export interface PageShellProps {
@@ -12,7 +12,7 @@ export interface PageShellProps {
   mainClassName?: string;
 }
 
-export const PageShell: React.FunctionComponent<PageShellProps> = ({
+export const PageShell: React.FC<PageShellProps> = ({
   title,
   children,
   mainClassName,

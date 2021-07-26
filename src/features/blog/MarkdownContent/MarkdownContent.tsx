@@ -13,7 +13,7 @@ export type MarkdownContentProps = React.DetailedHTMLProps<
   content: string;
 };
 
-export const MarkdownContent: React.FunctionComponent<MarkdownContentProps> = ({
+export const MarkdownContent: React.FC<MarkdownContentProps> = ({
   content,
   ...props
 }) => {

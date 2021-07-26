@@ -1,1 +1,1 @@
-export { HomePage as default } from '../features/home/HomePage/HomePage';
+export { HomePage as default } from '../features/pages/HomePage/HomePage';

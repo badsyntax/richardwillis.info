@@ -1,0 +1,17 @@
+@import '../../../styles/theme';
+
+.date {
+  margin-bottom: $theme-spacing-lg;
+}
+
+.back-link {
+  margin-bottom: $theme-spacing-lg;
+  // @apply text-sm
+  //   sm:text-base
+  //   mb-6
+  //   sm:mb-8
+  //   inline-block
+  //   font-medium;
+  // color: #9cdcfe;
+  // font-weight: normal;
+}

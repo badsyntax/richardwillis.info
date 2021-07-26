@@ -6,6 +6,4 @@ npm-debug.log
 .gitignore
 .github
 /cloudformation
-/nginx
-/scripts
 docker-compose.yml

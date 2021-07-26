@@ -1,13 +1,11 @@
-import { VFileCompatible } from 'vfile';
-import unified from 'unified';
 import parse from 'remark-parse';
 import remark2rehype from 'remark-rehype';
 import html from 'rehype-stringify';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import rehypePrism from '@mapbox/rehype-prism';
+import { unified } from 'unified';
 
-export const markdownToSimpleHtml = (markdown: VFileCompatible): string => {
+export const markdownToSimpleHtml = (markdown: string): string => {
   const result = unified()
     .use(parse)
     .use(remark2rehype)

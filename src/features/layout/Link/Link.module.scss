@@ -1,0 +1,13 @@
+@import '../../../styles/theme';
+
+.root {
+  color: $theme-link-color;
+}
+.variant-card-button {
+  /* composes: variant-card from '../Button/Button.module.css'; */
+}
+
+.variant-normal {
+  /* @apply underline */
+  /* font-medium; */
+}

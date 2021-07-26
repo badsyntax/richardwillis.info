@@ -1,5 +1,0 @@
-_id: 540fcef0-4d1b-11eb-ab9a-9f744e76d2e6
-slug: test-post
-name: Richard
-message: "This is a test post with some **markdown**.\r\n\r\nHere's some *javascript*:\r\n\r\n```js\r\nalert('foo');\r\n```\r\n\r\n> A quote"
-date: 1609606533742

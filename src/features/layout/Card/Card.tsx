@@ -4,10 +4,10 @@ import classNames from 'classnames/bind';
 import { Link, LinkProps } from '../Link/Link';
 import { Typography, TypographyProps } from '../Typography/Typography';
 
-import STYLES from './Card.module.css';
+import STYLES from './Card.module.scss';
 const classes = classNames.bind(STYLES);
 
-export type CardTitleType = React.FunctionComponent<TypographyProps>;
+export type CardTitleType = React.FC<TypographyProps>;
 
 export const CardTitle: CardTitleType = ({ children, className, ...props }) => {
   return (
@@ -17,7 +17,7 @@ export const CardTitle: CardTitleType = ({ children, className, ...props }) => {
   );
 };
 
-export type CardContentType = React.FunctionComponent<TypographyProps>;
+export type CardContentType = React.FC<TypographyProps>;
 
 export const CardContent: CardContentType = ({ className, ...props }) => {
   return (
@@ -29,7 +29,7 @@ export type CardProps = {
   className?: string;
 } & LinkProps;
 
-export type CardType = React.FunctionComponent<CardProps> & {
+export type CardType = React.FC<CardProps> & {
   Title: CardTitleType;
   Content: CardContentType;
 };
