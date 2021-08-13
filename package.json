@@ -26,7 +26,7 @@
     "express": "^4.17.1",
     "gray-matter": "^4.0.2",
     "js-yaml": "^4.0.0",
-    "next": "10.0.4",
+    "next": "11.1.0",
     "node-cache": "^5.1.2",
     "nprogress": "^0.2.0",
     "prism-themes": "^1.5.0",
