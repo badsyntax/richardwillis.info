@@ -18,11 +18,9 @@ FROM base AS builder
 
 WORKDIR /app
 
-ARG APP_VERSION
 ARG ASSET_PREFIX
 ARG STRAPI_ENDPOINT
 
-ENV APP_VERSION $APP_VERSION
 ENV ASSET_PREFIX $ASSET_PREFIX
 ENV STRAPI_ENDPOINT $STRAPI_ENDPOINT
 
@@ -37,8 +35,7 @@ COPY . .
 
 COPY --from=deps /app/node_modules ./node_modules
 
-RUN echo "$APP_VERSION" > VERSION && \
-    NODE_ENV=production npm run build && \
+RUN NODE_ENV=production npm run build && \
     npm prune --production
 
 # hadolint ignore=DL3007
@@ -55,19 +52,3 @@ LABEL org.label-schema.vendor="badsyntax"
 COPY --from=builder /app/.next /app/.next
 COPY --from=builder /app/out /usr/share/nginx/html
 COPY ./nginx /etc/nginx
-
-# RUN mkdir -p $APP_HOME && chown -R node:node $APP_HOME
-# WORKDIR $APP_HOME
-
-# COPY --from=deps --chown=node:node $APP_HOME/package.json $APP_HOME/package.json
-# COPY --from=deps --chown=node:node /app/node_modules ./node_modules
-# COPY --from=builder --chown=node:node $APP_HOME/.next $APP_HOME/.next
-# COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.config.js
-# COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
-# COPY --from=builder --chown=node:node $APP_HOME/VERSION $APP_HOME/VERSION
-
-# USER node
-
-# CMD ["npm", "start"]
-
-
