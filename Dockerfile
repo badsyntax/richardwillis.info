@@ -1,5 +1,18 @@
 FROM node:16.7.0-alpine as base
 
+FROM base AS deps
+
+WORKDIR /app
+
+ENV NPM_CONFIG_LOGLEVEL warn
+ENV NPM_CONFIG_FUND false
+ENV NPM_CONFIG_AUDIT false
+ENV CI true
+
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
 FROM base AS builder
 
 WORKDIR /app
@@ -18,10 +31,11 @@ ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
 ENV CI true
 
-COPY package.json package-lock.json ./
+WORKDIR /app
 
-RUN npm ci
 COPY . .
+
+COPY --from=deps /app/node_modules ./node_modules
 
 RUN echo "$APP_VERSION" > VERSION
 RUN NODE_ENV=production npm run build
@@ -50,8 +64,8 @@ ENV APP_HOME /app
 RUN mkdir -p $APP_HOME && chown -R node:node $APP_HOME
 WORKDIR $APP_HOME
 
-COPY --from=builder --chown=node:node $APP_HOME/package.json $APP_HOME/package.json
-COPY --from=builder --chown=node:node $APP_HOME/node_modules $APP_HOME/node_modules
+COPY --from=deps --chown=node:node $APP_HOME/package.json $APP_HOME/package.json
+COPY --from=deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node $APP_HOME/.next $APP_HOME/.next
 COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.config.js
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
