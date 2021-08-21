@@ -98,8 +98,9 @@ jobs:
       - name: Copy static files from docker image
         run: |
           docker pull registry.docker-box.richardwillis.info/${{ github.repository }}:latest
-          docker run -i --name helper registry.docker-box.richardwillis.info/${{ github.repository }}:latest true
+          docker run -d --name helper registry.docker-box.richardwillis.info/${{ github.repository }}:latest tail -f /dev/null
           docker cp helper:/app/.next .
+          docker stop helper
           docker rm helper
 
       - name: Sync static assets to S3
