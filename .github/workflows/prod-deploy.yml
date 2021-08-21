@@ -32,7 +32,7 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
-      - name: Build and push Next.js docker image
+      - name: Build and push docker image
         uses: docker/build-push-action@v2
         with:
           context: ./
