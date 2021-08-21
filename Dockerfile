@@ -55,7 +55,7 @@ COPY --from=builder --chown=node:node $APP_HOME/node_modules $APP_HOME/node_modu
 COPY --from=builder --chown=node:node $APP_HOME/.next $APP_HOME/.next
 COPY --from=builder --chown=node:node $APP_HOME/next.config.js $APP_HOME/next.config.js
 COPY --from=builder --chown=node:node $APP_HOME/public $APP_HOME/public
-# COPY --from=builder --chown=node:node $APP_HOME/VERSION $APP_HOME/VERSION
+COPY --from=builder --chown=node:node $APP_HOME/VERSION $APP_HOME/VERSION
 
 USER node
 
