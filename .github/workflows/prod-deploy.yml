@@ -1,5 +1,7 @@
 name: Prod deploy
 on:
+  repository_dispatch:
+    types: [strapi_updated]
   push:
     # branches:
     #   - master

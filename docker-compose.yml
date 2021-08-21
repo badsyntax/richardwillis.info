@@ -22,19 +22,19 @@ services:
       mode: replicated
       replicas: 1
 
-  # actions_proxy:
-  #   image: ghcr.io/badsyntax/strapi-webhook-actions-proxy:latest
-  #   networks:
-  #     - richardwillis
-  #   secrets:
-  #     - source: richardwillis-actions-proxy-env
-  #       target: /app/.env
-  #       uid: '0'
-  #       gid: '0'
-  #       mode: 444
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 2
+  actions_proxy:
+    image: ghcr.io/badsyntax/strapi-webhook-actions-proxy:latest
+    networks:
+      - richardwillis
+    secrets:
+      - source: richardwillis-actions-proxy-env
+        target: /app/.env
+        uid: '0'
+        gid: '0'
+        mode: 444
+    deploy:
+      mode: replicated
+      replicas: 2
 
   nextjs:
     image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info:latest
@@ -87,33 +87,6 @@ services:
         - 'traefik.http.routers.strapi-secure.rule=Host(`strapi.docker-box.richardwillis.info`)'
         - 'traefik.http.routers.strapi-secure.tls.certresolver=letsencrypt'
 
-  # staticman:
-  #   image: ghcr.io/badsyntax/richardwillis-staticman:latest
-  #   networks:
-  #     - traefik-public
-  #   healthcheck:
-  #     test:
-  #       ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
-  #   secrets:
-  #     - source: richardwillis-staticman-config
-  #       target: /app/config.production.json
-  #       uid: '0'
-  #       gid: '0'
-  #       mode: 444
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 2
-  #     labels:
-  #       - 'traefik.http.routers.staticman.entrypoints=web'
-  #       - 'traefik.http.routers.staticman.rule=Host(`staticman.docker-box.richardwillis.info`)'
-  #       - 'traefik.http.services.staticman-service.loadbalancer.server.port=3000'
-  #       - 'traefik.http.middlewares.staticman-redirectscheme.redirectscheme.permanent=true'
-  #       - 'traefik.http.middlewares.staticman-redirectscheme.redirectscheme.scheme=https'
-  #       - 'traefik.http.routers.staticman.middlewares=staticman-redirectscheme'
-  #       - 'traefik.http.routers.staticman-secure.entrypoints=websecure'
-  #       - 'traefik.http.routers.staticman-secure.rule=Host(`staticman.docker-box.richardwillis.info`)'
-  #       - 'traefik.http.routers.staticman-secure.tls.certresolver=letsencrypt'
-
 networks:
   traefik-public:
     external: true
@@ -122,13 +95,13 @@ networks:
     attachable: true
 
 secrets:
-  richardwillis-staticman-config:
-    external: true
   richardwillis-postgres-password:
     external: true
   richardwillis-postgres-user:
     external: true
   richardwillis-strapi-config:
+    external: true
+  richardwillis-actions-proxy-env:
     external: true
 
 volumes:
