@@ -36,28 +36,26 @@ services:
   #     mode: replicated
   #     replicas: 2
 
-  # nextjs:
-  #   image: ghcr.io/badsyntax/richardwillis:latest
-  #   networks:
-  #     - traefik-public
-  #   healthcheck:
-  #     test:
-  #       ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
-  #   ports:
-  #     - '3000:3000'
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 2
-  #     labels:
-  #       - 'traefik.http.routers.richardwillis.entrypoints=web'
-  #       - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
-  #       - 'traefik.http.services.richardwillis-service.loadbalancer.server.port=3000'
-  #       - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.permanent=true'
-  #       - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.scheme=https'
-  #       - 'traefik.http.routers.richardwillis.middlewares=richardwillis-redirectscheme'
-  #       - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
-  #       - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
-  #       - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
+  nextjs:
+    image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info:latest
+    networks:
+      - traefik-public
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - 'traefik.http.routers.richardwillis.entrypoints=web'
+        - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
+        - 'traefik.http.services.richardwillis-service.loadbalancer.server.port=3000'
+        - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.permanent=true'
+        - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.scheme=https'
+        - 'traefik.http.routers.richardwillis.middlewares=richardwillis-redirectscheme'
+        - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
+        - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
+        - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
 
   strapi:
     image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info-strapi:latest
