@@ -1,4 +1,4 @@
-FROM node:16-alpine as base
+FROM node:16.7.0-alpine as base
 
 FROM base AS builder
 
@@ -13,6 +13,7 @@ ENV ASSET_PREFIX $ASSET_PREFIX
 ENV STRAPI_ENDPOINT $STRAPI_ENDPOINT
 
 ENV NPM_CONFIG_LOGLEVEL warn
+ENV NPM_CONFIG_UPDATE_NOTIFIER false
 ENV NPM_CONFIG_FUND false
 ENV NPM_CONFIG_AUDIT false
 ENV CI true
@@ -38,6 +39,10 @@ LABEL org.label-schema.usage="README.md"
 LABEL org.label-schema.vendor="badsyntax"
 
 ENV NPM_CONFIG_LOGLEVEL warn
+ENV NPM_CONFIG_UPDATE_NOTIFIER false
+ENV NPM_CONFIG_FUND false
+ENV NPM_CONFIG_AUDIT false
+
 ENV NODE_ENV production
 ENV PORT 3000
 ENV APP_HOME /app
