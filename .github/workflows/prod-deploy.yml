@@ -3,8 +3,8 @@ on:
   repository_dispatch:
     types: [strapi_updated]
   push:
-    # branches:
-    #   - master
+    branches:
+      - master
 #   release:
 #     types: [published]
 
