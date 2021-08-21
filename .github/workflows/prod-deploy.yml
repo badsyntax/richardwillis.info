@@ -3,8 +3,8 @@ on:
   repository_dispatch:
     types: [strapi_updated]
   push:
-    # branches:
-    # - master
+    branches:
+      - master
 #   release:
 #     types: [published]
 
@@ -25,9 +25,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-amd64-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-buildx-amd64-
 
       - name: Cache .next
         uses: actions/cache@v2
@@ -59,12 +59,11 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: registry.docker-box.richardwillis.info/${{ github.repository }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
           build-args: |
-            APP_VERSION=${{ github.event.release.tag_name }}
             STRAPI_ENDPOINT=${{ secrets.STRAPI_ENDPOINT }}
 
       # Temp fix
@@ -103,17 +102,27 @@ jobs:
           docker stop helper
           docker rm helper
 
-      - name: Sync static assets to S3
-        uses: jakejarvis/s3-sync-action@master
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          args: --cache-control public,max-age=31536000,immutable --size-only
-        env:
-          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-east-1'
-          SOURCE_DIR: '.next/static'
-          DEST_DIR: '_next/static'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Copy files to the s3 website content bucket
+        run: aws s3 sync .next/static s3://${{ secrets.AWS_S3_BUCKET }}/_next/static
+
+      # - name: Sync static assets to S3
+      #   uses: jakejarvis/s3-sync-action@master
+      #   with:
+      #     args: --cache-control public,max-age=31536000,immutable --size-only
+      #   env:
+      #     AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: 'us-east-1'
+      #     SOURCE_DIR: '.next/static'
+      #     DEST_DIR: '_next/static'
 
   deploy:
     name: Deploy app
