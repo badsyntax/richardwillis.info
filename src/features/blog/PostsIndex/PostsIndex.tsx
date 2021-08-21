@@ -11,7 +11,6 @@ export interface PostsIndexProps {
 }
 
 export const PostsIndex: React.FC<PostsIndexProps> = ({ posts }) => {
-  // console.log('POSTS', JSON.stringify(posts, null, 2));
   return (
     <nav className={classes('root')}>
       {posts.map((post) => {

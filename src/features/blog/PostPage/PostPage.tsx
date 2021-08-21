@@ -12,7 +12,6 @@ export interface PostPagePros {
 }
 
 export const PostPage: React.FC<PostPagePros> = ({ post }) => {
-  console.log('page', post);
   return (
     <PageShell title={`${post.title} - Blog`} description={post.excerpt}>
       <PostHeader title={post.title} date={post.date} author={post.author} />

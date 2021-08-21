@@ -25,7 +25,6 @@ export const BlogPostCard: React.FC<BlogPostCardProps & LinkProps> = ({
   titleClassName,
   ...props
 }) => {
-  console.log('DATE', date);
   return (
     <Card className={className} {...props}>
       <Card.Title className={classes(titleClassName)}>{title}</Card.Title>
