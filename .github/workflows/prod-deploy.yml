@@ -3,8 +3,8 @@ on:
   repository_dispatch:
     types: [strapi_updated]
   push:
-    branches:
-      - master
+    # branches:
+    # - master
 #   release:
 #     types: [published]
 
@@ -41,6 +41,13 @@ jobs:
           registry: registry.docker-box.richardwillis.info
           username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Update version cache
         run: |

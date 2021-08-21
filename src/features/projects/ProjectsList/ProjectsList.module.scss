@@ -1,9 +1,7 @@
 @import '../../../styles/theme';
 
 .root {
-  // @apply flex
-  //   flex-col
-  //   mt-6;
+  margin-top: $theme-spacing-xl;
 }
 
 .card {
