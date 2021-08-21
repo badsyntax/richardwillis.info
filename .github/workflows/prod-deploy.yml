@@ -1,6 +1,8 @@
 name: Prod deploy
 on:
   push:
+    # branches:
+    #   - master
 #   release:
 #     types: [published]
 
@@ -46,17 +48,6 @@ jobs:
             APP_VERSION=${{ github.event.release.tag_name }}
             STRAPI_ENDPOINT=${{ secrets.STRAPI_ENDPOINT }}
 
-      # - name: Build and push Staticman docker image
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./staticman
-      #     file: ./staticman/Dockerfile
-      #     push: true
-      #     platforms: linux/amd64
-      #     tags: registry.docker-box.richardwillis.info/${{ github.repository_owner }}/richardwillis-staticman:latest
-      #     cache-from: type=local,src=/tmp/.buildx-cache
-      #     cache-to: type=local,dest=/tmp/.buildx-cache-new
-
       # Temp fix
       # https://github.com/docker/build-push-action/issues/252
       # https://github.com/moby/buildkit/issues/1896
@@ -96,110 +87,13 @@ jobs:
           SOURCE_DIR: '.next/static'
           DEST_DIR: '_next/static'
 
-  # deploy:
-  #   name: Deploy app
-  #   needs: [publish-s3]
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - name: Save deploy start time
-  #       id: deploy_start
-  #       run: |
-  #         start=$(date +%s%N | cut -b1-13)
-  #         echo ::set-output name=start_time::$start
-  #     - name: Create GitHub deployment
-  #       id: create_deployment
-  #       uses: octokit/request-action@v2.x
-  #       with:
-  #         route: POST /repos/:repository/deployments
-  #         repository: ${{ github.repository }}
-  #         ref: ${{ github.event.release.tag_name }}
-  #         environment: production
-  #         required_contexts: '[]'
-  #         production_environment: true
-  #         auto_merge: false
-  #       env:
-  #         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-  #     - name: Set GitHub deployment status to in progress
-  #       id: start_deployment
-  #       uses: octokit/request-action@v2.x
-  #       with:
-  #         route: POST /repos/:repository/deployments/:deployment/statuses
-  #         repository: ${{ github.repository }}
-  #         deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-  #         environment: production
-  #         environment_url: https://richardwillis.info
-  #         log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-  #         state: in_progress
-  #         mediaType: '{"previews": ["flash", "ant-man"]}'
-  #       env:
-  #         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-  #     - name: Create deploy repo
-  #       id: deploy_repo
-  #       run: |
-  #         echo "FROM $IMAGE_URL" > Dockerfile
-  #         git init
-  #         git config user.email "willis.rh@gmail.com"
-  #         git config user.name "Richard Willis"
-  #         git add Dockerfile
-  #         git commit -m "Add Dockerfile"
-  #         commit=$(git rev-parse HEAD 2>/dev/null || true)
-  #         echo ::set-output name=commit_sha::$commit
-  #       env:
-  #         IMAGE_URL: registry.docker-box.richardwillis.info/${{ github.repository_owner }}/richardwillis:latest
-  #     - name: Push to dokku
-  #       uses: dokku/github-action@master
-  #       with:
-  #         command: deploy
-  #         git_remote_url: ${{ secrets.GIT_REMOTE_URL }}
-  #         ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-  #         git_push_flags: '--force'
-  #         ci_commit: ${{ steps.deploy_repo.outputs.commit_sha }}
-  #     - name: Set Grafana deployment
-  #       run: |
-  #         end=$(date +%s%N | cut -b1-13)
-  #         curl -X POST https://grafana.$DOKKU_HOST/api/annotations \
-  #           -H "Content-Type: application/json" \
-  #           -H "Authorization: Bearer $AUTH_TOKEN" \
-  #           --data @- << EOF
-  #           {
-  #             "dashboardId":2,
-  #             "time":$TIME_START,
-  #             "timeEnd":$end,
-  #             "tags":["deployment","production"],
-  #             "text":"App version $APP_VERSION deployed to <a href=\"https://richardwillis.info\">https://richardwillis.info</a>"
-  #           }
-  #         EOF
-  #       env:
-  #         AUTH_TOKEN: '${{ secrets.GRAFANA_AUTH_TOKEN }}'
-  #         DOKKU_HOST: '${{ secrets.DOKKU_HOST }}'
-  #         TIME_START: ${{ steps.deploy_start.outputs.start_time }}
-  #         APP_VERSION: '${{ github.event.release.tag_name }}'
-  #     - name: Set deployment status to success
-  #       id: successful_deployment
-  #       uses: octokit/request-action@v2.x
-  #       with:
-  #         route: POST /repos/:repository/deployments/:deployment/statuses
-  #         repository: ${{ github.repository }}
-  #         deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-  #         environment: production
-  #         environment_url: https://richardwillis.info
-  #         log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-  #         mediaType: '{"previews": ["ant-man"]}'
-  #         state: success
-  #       env:
-  #         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-  #     - name: Set deployment status to failure
-  #       id: failed_deployment
-  #       uses: octokit/request-action@v2.x
-  #       if: failure()
-  #       with:
-  #         route: POST /repos/:repository/deployments/:deployment/statuses
-  #         repository: ${{ github.repository }}
-  #         deployment: ${{ fromJson(steps.create_deployment.outputs.data).id }}
-  #         environment: production
-  #         environment_url: https://richardwillis.info
-  #         log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-  #         mediaType: '{"previews": ["ant-man"]}'
-  #         state: failure
-  #       env:
-  #         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-20.04
+    needs: [publish-s3]
+    steps:
+      - name: Deploy
+        run: |
+          curl --fail -X POST "$DEPLOY_ENDPOINT" || exit 1
+        env:
+          DEPLOY_ENDPOINT: '${{ secrets.DEPLOY_ENDPOINT }}'
