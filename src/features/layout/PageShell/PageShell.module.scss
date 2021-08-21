@@ -1,13 +1,19 @@
 @import '../../../styles/theme';
 
 .root {
+  // padding-left: $theme-spacing-lg;
+  // padding-right: $theme-spacing-lg;
 }
 
 .main {
-  max-width: 64rem;
+  max-width: $theme-shell-width;
   margin-right: auto;
   margin-left: auto;
   /* FIXME */
   scroll-margin-top: 10rem;
-  padding-top: $theme-spacing-lg;
+  padding-left: $theme-spacing-lg;
+  padding-right: $theme-spacing-lg;
+  padding-top: $theme-spacing-xl;
+  padding-bottom: $theme-spacing-xl;
+  // margin: $theme-spacing-lg;
 }

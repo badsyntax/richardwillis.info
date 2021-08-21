@@ -6,6 +6,9 @@
 }
 
 .variant-h1 {
+  font-size: $theme-font-size-xl;
+  margin-bottom: $theme-spacing-lg !important;
+  margin-top: $theme-spacing-md;
 }
 
 .variant-h2 {
@@ -15,6 +18,10 @@
 }
 
 .variant-p {
+  margin-top: $theme-spacing-lg;
+  margin-bottom: $theme-spacing-lg;
+  font-size: $theme-font-size-md;
+  line-height: $theme-font-size-lg;
 }
 
 .variant-prose {
@@ -22,10 +29,12 @@
     margin-top: 0;
   }
 
+  a {
+    color: $theme-link-color;
+  }
+
   h1 {
-    font-size: $theme-font-size-xl;
-    margin-bottom: $theme-spacing-lg;
-    margin-top: $theme-spacing-xl;
+    @extend .variant-h1;
   }
 
   h2 {
@@ -41,10 +50,7 @@
   }
 
   p {
-    margin-top: $theme-spacing-lg;
-    margin-bottom: $theme-spacing-lg;
-    font-size: $theme-font-size-md;
-    line-height: $theme-font-size-lg;
+    @extend .variant-p;
   }
 
   li {
