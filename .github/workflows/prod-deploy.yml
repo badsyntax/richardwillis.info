@@ -38,7 +38,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: registry.docker-box.richardwillis.info/${{ github.repository }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
@@ -52,7 +52,7 @@ jobs:
       #     context: ./staticman
       #     file: ./staticman/Dockerfile
       #     push: true
-      #     platforms: linux/amd64,linux/arm64
+      #     platforms: linux/amd64
       #     tags: registry.docker-box.richardwillis.info/${{ github.repository_owner }}/richardwillis-staticman:latest
       #     cache-from: type=local,src=/tmp/.buildx-cache
       #     cache-to: type=local,dest=/tmp/.buildx-cache-new
