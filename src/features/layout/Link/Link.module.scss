@@ -1,8 +1,9 @@
 @import '../../../styles/theme';
 
 .root {
-  color: $theme-link-color;
+  @extend %theme-link;
 }
+
 .variant-card-button {
   /* composes: variant-card from '../Button/Button.module.css'; */
 }

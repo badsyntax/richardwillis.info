@@ -2,69 +2,81 @@
 
 .root {
   color: $theme-text-color;
-  font-family: 'Fira Code', monospace;
+  font-family: $theme-font-family;
 }
 
 .variant-h1 {
-  font-size: $theme-font-size-xl;
-  margin-bottom: $theme-spacing-lg !important;
-  margin-top: $theme-spacing-md;
+  @extend %theme-h1;
 }
 
 .variant-h2 {
+  @extend %theme-h2;
 }
 
 .variant-h3 {
+  @extend %theme-h3;
 }
 
 .variant-p {
-  margin-top: $theme-spacing-lg;
   margin-bottom: $theme-spacing-lg;
-  font-size: $theme-font-size-md;
-  line-height: $theme-font-size-lg;
 }
 
 .variant-prose {
+  font-size: $theme-font-size-md;
+  line-height: 1.8;
+
   > :first-child {
     margin-top: 0;
   }
 
   a {
-    color: $theme-link-color;
+    @extend %theme-link;
   }
 
   h1 {
-    @extend .variant-h1;
+    @extend %theme-h1;
   }
 
   h2 {
-    font-size: $theme-font-size-lg;
-    margin-bottom: $theme-spacing-lg;
+    @extend %theme-h2;
     margin-top: $theme-spacing-xl;
   }
 
   h3 {
-    font-size: $theme-font-size-md;
-    margin-bottom: $theme-spacing-lg;
+    @extend %theme-h3;
     margin-top: $theme-spacing-xl;
   }
 
   p {
     @extend .variant-p;
+    margin-top: $theme-spacing-lg;
   }
 
-  li {
-    font-size: $theme-font-size-md;
-    line-height: $theme-font-size-lg;
+  hr {
+    @extend %theme-hr;
+  }
+
+  ul,
+  ol {
+    @extend %theme-list;
+  }
+
+  ul {
+    > li {
+      @extend %theme-list-item;
+    }
   }
 
   code {
-    border-radius: 0.2rem;
     background-color: #333;
     padding: 1px 4px;
   }
 
   pre {
+    @include scrollbar;
+    margin-top: $theme-spacing-lg;
+    margin-bottom: $theme-spacing-lg;
+
     code {
       background-color: transparent;
       border-width: 0;
@@ -77,13 +89,13 @@
 
   pre[class*='language-'],
   code[class*='language-'] {
-    font-size: $theme-font-size-md;
+    font-size: $theme-font-size-base;
   }
 
   pre[class*='language-'] {
     border-color: #333;
     border-width: 1px;
-    border-radius: 10px;
+    // border-radius: 10px;
     border-style: solid;
     padding: $theme-spacing-md;
     background: rgb(26, 26, 26);

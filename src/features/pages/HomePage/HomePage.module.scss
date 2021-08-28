@@ -11,19 +11,33 @@
 .title {
   margin: 0;
   margin-bottom: $theme-spacing-lg;
+  font-size: $theme-font-size-xxl;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-2xl;
+  }
 }
 
 .description {
   margin: 0;
   margin-bottom: $theme-spacing-lg;
   color: $theme-heading-color;
+  font-size: $theme-font-size-lg;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-xxl;
+  }
 }
 
 .nav-grid {
 }
 
-.nav-item:not(:last-child) {
-  margin-right: $theme-spacing-md;
+.nav-item {
+  font-size: $theme-font-size-md;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-xl;
+  }
+  &:not(:last-child) {
+    margin-right: $theme-spacing-md;
+  }
 }
 
 @screen sm {

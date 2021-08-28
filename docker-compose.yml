@@ -48,13 +48,13 @@ services:
       replicas: 2
       labels:
         - 'traefik.http.routers.richardwillis.entrypoints=web'
-        - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
+        - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
         - 'traefik.http.services.richardwillis-service.loadbalancer.server.port=80'
         - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.permanent=true'
         - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.scheme=https'
         - 'traefik.http.routers.richardwillis.middlewares=richardwillis-redirectscheme'
         - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
-        - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`)'
+        - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
         - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
 
   strapi:
