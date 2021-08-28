@@ -1,19 +1,20 @@
 import React from 'react';
-import Head from 'next/head';
 import classNames from 'classnames/bind';
-
-import { Header } from '../../layout/Header/Header';
 
 import { PageShell } from '../../layout/PageShell/PageShell';
 import { Typography } from '../../layout/Typography/Typography';
 import { Link } from '../../layout/Link/Link';
 import { ProjectsList } from '../ProjectsList/ProjectsList';
-import { projects } from './projects';
+import { Project } from '../../api/strapi';
 
 import STYLES from './ProjectsPage.module.scss';
 const classes = classNames.bind(STYLES);
 
-export const ProjectsPage: React.FC = () => {
+export interface ProjectsPageProps {
+  allProjects: Project[];
+}
+
+export const ProjectsPage: React.FC<ProjectsPageProps> = ({ allProjects }) => {
   return (
     <PageShell
       title="Projects"
@@ -27,15 +28,12 @@ export const ProjectsPage: React.FC = () => {
           all of my personal code is released as OSS.
         </p>
         <p>
-          Below are a few of the projects I've been working on. You can find all
-          my projects <Link href="https://github.com/badsyntax">on GitHub</Link>
-          .
+          Below are a few of the projects I&apos;ve been working on. You can
+          find all my projects{' '}
+          <Link href="https://github.com/badsyntax">on GitHub</Link>.
         </p>
       </Typography>
-      <ProjectsList projects={projects} />
-      {/* <ProjectsList projects={projects} /> */}
-      {/* <Typography as="h2">GitHub Stats</Typography> */}
-      {/* <p>Some of my GitHub stats here</p> */}
+      <ProjectsList projects={allProjects} />
     </PageShell>
   );
 };

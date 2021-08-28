@@ -1,10 +1,11 @@
 import React, { Fragment } from 'react';
 import classNames from 'classnames/bind';
 // import { FaGithub, FaRegStar } from 'react-icons/fa';
-import { Project } from '../types';
+// import { Project } from '../types';
 import { Card } from '../../layout/Card/Card';
 
 import STYLES from './ProjectsList.module.scss';
+import { Project } from '../../api/strapi';
 // import { useEnrichProjectsWithStars } from '../../../hooks/useEnrichProjectsWithStars';
 const classes = classNames.bind(STYLES);
 
@@ -17,8 +18,13 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ projects }) => {
   return (
     <nav className={classes('root')}>
       {projects.map((project, i) => {
+        const tags = (project.tags || '').split(', ');
         return (
-          <Card href={project.repoUrl} className={classes('card')} key={i}>
+          <Card
+            href={project.repoUrl || '#'}
+            className={classes('card')}
+            key={i}
+          >
             <Card.Title className={classes('title')}>
               {/* <FaGithub className={classes('github-icon')} /> */}
               {project.title}
@@ -26,10 +32,10 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ projects }) => {
             <Card.Content>{project.description}</Card.Content>
             <div className={classes('footer')}>
               <Card.Content className={classes('tags')}>
-                {project.tags.map((tag, i) => (
+                {tags.map((tag, i) => (
                   <span key={tag}>
                     {tag}
-                    {i < project.tags.length - 1 ? ', ' : ''}
+                    {i < tags.length - 1 ? ', ' : ''}
                   </span>
                 ))}
               </Card.Content>

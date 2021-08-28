@@ -2,6 +2,7 @@ apis/ArticleApi.ts
 apis/CategoryApi.ts
 apis/GlobalApi.ts
 apis/HomepageApi.ts
+apis/ProjectApi.ts
 apis/WriterApi.ts
 apis/index.ts
 index.ts
@@ -16,7 +17,9 @@ models/NewArticle.ts
 models/NewCategory.ts
 models/NewGlobal.ts
 models/NewHomepage.ts
+models/NewProject.ts
 models/NewWriter.ts
+models/Project.ts
 models/Writer.ts
 models/index.ts
 runtime.ts
