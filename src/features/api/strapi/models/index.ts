@@ -11,5 +11,7 @@ export * from './NewArticle';
 export * from './NewCategory';
 export * from './NewGlobal';
 export * from './NewHomepage';
+export * from './NewProject';
 export * from './NewWriter';
+export * from './Project';
 export * from './Writer';

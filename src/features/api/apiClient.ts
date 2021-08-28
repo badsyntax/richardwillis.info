@@ -1,5 +1,10 @@
 import fetch from 'node-fetch';
-import { ArticleApi, Configuration, ConfigurationParameters } from './strapi';
+import {
+  ArticleApi,
+  Configuration,
+  ConfigurationParameters,
+  ProjectApi,
+} from './strapi';
 
 const configParams: ConfigurationParameters = {
   basePath: process.env.STRAPI_ENDPOINT,
@@ -11,7 +16,7 @@ const apiConfig = new Configuration(configParams);
 
 export const apiClient = {
   articleApi: new ArticleApi(apiConfig),
+  projectApi: new ProjectApi(apiConfig),
 };
 
 export type ApiClient = typeof apiClient;
-
