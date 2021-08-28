@@ -1,0 +1,39 @@
+@import '../../../styles/theme';
+
+.mobile-nav {
+  flex-basis: 100%;
+  display: none;
+  flex-direction: column;
+  background: #333333;
+}
+
+.mobile-nav-visible {
+  display: flex;
+  @include respond-above(sm) {
+    display: none;
+  }
+}
+
+.menu-button {
+  background-color: transparent;
+  border: 0;
+  color: white;
+  font-size: $theme-font-size-xxl;
+  position: absolute;
+  left: $theme-spacing-md;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $theme-spacing-md;
+  cursor: pointer;
+  &:hover {
+    color: #ce9178;
+  }
+  @include respond-above(sm) {
+    display: none;
+  }
+}
+
+.menu-button-label {
+  @include screen-reader-only;
+}

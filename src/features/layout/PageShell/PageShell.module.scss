@@ -1,8 +1,9 @@
 @import '../../../styles/theme';
 
 .root {
-  // padding-left: $theme-spacing-lg;
-  // padding-right: $theme-spacing-lg;
+  // @include respond-above(sm) {
+  // padding-top: 3rem;
+  // }
 }
 
 .main {
@@ -13,7 +14,7 @@
   scroll-margin-top: 10rem;
   padding-left: $theme-spacing-lg;
   padding-right: $theme-spacing-lg;
-  padding-top: $theme-spacing-xl;
+  padding-top: 6.2rem;
   padding-bottom: $theme-spacing-xl;
   // margin: $theme-spacing-lg;
 }

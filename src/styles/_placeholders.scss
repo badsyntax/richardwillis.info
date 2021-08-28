@@ -1,0 +1,65 @@
+%theme-link {
+  color: $theme-link-color;
+  &:hover {
+    color: #ce9178;
+  }
+}
+
+%theme-h1 {
+  font-size: $theme-font-size-xxl;
+  margin-bottom: $theme-spacing-lg;
+}
+
+%theme-h2 {
+  font-size: $theme-font-size-xl;
+  margin-bottom: $theme-spacing-lg;
+}
+
+%theme-h3 {
+  font-size: $theme-font-size-lg;
+  margin-bottom: $theme-spacing-lg;
+}
+
+%theme-hr {
+  margin-top: $theme-spacing-xxl;
+  margin-bottom: $theme-spacing-xxl;
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #333;
+  padding: 0;
+
+  & + * {
+    margin-top: 0;
+  }
+}
+
+%theme-list {
+  margin-top: $theme-spacing-lg;
+  margin-bottom: $theme-spacing-lg;
+  margin-left: $theme-spacing-md;
+  margin-right: 0;
+  padding: 0;
+  list-style: none;
+}
+
+%theme-list-item {
+  font-size: $theme-font-size-md;
+  line-height: $theme-font-size-lg;
+  padding-left: $theme-spacing-lg;
+  margin-top: $theme-spacing-md;
+  margin-bottom: $theme-spacing-md;
+  position: relative;
+
+  &::before {
+    $width: 0.35rem;
+    width: $width;
+    height: $width;
+    top: calc(#{$theme-font-size-md} - (#{$width} * 2));
+    left: $theme-spacing-xs;
+    content: '';
+    position: absolute;
+    background-color: #d1d5db;
+    border-radius: 50%;
+  }
+}

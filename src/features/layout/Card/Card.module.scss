@@ -22,13 +22,13 @@
     margin-bottom: 0;
   }
 }
+
 .title {
   margin-bottom: $theme-spacing-md;
+  margin-top: 0;
   color: $theme-link-color;
 }
+
 .content {
   margin-bottom: $theme-spacing-md;
-  margin-top: 0;
-  // @apply my-1;
-  // color: #ce9178;
 }
