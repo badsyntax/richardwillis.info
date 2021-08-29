@@ -12,8 +12,8 @@ on:
 #     types: [published]
 
 jobs:
-  publish-docker-images:
-    name: Publish docker images
+  deploy:
+    name: Deploy App
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2.3.4
@@ -85,26 +85,6 @@ jobs:
           docker stop helper
           docker rm helper
 
-  publish-s3:
-    name: Publish static assets to S3
-    needs: [publish-docker-images]
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Login to Docker Registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.docker-box.richardwillis.info
-          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
-          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-
-      - name: Copy static files from docker image
-        run: |
-          docker pull registry.docker-box.richardwillis.info/${{ github.repository }}:latest
-          docker run -d --name helper registry.docker-box.richardwillis.info/${{ github.repository }}:latest tail -f /dev/null
-          docker cp helper:/app/.next .
-          docker stop helper
-          docker rm helper
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -115,25 +95,61 @@ jobs:
       - name: Sync static assets to S3
         run: aws s3 sync .next/static s3://${{ secrets.AWS_S3_BUCKET }}/_next/static --cache-control public,max-age=31536000,immutable --size-only
 
-      # - name: Sync static assets to S3
-      #   uses: jakejarvis/s3-sync-action@master
-      #   with:
-      #     args: --cache-control public,max-age=31536000,immutable --size-only
-      #   env:
-      #     AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: 'us-east-1'
-      #     SOURCE_DIR: '.next/static'
-      #     DEST_DIR: '_next/static'
-
-  deploy:
-    name: Deploy app
-    runs-on: ubuntu-20.04
-    needs: [publish-s3]
-    steps:
-      - name: Deploy
+      - name: Restart Service
         run: |
           curl --fail -X POST "$DEPLOY_ENDPOINT" || exit 1
         env:
           DEPLOY_ENDPOINT: '${{ secrets.DEPLOY_ENDPOINT }}'
+
+  # publish-s3:
+  #   name: Publish static assets to S3
+  #   needs: [publish-docker-images]
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - name: Login to Docker Registry
+  #       uses: docker/login-action@v1
+  #       with:
+  #         registry: registry.docker-box.richardwillis.info
+  #         username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+  #         password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+  #     - name: Copy static files from docker image
+  #       run: |
+  #         docker pull registry.docker-box.richardwillis.info/${{ github.repository }}:latest
+  #         docker run -d --name helper registry.docker-box.richardwillis.info/${{ github.repository }}:latest tail -f /dev/null
+  #         docker cp helper:/app/.next .
+  #         docker stop helper
+  #         docker rm helper
+
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: us-east-1
+
+  #     - name: Sync static assets to S3
+  #       run: aws s3 sync .next/static s3://${{ secrets.AWS_S3_BUCKET }}/_next/static --cache-control public,max-age=31536000,immutable --size-only
+
+  #     # - name: Sync static assets to S3
+  #     #   uses: jakejarvis/s3-sync-action@master
+  #     #   with:
+  #     #     args: --cache-control public,max-age=31536000,immutable --size-only
+  #     #   env:
+  #     #     AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+  #     #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     #     AWS_REGION: 'us-east-1'
+  #     #     SOURCE_DIR: '.next/static'
+  #     #     DEST_DIR: '_next/static'
+
+  # deploy:
+  #   name: Deploy app
+  #   runs-on: ubuntu-20.04
+  #   needs: [publish-s3]
+  #   steps:
+  #     - name: Deploy
+  #       run: |
+  #         curl --fail -X POST "$DEPLOY_ENDPOINT" || exit 1
+  #       env:
+  #         DEPLOY_ENDPOINT: '${{ secrets.DEPLOY_ENDPOINT }}'
