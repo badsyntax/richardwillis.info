@@ -29,7 +29,7 @@
   font-size: $theme-font-size-md;
   line-height: 1.8;
 
-  > :first-child {
+  > :first-child:not(hr) {
     margin-top: 0;
   }
 
@@ -43,17 +43,14 @@
 
   h2 {
     @extend %theme-h2;
-    margin-top: $theme-spacing-xl;
   }
 
   h3 {
     @extend %theme-h3;
-    margin-top: $theme-spacing-xl;
   }
 
   p {
     @extend .variant-p;
-    margin-top: $theme-spacing-lg;
   }
 
   hr {

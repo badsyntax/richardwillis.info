@@ -1,7 +1,11 @@
 @import '../../../styles/theme';
 
+.title {
+  margin-top: 0;
+}
+
 .date {
-  margin-bottom: $theme-spacing-lg;
+  @include spacing;
 }
 
 .back-link {

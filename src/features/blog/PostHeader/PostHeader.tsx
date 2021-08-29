@@ -19,7 +19,9 @@ interface PostHeaderProps {
 export const PostHeader: React.FC<PostHeaderProps> = ({ title, date }) => {
   return (
     <>
-      <Typography as="h1">{title}</Typography>
+      <Typography as="h1" className={classes('title')}>
+        {title}
+      </Typography>
       <Typography as="div" className={classes('date')}>
         Posted on: {getFormattedDateLong(new Date(date))}
       </Typography>
