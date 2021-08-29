@@ -109,7 +109,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Copy files to the s3 website content bucket
+      - name: Sync static assets to S3
         run: aws s3 sync .next/static s3://${{ secrets.AWS_S3_BUCKET }}/_next/static --cache-control public,max-age=31536000,immutable --size-only
 
       # - name: Sync static assets to S3

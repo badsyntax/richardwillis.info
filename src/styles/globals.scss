@@ -1,11 +1,18 @@
-// @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
 @import 'node_modules/modern-normalize/modern-normalize';
-// @import './node_modules/@vscode/codicons/dist/codicon';
 @import './theme';
+
+html,
+body {
+  height: 100%;
+}
 
 body {
   background-color: $theme-background;
   @include scrollbar(14px);
+
+  > div {
+    height: 100%;
+  }
 }
 
 ul,
