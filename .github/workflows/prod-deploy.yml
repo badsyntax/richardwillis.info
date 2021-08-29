@@ -1,4 +1,7 @@
 name: Prod deploy
+concurrency:
+  group: prod_deploy
+  cancel-in-progress: false
 on:
   repository_dispatch:
     types: [strapi_updated]
