@@ -11,7 +11,7 @@ export function getBlogPost(article: Article, fields: string[] = []): Post {
   function getPostData(article: Article, key: string): Article[keyof Article] {
     switch (key) {
       case 'date':
-        return article.publishedAt?.toISOString();
+        return article.publishDate?.toISOString();
       case 'excerpt':
         return article.excerpt || '';
       case 'author':
@@ -49,7 +49,9 @@ export async function getPostBySlug(
 }
 
 export async function getAllPosts(fields: string[] = []): Promise<Post[]> {
-  const articles = await apiClient.articleApi.articlesGet({});
+  const articles = await apiClient.articleApi.articlesGet({
+    sort: 'publish_date:DESC',
+  });
   return articles.map((article) => getBlogPost(article, fields));
 }
 

@@ -78,6 +78,12 @@ export interface Article {
      * @type {Date}
      * @memberof Article
      */
+    publishDate: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof Article
+     */
     publishedAt?: Date;
 }
 
@@ -100,6 +106,7 @@ export function ArticleFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         'image': json['image'],
         'author': !exists(json, 'author') ? undefined : json['author'],
         'excerpt': !exists(json, 'excerpt') ? undefined : json['excerpt'],
+        'publishDate': (new Date(json['publish_date'])),
         'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
     };
 }
@@ -122,6 +129,7 @@ export function ArticleToJSON(value?: Article | null): any {
         'image': value.image,
         'author': value.author,
         'excerpt': value.excerpt,
+        'publish_date': (value.publishDate.toISOString().substr(0,10)),
         'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
     };
 }
