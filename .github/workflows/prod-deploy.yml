@@ -102,6 +102,7 @@ jobs:
           DEPLOY_ENDPOINT: '${{ secrets.DEPLOY_ENDPOINT }}'
 
   # publish-s3:
+
   #   name: Publish static assets to S3
   #   needs: [publish-docker-images]
   #   runs-on: ubuntu-20.04
