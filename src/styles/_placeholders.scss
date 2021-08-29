@@ -6,7 +6,7 @@
 }
 
 %theme-h1 {
-  @include spacing;
+  @include header-spacing;
   font-size: $theme-font-size-xl;
   @include respond-above(sm) {
     font-size: $theme-font-size-xxl;
@@ -14,7 +14,7 @@
 }
 
 %theme-h2 {
-  @include spacing;
+  @include header-spacing;
   font-size: $theme-font-size-lg;
   @include respond-above(sm) {
     font-size: $theme-font-size-xl;
@@ -22,7 +22,7 @@
 }
 
 %theme-h3 {
-  @include spacing;
+  @include header-spacing;
   font-size: $theme-font-size-md;
   @include respond-above(sm) {
     font-size: $theme-font-size-lg;
@@ -38,13 +38,18 @@
 }
 
 %theme-hr {
-  margin-top: $theme-spacing-xxl;
-  margin-bottom: $theme-spacing-xl;
+  margin-top: $theme-spacing-lg;
+  margin-bottom: $theme-spacing-lg;
   display: block;
   height: 1px;
   border: 0;
   border-top: 1px solid #333;
   padding: 0;
+
+  @include respond-above(sm) {
+    margin-top: $theme-spacing-xl;
+    margin-bottom: $theme-spacing-xl;
+  }
 
   & + * {
     margin-top: 0;
@@ -52,25 +57,21 @@
 }
 
 %theme-list {
-  margin-top: $theme-spacing-lg;
-  margin-bottom: $theme-spacing-lg;
+  @include spacing;
   margin-left: $theme-spacing-md;
-  margin-right: 0;
   padding: 0;
   list-style: none;
 }
 
 %theme-list-item {
-  @include spacing;
   font-size: $theme-font-size-base;
-  line-height: $theme-font-size-md;
+  line-height: $theme-font-size-lg;
   padding-left: $theme-spacing-lg;
-  margin-top: $theme-spacing-md;
+  margin-bottom: $theme-spacing-md;
   position: relative;
 
   @include respond-above(sm) {
     font-size: $theme-font-size-md;
-    line-height: $theme-font-size-lg;
   }
 
   &::before {
