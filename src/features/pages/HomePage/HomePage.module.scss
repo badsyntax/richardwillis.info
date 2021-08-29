@@ -10,7 +10,7 @@
 
 .title {
   margin: 0;
-  margin-bottom: $theme-spacing-lg;
+  margin-bottom: $theme-spacing-xl;
   font-size: $theme-font-size-xxl;
   @include respond-above(sm) {
     font-size: $theme-font-size-2xl;
@@ -19,7 +19,7 @@
 
 .description {
   margin: 0;
-  margin-bottom: $theme-spacing-lg;
+  margin-bottom: $theme-spacing-xl;
   color: $theme-heading-color;
   font-size: $theme-font-size-lg;
   @include respond-above(sm) {

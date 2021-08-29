@@ -53,16 +53,16 @@ $breakpoints: (
 }
 
 @mixin spacing {
-  margin-bottom: $theme-spacing-lg;
+  margin-bottom: $theme-spacing-md;
   @include respond-above(sm) {
-    margin-bottom: $theme-spacing-xl;
+    margin-bottom: $theme-spacing-lg;
   }
 }
 
 @mixin header-spacing {
   @include spacing;
-  margin-top: $theme-spacing-xl;
+  margin-top: $theme-spacing-lg;
   @include respond-above(sm) {
-    margin-top: $theme-spacing-xxl;
+    margin-top: $theme-spacing-xl;
   }
 }
