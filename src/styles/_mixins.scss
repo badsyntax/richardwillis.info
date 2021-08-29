@@ -51,3 +51,10 @@ $breakpoints: (
     border-color: $track-color;
   }
 }
+
+@mixin spacing {
+  margin-bottom: $theme-spacing-md;
+  @include respond-above(sm) {
+    margin-bottom: $theme-spacing-lg;
+  }
+}

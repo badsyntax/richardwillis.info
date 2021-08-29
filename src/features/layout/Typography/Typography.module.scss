@@ -18,7 +18,11 @@
 }
 
 .variant-p {
-  margin-bottom: $theme-spacing-lg;
+  @extend %theme-p;
+}
+
+.variant-hr {
+  @extend %theme-hr;
 }
 
 .variant-prose {

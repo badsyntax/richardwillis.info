@@ -6,23 +6,40 @@
 }
 
 %theme-h1 {
-  font-size: $theme-font-size-xxl;
-  margin-bottom: $theme-spacing-lg;
+  @include spacing;
+  font-size: $theme-font-size-xl;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-xxl;
+  }
 }
 
 %theme-h2 {
-  font-size: $theme-font-size-xl;
-  margin-bottom: $theme-spacing-lg;
+  @include spacing;
+  font-size: $theme-font-size-lg;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-xl;
+  }
 }
 
 %theme-h3 {
-  font-size: $theme-font-size-lg;
-  margin-bottom: $theme-spacing-lg;
+  @include spacing;
+  font-size: $theme-font-size-md;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-lg;
+  }
+}
+
+%theme-p {
+  @include spacing;
+  font-size: $theme-font-size-base;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-md;
+  }
 }
 
 %theme-hr {
   margin-top: $theme-spacing-xxl;
-  margin-bottom: $theme-spacing-xxl;
+  margin-bottom: $theme-spacing-xl;
   display: block;
   height: 1px;
   border: 0;
@@ -44,12 +61,17 @@
 }
 
 %theme-list-item {
-  font-size: $theme-font-size-md;
-  line-height: $theme-font-size-lg;
+  @include spacing;
+  font-size: $theme-font-size-base;
+  line-height: $theme-font-size-md;
   padding-left: $theme-spacing-lg;
   margin-top: $theme-spacing-md;
-  margin-bottom: $theme-spacing-md;
   position: relative;
+
+  @include respond-above(sm) {
+    font-size: $theme-font-size-md;
+    line-height: $theme-font-size-lg;
+  }
 
   &::before {
     $width: 0.35rem;
