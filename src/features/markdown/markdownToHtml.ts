@@ -3,11 +3,12 @@ import remarkRehype from 'remark-rehype';
 import html from 'rehype-stringify';
 import slug from 'rehype-slug';
 import { unified } from 'unified';
-
 import autolinkHeadings from 'rehype-autolink-headings';
 import externalLinks from 'remark-external-links';
 // @ts-ignore
 import rehypePrism from '@mapbox/rehype-prism';
+
+import rehypePicture from './reypePicture';
 
 export const markdownToHtml = (markdown: string): string => {
   const result = unified()
@@ -31,6 +32,17 @@ export const markdownToHtml = (markdown: string): string => {
       },
     })
     .use(html)
+    // TODO: add webp format
+    .use(rehypePicture, {
+      png: {
+        sizes: [420, 640, 768, 1024, 1280],
+        formats: { png: 'image/png' },
+      },
+      jpg: {
+        sizes: [420, 640, 768, 1024, 1280],
+        formats: { jpg: 'image/jpg' },
+      },
+    })
     .processSync(markdown);
   return result.toString();
 };
