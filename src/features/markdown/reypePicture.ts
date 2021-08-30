@@ -15,6 +15,8 @@ import { Node, Data } from 'unist';
 
 const own = {}.hasOwnProperty;
 
+const extRegEx = new RegExp('.[a-z]+$');
+
 /**
  * @type {import('unified').Plugin<[Options] | void[], Root>}
  */
@@ -54,11 +56,8 @@ export default function rehypePicture(options: {}) {
       for (let key in formats) {
         if (own.call(formats, key)) {
           const sizes = getSourceSizes(map.sizes);
-          const srcSet = getSourceSet(
-            replaceExt(src, '.' + key),
-            map.sizes,
-            key
-          );
+          const newSrc = src.replace(extRegEx, '.' + key);
+          const srcSet = getSourceSet(newSrc, map.sizes, key);
           nodes.push({
             type: 'element',
             tagName: 'source',
