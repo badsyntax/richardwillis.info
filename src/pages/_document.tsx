@@ -30,6 +30,11 @@ export default class MyDocument extends Document {
             href={`${siteAssets}favicon-16x16.png`}
           />
           <meta name="theme-color" content="#000000" />
+          <script
+            defer
+            data-domain="richardwillis.info"
+            src="https://plausible.docker-box.richardwillis.info/js/plausible.js"
+          ></script>
         </Head>
         <body>
           <Main />

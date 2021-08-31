@@ -1,14 +1,14 @@
 version: '3.8'
 
 services:
-  postgres:
+  strapi_db:
     image: postgres:13.3-alpine
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    networks:
-      - richardwillis
     ports:
       - '5432:5432'
+    networks:
+      - richardwillis
     healthcheck:
       test: ['CMD', 'pg_isready']
     environment:
@@ -21,6 +21,79 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      labels:
+        - 'traefik.enable=false'
+
+  plausible_db:
+    image: postgres:13.3-alpine
+    volumes:
+      - plausible-db-data:/var/lib/postgresql/data
+    networks:
+      - plausible
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+    environment:
+      - POSTGRES_DB=plausible
+      - POSTGRES_USER_FILE=/run/secrets/richardwillis-plausible-postgres-user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/richardwillis-plausible-postgres-password
+    secrets:
+      - richardwillis-plausible-postgres-password
+      - richardwillis-plausible-postgres-user
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - 'traefik.enable=false'
+
+  plausible_events_db:
+    image: yandex/clickhouse-server:21.3.2.5
+    volumes:
+      - plausible-event-data:/var/lib/clickhouse
+      - plausible-etc:/etc/clickhouse-server
+    networks:
+      - plausible
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - 'traefik.enable=false'
+
+  plausible:
+    image: plausible/analytics:master
+    command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+    networks:
+      - plausible
+      - traefik-public
+    environment:
+      - CONFIG_DIR=/run/secrets
+    secrets:
+      - source: richardwillis-plausible-admin-user-email
+        target: /run/secrets/ADMIN_USER_EMAIL
+      - source: richardwillis-plausible-admin-user-name
+        target: /run/secrets/ADMIN_USER_NAME
+      - source: richardwillis-plausible-admin-user-password
+        target: /run/secrets/ADMIN_USER_PWD
+      - source: richardwillis-plausible-base-url
+        target: /run/secrets/BASE_URL
+      - source: richardwillis-plausible-secret-key-base
+        target: /run/secrets/SECRET_KEY_BASE
+      - source: richardwillis-plausible-database-url
+        target: /run/secrets/DATABASE_URL
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.lbswarm=true'
+        - 'traefik.http.routers.plausible.entrypoints=web'
+        - 'traefik.http.routers.plausible.rule=Host(`plausible.docker-box.richardwillis.info`)'
+        - 'traefik.http.services.plausible-service.loadbalancer.server.port=8000'
+        - 'traefik.http.middlewares.plausible-redirectscheme.redirectscheme.permanent=true'
+        - 'traefik.http.middlewares.plausible-redirectscheme.redirectscheme.scheme=https'
+        - 'traefik.http.routers.plausible.middlewares=plausible-redirectscheme'
+        - 'traefik.http.routers.plausible-secure.entrypoints=websecure'
+        - 'traefik.http.routers.plausible-secure.rule=Host(`plausible.docker-box.richardwillis.info`)'
+        - 'traefik.http.routers.plausible-secure.tls.certresolver=letsencrypt'
 
   actions_proxy:
     image: ghcr.io/badsyntax/strapi-webhook-actions-proxy:latest
@@ -35,6 +108,8 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+      labels:
+        - 'traefik.enable=false'
 
   nextjs:
     image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info:latest
@@ -47,6 +122,8 @@ services:
       mode: replicated
       replicas: 2
       labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.lbswarm=true'
         - 'traefik.http.routers.richardwillis.entrypoints=web'
         - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
         - 'traefik.http.services.richardwillis-service.loadbalancer.server.port=80'
@@ -56,7 +133,6 @@ services:
         - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
         - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
         - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
-        - 'traefik.docker.lbswarm=true'
 
   strapi:
     image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info-strapi:latest
@@ -78,6 +154,8 @@ services:
       mode: replicated
       replicas: 2
       labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.lbswarm=true'
         - 'traefik.http.routers.strapi.entrypoints=web'
         - 'traefik.http.routers.strapi.rule=Host(`strapi.docker-box.richardwillis.info`)'
         - 'traefik.http.services.strapi-service.loadbalancer.server.port=3000'
@@ -87,12 +165,14 @@ services:
         - 'traefik.http.routers.strapi-secure.entrypoints=websecure'
         - 'traefik.http.routers.strapi-secure.rule=Host(`strapi.docker-box.richardwillis.info`)'
         - 'traefik.http.routers.strapi-secure.tls.certresolver=letsencrypt'
-        - 'traefik.docker.lbswarm=true'
 
 networks:
   traefik-public:
     external: true
   richardwillis:
+    driver: overlay
+    attachable: true
+  plausible:
     driver: overlay
     attachable: true
 
@@ -105,7 +185,26 @@ secrets:
     external: true
   richardwillis-actions-proxy-env:
     external: true
+  richardwillis-plausible-admin-user-email:
+    external: true
+  richardwillis-plausible-admin-user-name:
+    external: true
+  richardwillis-plausible-admin-user-password:
+    external: true
+  richardwillis-plausible-base-url:
+    external: true
+  richardwillis-plausible-secret-key-base:
+    external: true
+  richardwillis-plausible-postgres-user:
+    external: true
+  richardwillis-plausible-postgres-password:
+    external: true
+  richardwillis-plausible-database-url:
+    external: true
 
 volumes:
   postgres-data:
   strapi-uploads:
+  plausible-db-data:
+  plausible-event-data:
+  plausible-etc:
