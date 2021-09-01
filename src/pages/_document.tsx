@@ -3,35 +3,31 @@ import Document, { Html, Main, NextScript, Head } from 'next/document';
 import getConfig from 'next/config';
 const { publicRuntimeConfig } = getConfig();
 
+const siteAssets = `${publicRuntimeConfig.assetPrefix}site-assets/`;
+
 export default class MyDocument extends Document {
   render(): React.ReactElement {
     return (
       <Html lang="en">
         <Head>
-          <link
-            rel="shortcut icon"
-            href={`${publicRuntimeConfig.assetPrefix}favicon.ico`}
-          />
-          <link
-            rel="icon"
-            href={`${publicRuntimeConfig.assetPrefix}favicon.ico`}
-          />
+          <link rel="shortcut icon" href={`${siteAssets}favicon.ico`} />
+          <link rel="icon" href={`${siteAssets}favicon.ico`} />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
-            href={`${publicRuntimeConfig.assetPrefix}apple-touch-icon.png`}
+            href={`${siteAssets}apple-touch-icon.png`}
           />
           <link
             rel="icon"
             type="image/png"
             sizes="32x32"
-            href={`${publicRuntimeConfig.assetPrefix}favicon-32x32.png`}
+            href={`${siteAssets}favicon-32x32.png`}
           />
           <link
             rel="icon"
             type="image/png"
             sizes="16x16"
-            href={`${publicRuntimeConfig.assetPrefix}favicon-16x16.png`}
+            href={`${siteAssets}favicon-16x16.png`}
           />
           <meta name="theme-color" content="#000000" />
         </Head>
