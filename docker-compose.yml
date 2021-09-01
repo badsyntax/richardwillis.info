@@ -56,6 +56,7 @@ services:
         - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
         - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
         - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
+        - 'traefik.docker.lbswarm=true'
 
   strapi:
     image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info-strapi:latest
@@ -86,6 +87,7 @@ services:
         - 'traefik.http.routers.strapi-secure.entrypoints=websecure'
         - 'traefik.http.routers.strapi-secure.rule=Host(`strapi.docker-box.richardwillis.info`)'
         - 'traefik.http.routers.strapi-secure.tls.certresolver=letsencrypt'
+        - 'traefik.docker.lbswarm=true'
 
 networks:
   traefik-public:
