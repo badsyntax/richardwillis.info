@@ -50,5 +50,6 @@ LABEL org.label-schema.usage="README.md"
 LABEL org.label-schema.vendor="badsyntax"
 
 COPY --from=builder /app/.next /app/.next
+COPY --from=builder /app/public /app/public
 COPY --from=builder /app/out /usr/share/nginx/html
 COPY ./nginx /etc/nginx

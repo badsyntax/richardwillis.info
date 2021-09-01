@@ -85,6 +85,13 @@ jobs:
           docker stop helper
           docker rm helper
 
+      - name: Extract public assets
+        run: |
+          docker run -d --name helper registry.docker-box.richardwillis.info/${{ github.repository }}:latest tail -f /dev/null
+          docker cp helper:/app/public .
+          docker stop helper
+          docker rm helper
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -92,8 +99,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Sync static assets to S3
+      - name: Sync .next static assets to S3
         run: aws s3 sync .next/static s3://${{ secrets.AWS_S3_BUCKET }}/_next/static --cache-control public,max-age=31536000,immutable --size-only
+
+      - name: Sync public assets to S3
+        run: aws s3 sync public/site-assets s3://${{ secrets.AWS_S3_BUCKET }}/site-assets --cache-control public,max-age=31536000,immutable --size-only
 
       - name: Restart Service
         run: |
