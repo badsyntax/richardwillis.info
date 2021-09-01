@@ -29,6 +29,7 @@ jobs:
         run: npm run build
         env:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
+          ASSET_PREFIX: /
 
       - name: Lighthouse
         run: npm run lighthouse
