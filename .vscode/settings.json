@@ -24,6 +24,6 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "cSpell.language": "en-GB",
-  "cSpell.words": ["govuk", "strapi"],
+  "cSpell.words": ["govuk", "rehype", "strapi"],
   "git.ignoreLimitWarning": true
 }

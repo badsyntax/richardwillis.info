@@ -58,31 +58,18 @@
 
 %theme-list {
   @include spacing;
-  margin-left: $theme-spacing-md;
   padding: 0;
-  list-style: none;
+  margin-left: $theme-spacing-lg;
+  @include respond-above(sm) {
+    margin-left: $theme-spacing-xxl;
+  }
 }
 
 %theme-list-item {
   font-size: $theme-font-size-base;
-  line-height: $theme-font-size-lg;
-  padding-left: $theme-spacing-lg;
-  margin-bottom: $theme-spacing-md;
-  position: relative;
 
+  @include spacing-sm;
   @include respond-above(sm) {
     font-size: $theme-font-size-md;
-  }
-
-  &::before {
-    $width: 0.35rem;
-    width: $width;
-    height: $width;
-    top: calc(#{$theme-font-size-md} - (#{$width} * 2));
-    left: $theme-spacing-xs;
-    content: '';
-    position: absolute;
-    background-color: #d1d5db;
-    border-radius: 50%;
   }
 }

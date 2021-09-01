@@ -1,10 +1,10 @@
-import parse from 'remark-parse';
+import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import html from 'rehype-stringify';
 import slug from 'rehype-slug';
 import { unified } from 'unified';
 import autolinkHeadings from 'rehype-autolink-headings';
-import externalLinks from 'remark-external-links';
+import rehypeExternalLinks from 'rehype-external-links';
 // @ts-ignore
 import rehypePrism from '@mapbox/rehype-prism';
 
@@ -12,9 +12,9 @@ import rehypePicture from './reypePicture';
 
 export const markdownToHtml = (markdown: string): string => {
   const result = unified()
-    .use(parse)
-    .use(externalLinks, { target: false, rel: ['nofollow'] })
+    .use(remarkParse)
     .use(remarkRehype)
+    .use(rehypeExternalLinks, { target: false, rel: ['nofollow'] })
     .use(rehypePrism)
     .use(slug)
     .use(autolinkHeadings, {

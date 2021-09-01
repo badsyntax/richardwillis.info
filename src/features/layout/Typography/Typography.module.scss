@@ -62,7 +62,8 @@
     @extend %theme-list;
   }
 
-  ul {
+  ul,
+  ol {
     > li {
       @extend %theme-list-item;
     }
