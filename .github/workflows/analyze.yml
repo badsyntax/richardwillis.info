@@ -25,6 +25,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Build
+        run: npm run build
+        env:
+          STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
+
   lint-dockerfile:
     runs-on: ubuntu-20.04
     name: Lint dockerfile
