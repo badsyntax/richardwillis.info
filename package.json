@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && next export",
-    "postbuild": "prettier out --write",
+    "postbuild": "./scripts/add-header-text.sh ./scripts/header-text.html ./out && prettier out --write",
     "export": "next export",
     "start": "next start",
     "lint": "next lint",
