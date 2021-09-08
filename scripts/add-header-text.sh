@@ -7,5 +7,6 @@ DATE_GENERATED=$(date)
 export DATE_GENERATED
 
 find "$root_dir" -type f -name '*.html' | while read -r file; do
-  envsubst <"$header_text" | cat - "$file" >temp && mv temp "$file"
+  # envsubst <"$header_text" | cat - "$file" >temp && mv temp "$file"
+  cat <"$header_text" - "$file" >temp && mv temp "$file"
 done
