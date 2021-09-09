@@ -31,11 +31,10 @@ jobs:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
           ASSET_PREFIX: /
 
-      - name: Run Lighthouse against a static dist dir
-        uses: treosh/lighthouse-ci-action@v8
-        with:
-          # no urls needed, since it uses local folder to scan .html files
-          configPath: './lighthouserc.json'
+      # - name: Run Lighthouse against a static dist dir
+      #   uses: treosh/lighthouse-ci-action@v8
+      #   with:
+      #     configPath: './lighthouserc.json'
 
       # - name: Lighthouse
       #   run: npm run lighthouse
