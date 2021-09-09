@@ -58,6 +58,28 @@ services:
       labels:
         - 'traefik.enable=false'
 
+  plausible_geoip:
+    image: maxmindinc/geoipupdate
+    environment:
+      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
+      - GEOIPUPDATE_FREQUENCY=168 # update every 7 days
+    volumes:
+      - plausible-geoip:/usr/share/GeoIP
+    secrets:
+      - richardwillis-geoupdate-account-id
+      - richardwillis-geoupdate-license-key
+    entrypoint:
+      [
+        '/bin/sh',
+        '-c',
+        'export GEOIPUPDATE_ACCOUNT_ID=$$(cat /run/secrets/richardwillis-geoupdate-account-id); export GEOIPUPDATE_LICENSE_KEY=$$(cat /run/secrets/richardwillis-geoupdate-license-key); source /usr/bin/entry.sh',
+      ]
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - 'traefik.enable=false'
+
   plausible:
     image: plausible/analytics:master@sha256:adfc5f693e8d70d48b04fc17b009b2871b9ee23d9a349e606eab708e964d2a60
     command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
@@ -66,6 +88,9 @@ services:
       - traefik-public
     environment:
       - CONFIG_DIR=/run/secrets
+      - GEOLITE2_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb
+    volumes:
+      - plausible-geoip:/geoip:ro
     healthcheck:
       test:
         ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:8000']
@@ -204,6 +229,10 @@ secrets:
     external: true
   richardwillis-plausible-database-url:
     external: true
+  richardwillis-geoupdate-account-id:
+    external: true
+  richardwillis-geoupdate-license-key:
+    external: true
 
 volumes:
   postgres-data:
@@ -211,3 +240,4 @@ volumes:
   plausible-db-data:
   plausible-event-data:
   plausible-etc-clickhouse-server:
+  plausible-geoip:

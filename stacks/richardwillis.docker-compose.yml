@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  strapi_db:
+    image: postgres:13.3-alpine
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - richardwillis
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+    environment:
+      - POSTGRES_DB=strapi
+      - POSTGRES_USER_FILE=/run/secrets/richardwillis-postgres-user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/richardwillis-postgres-password
+    secrets:
+      - richardwillis-postgres-password
+      - richardwillis-postgres-user
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - 'traefik.enable=false'
+
+  actions_proxy:
+    image: ghcr.io/badsyntax/strapi-webhook-actions-proxy:latest
+    networks:
+      - richardwillis
+    secrets:
+      - source: richardwillis-actions-proxy-env
+        target: /app/.env
+        uid: '0'
+        gid: '0'
+        mode: 444
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - 'traefik.enable=false'
+
+  nextjs:
+    image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info:latest
+    networks:
+      - traefik-public
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:80']
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.lbswarm=true'
+        - 'traefik.http.routers.richardwillis.entrypoints=web'
+        - 'traefik.http.routers.richardwillis.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
+        - 'traefik.http.services.richardwillis-service.loadbalancer.server.port=80'
+        - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.permanent=true'
+        - 'traefik.http.middlewares.richardwillis-redirectscheme.redirectscheme.scheme=https'
+        - 'traefik.http.routers.richardwillis.middlewares=richardwillis-redirectscheme'
+        - 'traefik.http.routers.richardwillis-secure.entrypoints=websecure'
+        - 'traefik.http.routers.richardwillis-secure.rule=Host(`richardwillis.docker-box.richardwillis.info`, `richardwillis.info`)'
+        - 'traefik.http.routers.richardwillis-secure.tls.certresolver=letsencrypt'
+
+  strapi:
+    image: registry.docker-box.richardwillis.info/badsyntax/richardwillis.info-strapi:latest
+    networks:
+      - traefik-public
+      - richardwillis
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:3000']
+    volumes:
+      - strapi-uploads:/app/public/uploads
+    secrets:
+      - source: richardwillis-strapi-config
+        target: /app/.env
+        uid: '0'
+        gid: '0'
+        mode: 444
+    deploy:
+      mode: replicated
+      replicas: 2
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.docker.lbswarm=true'
+        - 'traefik.http.routers.strapi.entrypoints=web'
+        - 'traefik.http.routers.strapi.rule=Host(`strapi.docker-box.richardwillis.info`)'
+        - 'traefik.http.services.strapi-service.loadbalancer.server.port=3000'
+        - 'traefik.http.middlewares.strapi-redirectscheme.redirectscheme.permanent=true'
+        - 'traefik.http.middlewares.strapi-redirectscheme.redirectscheme.scheme=https'
+        - 'traefik.http.routers.strapi.middlewares=strapi-redirectscheme'
+        - 'traefik.http.routers.strapi-secure.entrypoints=websecure'
+        - 'traefik.http.routers.strapi-secure.rule=Host(`strapi.docker-box.richardwillis.info`)'
+        - 'traefik.http.routers.strapi-secure.tls.certresolver=letsencrypt'
+
+networks:
+  traefik-public:
+    external: true
+  richardwillis:
+    driver: overlay
+    attachable: true
+
+secrets:
+  richardwillis-postgres-password:
+    external: true
+  richardwillis-postgres-user:
+    external: true
+  richardwillis-strapi-config:
+    external: true
+  richardwillis-actions-proxy-env:
+    external: true
+
+volumes:
+  postgres-data:
+  strapi-uploads:
