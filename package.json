@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "generate-strapi-client": "openapi-generator-cli generate -i http://localhost:1337/openapi.json -g typescript-fetch -t ./src/features/api/typescript-fetch -o ./src/features/api/strapi --additional-properties=typescriptThreePlus=true",
-    "pregenerate-strapi-client": "rimraf ./src/api/strapi"
+    "pregenerate-strapi-client": "rimraf ./src/api/strapi",
+    "lighthouse": "npx @lhci/cli autorun"
   },
   "type": "commonjs",
   "dependencies": {

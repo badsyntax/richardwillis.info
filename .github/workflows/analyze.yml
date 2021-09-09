@@ -10,14 +10,14 @@ on:
 jobs:
   lint-app:
     runs-on: ubuntu-20.04
-    name: Lint app
+    name: Lint & Lighthouse
     steps:
       - uses: actions/checkout@v2.3.4
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.4.0
         with:
-          node-version: 14.15.4
+          node-version: 16
 
       - name: Install NPM Packages
         run: npm ci
@@ -29,6 +29,16 @@ jobs:
         run: npm run build
         env:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
+          ASSET_PREFIX: /
+
+      - name: Run Lighthouse against a static dist dir
+        uses: treosh/lighthouse-ci-action@v8
+        with:
+          # no urls needed, since it uses local folder to scan .html files
+          configPath: './lighthouserc.json'
+
+      # - name: Lighthouse
+      #   run: npm run lighthouse
 
   lint-dockerfile:
     runs-on: ubuntu-20.04
