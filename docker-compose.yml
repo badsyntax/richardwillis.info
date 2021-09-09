@@ -49,7 +49,7 @@ services:
     image: yandex/clickhouse-server:21.3.2.5
     volumes:
       - plausible-event-data:/var/lib/clickhouse
-      - plausible-etc:/etc/clickhouse-server
+      - plausible-etc-clickhouse-server:/etc/clickhouse-server
     networks:
       - plausible
     deploy:
@@ -59,13 +59,16 @@ services:
         - 'traefik.enable=false'
 
   plausible:
-    image: plausible/analytics:master
+    image: plausible/analytics:master@sha256:adfc5f693e8d70d48b04fc17b009b2871b9ee23d9a349e606eab708e964d2a60
     command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
     networks:
       - plausible
       - traefik-public
     environment:
       - CONFIG_DIR=/run/secrets
+    healthcheck:
+      test:
+        ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:8000']
     secrets:
       - source: richardwillis-plausible-admin-user-email
         target: /run/secrets/ADMIN_USER_EMAIL
@@ -207,4 +210,4 @@ volumes:
   strapi-uploads:
   plausible-db-data:
   plausible-event-data:
-  plausible-etc:
+  plausible-etc-clickhouse-server:
