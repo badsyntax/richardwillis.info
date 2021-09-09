@@ -11,7 +11,7 @@ export type CardTitleType = React.FC<TypographyProps>;
 
 export const CardTitle: CardTitleType = ({ children, className, ...props }) => {
   return (
-    <Typography as="h3" {...props} className={classes('title', className)}>
+    <Typography as="h2" {...props} className={classes('title', className)}>
       {children}
     </Typography>
   );
