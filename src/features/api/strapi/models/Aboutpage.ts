@@ -18,62 +18,58 @@ import {
     AboutpageSeoFromJSON,
     AboutpageSeoFromJSONTyped,
     AboutpageSeoToJSON,
-    HomepageHero,
-    HomepageHeroFromJSON,
-    HomepageHeroFromJSONTyped,
-    HomepageHeroToJSON,
 } from './';
 
 /**
  * 
  * @export
- * @interface NewHomepage
+ * @interface Aboutpage
  */
-export interface NewHomepage {
+export interface Aboutpage {
+    /**
+     * 
+     * @type {string}
+     * @memberof Aboutpage
+     */
+    id: string;
     /**
      * 
      * @type {AboutpageSeo}
-     * @memberof NewHomepage
+     * @memberof Aboutpage
      */
     seo?: AboutpageSeo;
     /**
      * 
-     * @type {HomepageHero}
-     * @memberof NewHomepage
+     * @type {string}
+     * @memberof Aboutpage
      */
-    hero: HomepageHero;
+    body?: string;
     /**
      * 
-     * @type {string}
-     * @memberof NewHomepage
+     * @type {Date}
+     * @memberof Aboutpage
      */
-    createdBy?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewHomepage
-     */
-    updatedBy?: string;
+    publishedAt?: Date;
 }
 
-export function NewHomepageFromJSON(json: any): NewHomepage {
-    return NewHomepageFromJSONTyped(json, false);
+export function AboutpageFromJSON(json: any): Aboutpage {
+    return AboutpageFromJSONTyped(json, false);
 }
 
-export function NewHomepageFromJSONTyped(json: any, ignoreDiscriminator: boolean): NewHomepage {
+export function AboutpageFromJSONTyped(json: any, ignoreDiscriminator: boolean): Aboutpage {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
+        'id': json['id'],
         'seo': !exists(json, 'seo') ? undefined : AboutpageSeoFromJSON(json['seo']),
-        'hero': HomepageHeroFromJSON(json['hero']),
-        'createdBy': !exists(json, 'created_by') ? undefined : json['created_by'],
-        'updatedBy': !exists(json, 'updated_by') ? undefined : json['updated_by'],
+        'body': !exists(json, 'body') ? undefined : json['body'],
+        'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
     };
 }
 
-export function NewHomepageToJSON(value?: NewHomepage | null): any {
+export function AboutpageToJSON(value?: Aboutpage | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -82,10 +78,10 @@ export function NewHomepageToJSON(value?: NewHomepage | null): any {
     }
     return {
         
+        'id': value.id,
         'seo': AboutpageSeoToJSON(value.seo),
-        'hero': HomepageHeroToJSON(value.hero),
-        'created_by': value.createdBy,
-        'updated_by': value.updatedBy,
+        'body': value.body,
+        'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
     };
 }
 

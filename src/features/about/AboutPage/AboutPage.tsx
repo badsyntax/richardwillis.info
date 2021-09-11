@@ -3,17 +3,23 @@ import classNames from 'classnames/bind';
 
 import { PageShell } from '../../layout/PageShell/PageShell';
 import { Typography } from '../../layout/Typography/Typography';
-import { Link } from '../../layout/Link/Link';
 
 import STYLES from './AboutPage.module.scss';
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { MarkdownContent } from '../../blog/MarkdownContent/MarkdownContent';
 const classes = classNames.bind(STYLES);
 
-export const AboutPage: React.FC = () => {
+export type AboutPageProps = {
+  body: string;
+  mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
+};
+
+export const AboutPage: React.FC<AboutPageProps> = ({ mdxSource }) => {
   return (
     <PageShell title="About" description="About Richard Willis">
-      <Typography as="div" variant="prose" className={classes('content')}>
-        <h1>About</h1>
-        <p>
+      <Typography as="h1">About</Typography>
+      <MarkdownContent mdxSource={mdxSource} />
+      {/* <p>
           I&apos;m a front-end leaning full-stack developer with more than 10
           years of professional web development experience. I enjoy coding as a
           day job and as a hobby (check out my{' '}
@@ -25,19 +31,26 @@ export const AboutPage: React.FC = () => {
           Barcelona. I recently moved back to the UK and am currently residing
           in beautiful rural North Yorkshire.
         </p>
-        {/* <h2>Professional Experience</h2>
+        <Image
+          loader={myLoader}
+          src="https://assets.richardwillis.info/strapi-media/Screenshot_2021_08_29_at_08_06_23_c3af3fad05.png"
+          alt="test"
+          width="1280"
+          height="517"
+          layout="responsive"
+        /> */}
+      {/* <h2>Professional Experience</h2>
       <p>
         I'm a front-end leaning full-stack developer with more than 10 years
         of professional web development experience. View my cv here:{' '}
         <a href="/cv">richardwillis.info/cv</a>
       </p> */}
-        {/* <h2>Photos</h2>
+      {/* <h2>Photos</h2>
         <p>
           I don&apos;t consider myself a very good photographer but I do really
           enjoy nature and being outdoors. Most of the photos below were taken
           on a mobile device.
         </p> */}
-      </Typography>
       {/* <ImageGallery images={photos} width={400} height={300} /> */}
     </PageShell>
   );

@@ -13,63 +13,56 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import {
-    AboutpageSeo,
-    AboutpageSeoFromJSON,
-    AboutpageSeoFromJSONTyped,
-    AboutpageSeoToJSON,
-} from './';
-
 /**
  * 
  * @export
- * @interface Global
+ * @interface AboutpageSeo
  */
-export interface Global {
+export interface AboutpageSeo {
     /**
      * 
      * @type {string}
-     * @memberof Global
+     * @memberof AboutpageSeo
      */
     id: string;
     /**
      * 
-     * @type {object}
-     * @memberof Global
+     * @type {string}
+     * @memberof AboutpageSeo
      */
-    favicon?: object;
+    metaTitle: string;
     /**
      * 
      * @type {string}
-     * @memberof Global
+     * @memberof AboutpageSeo
      */
-    siteName: string;
+    metaDescription: string;
     /**
      * 
-     * @type {AboutpageSeo}
-     * @memberof Global
+     * @type {object}
+     * @memberof AboutpageSeo
      */
-    defaultSeo: AboutpageSeo;
+    shareImage?: object;
 }
 
-export function GlobalFromJSON(json: any): Global {
-    return GlobalFromJSONTyped(json, false);
+export function AboutpageSeoFromJSON(json: any): AboutpageSeo {
+    return AboutpageSeoFromJSONTyped(json, false);
 }
 
-export function GlobalFromJSONTyped(json: any, ignoreDiscriminator: boolean): Global {
+export function AboutpageSeoFromJSONTyped(json: any, ignoreDiscriminator: boolean): AboutpageSeo {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'id': json['id'],
-        'favicon': !exists(json, 'favicon') ? undefined : json['favicon'],
-        'siteName': json['siteName'],
-        'defaultSeo': AboutpageSeoFromJSON(json['defaultSeo']),
+        'metaTitle': json['metaTitle'],
+        'metaDescription': json['metaDescription'],
+        'shareImage': !exists(json, 'shareImage') ? undefined : json['shareImage'],
     };
 }
 
-export function GlobalToJSON(value?: Global | null): any {
+export function AboutpageSeoToJSON(value?: AboutpageSeo | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -79,9 +72,9 @@ export function GlobalToJSON(value?: Global | null): any {
     return {
         
         'id': value.id,
-        'favicon': value.favicon,
-        'siteName': value.siteName,
-        'defaultSeo': AboutpageSeoToJSON(value.defaultSeo),
+        'metaTitle': value.metaTitle,
+        'metaDescription': value.metaDescription,
+        'shareImage': value.shareImage,
     };
 }
 

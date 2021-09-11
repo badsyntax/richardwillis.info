@@ -1,17 +1,14 @@
 import { GetStaticProps } from 'next';
-import { getAllVisiblePosts } from '../../features/blog/api';
+import { getAllArticles } from '../../features/blog/api';
 
 export { BlogPage as default } from '../../features/blog/BlogPage/BlogPage';
 
-export const getStaticProps: GetStaticProps = async () => {
-  const allPosts = await getAllVisiblePosts([
-    'title',
-    'date',
-    'slug',
-    'author',
-    'excerpt',
-  ]);
+import { BlogPageProps } from '../../features/blog/BlogPage/BlogPage';
+
+export const getStaticProps: GetStaticProps<BlogPageProps> = async () => {
+  const allArticles = await getAllArticles();
+  console.log('allArticles', allArticles);
   return {
-    props: { allPosts },
+    props: { allArticles },
   };
 };

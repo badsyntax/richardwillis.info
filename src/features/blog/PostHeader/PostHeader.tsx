@@ -2,7 +2,6 @@
 import React, { Fragment } from 'react';
 import classNames from 'classnames/bind';
 import { PostTitle } from '../PostTitle/PostTitle';
-import { Author } from '../types';
 import { getFormattedDateLong } from '../../dates/getFormattedDate';
 import { Link } from '../../layout/Link/Link';
 import { Typography } from '../../layout/Typography/Typography';
@@ -13,7 +12,7 @@ const classes = classNames.bind(STYLES);
 interface PostHeaderProps {
   title: string;
   date: string;
-  author: Author;
+  // author: Author;
 }
 
 export const PostHeader: React.FC<PostHeaderProps> = ({ title, date }) => {

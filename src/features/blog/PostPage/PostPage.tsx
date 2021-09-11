@@ -5,22 +5,31 @@ import { PageShell } from '../../layout/PageShell/PageShell';
 import { Typography } from '../../layout/Typography/Typography';
 import { PostBody } from '../PostBody/PostBody';
 import { PostHeader } from '../PostHeader/PostHeader';
-import { Post } from '../types';
 
 import STYLES from './PostPage.module.scss';
+import { SerializedArticle } from '../api';
 const classes = classNames.bind(STYLES);
 
-export interface PostPagePros {
-  post: Post;
-  morePosts: boolean;
+export interface PostPageProps {
+  article?: SerializedArticle;
 }
 
-export const PostPage: React.FC<PostPagePros> = ({ post }) => {
+export const PostPage: React.FC<PostPageProps> = ({ article }) => {
+  if (!article) {
+    return null;
+  }
   return (
-    <PageShell title={`${post.title} - Blog`} description={post.excerpt}>
-      <PostHeader title={post.title} date={post.date} author={post.author} />
+    <PageShell
+      title={`${article.title} - Blog`}
+      description={article.description}
+    >
+      <PostHeader
+        title={article.title}
+        date={article.publishDate}
+        // author={article.author}
+      />
       <Typography as="hr" className={classes('hr')} />
-      {post.contentHtml && <PostBody content={post.contentHtml} />}
+      {article.mdxSource && <PostBody mdxSource={article.mdxSource} />}
       {/* <PostComments comments={post.comments} slug={post.slug} /> */}
     </PageShell>
   );

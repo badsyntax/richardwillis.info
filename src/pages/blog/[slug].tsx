@@ -1,11 +1,14 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { getAllPosts, getPostBySlug } from '../../features/blog/api';
+import { getAllArticles, getArticleBySlug } from '../../features/blog/api';
+import { PostPageProps } from '../../features/blog/PostPage/PostPage';
 // import { allPosts } from '../../features/blog/posts';
 // import { getAllPosts, getPostBySlug } from '../../features/blog/api';
 
 export { PostPage as default } from '../../features/blog/PostPage/PostPage';
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<PostPageProps> = async ({
+  params,
+}) => {
   // return {
   //   props: {
   //     post: allPosts.find((post) => post.slug === params?.slug),
@@ -17,21 +20,11 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     };
   }
 
-  const post = await getPostBySlug(params.slug, [
-    'title',
-    'date',
-    'slug',
-    'author',
-    'content',
-    'contentHtml',
-    'comments',
-    'excerpt',
-    'ogImage',
-  ]);
+  const article = await getArticleBySlug(params.slug);
 
   return {
     props: {
-      post,
+      article,
     },
   };
 };
@@ -42,10 +35,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
   //   fallback: false,
   // };
 
-  const posts = await getAllPosts(['slug']);
+  const articles = await getAllArticles();
 
   return {
-    paths: posts.map((post) => {
+    paths: articles.map((post) => {
       return {
         params: {
           slug: post.slug,

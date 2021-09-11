@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AboutpageApi';
 export * from './ArticleApi';
 export * from './CategoryApi';
 export * from './GlobalApi';
