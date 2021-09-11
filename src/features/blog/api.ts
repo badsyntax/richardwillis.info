@@ -1,60 +1,82 @@
-import { Post, PostComment } from './types';
-import { markdownToHtml } from '../markdown/markdownToHtml';
 import { apiClient } from '../api/apiClient';
 import { Article } from '../api/strapi';
+import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import rehypeSlug from 'rehype-slug';
+import rehypeExternalLinks from 'rehype-external-links';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-export function getComments(slug: string): PostComment[] {
-  return [];
+// @ts-ignore
+import rehypePrism from '@mapbox/rehype-prism';
+
+export type SerializedArticle = Omit<
+  Article,
+  'author' | 'category' | 'publishDate' | 'publishedAt'
+> & {
+  author: Article['author'] | null;
+  category: Article['category'] | null;
+  publishDate: string;
+  publishedAt?: string;
+  mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
+};
+
+function getMdxSource(
+  markdown: string
+): Promise<MDXRemoteSerializeResult<Record<string, unknown>>> {
+  return serialize(markdown, {
+    mdxOptions: {
+      rehypePlugins: [
+        rehypeSlug,
+        rehypeExternalLinks,
+        rehypePrism,
+        [
+          rehypeAutolinkHeadings,
+          {
+            properties: {
+              className: 'anchor',
+              ariaHidden: 'true',
+              ariaLabel: 'Heading anchor',
+              tabIndex: -1,
+            },
+            content: {
+              type: 'element',
+              tagName: 'span',
+              properties: { className: ['icon'] },
+              children: [],
+            },
+          },
+        ],
+      ],
+    },
+  });
 }
 
-export function getBlogPost(article: Article, fields: string[] = []): Post {
-  function getPostData(article: Article, key: string): Article[keyof Article] {
-    switch (key) {
-      case 'date':
-        return article.publishDate?.toISOString();
-      case 'excerpt':
-        return article.excerpt || '';
-      case 'author':
-        return article.author || '';
-      case 'contentHtml':
-        return markdownToHtml(article.content || '');
-      case 'comments':
-        return [];
-      case 'ogImage':
-        return '';
-      default:
-        return (article as any)[key];
-    }
-  }
-
-  const blogPost = fields.reduce<Partial<Post>>(
-    (acc: Partial<Post>, field: string) => ({
-      ...acc,
-      [field]: getPostData(article, field),
-    }),
-    {}
-  ) as Post;
-
-  return blogPost;
+async function getSerializableArticle(
+  article: Article
+): Promise<SerializedArticle> {
+  return {
+    ...article,
+    category: null,
+    author: null,
+    publishDate: article.publishDate?.toISOString(),
+    publishedAt: article.publishedAt?.toISOString(),
+    mdxSource: await getMdxSource(article.content || ''),
+  };
 }
 
-export async function getPostBySlug(
+export async function getArticleBySlug(
   slug: string,
   fields: string[] = []
-): Promise<Post> {
+): Promise<SerializedArticle> {
   const article = await apiClient.articleApi.articlesSlugGet({
     slug,
   });
-  return getBlogPost(article, fields);
+  return getSerializableArticle(article);
 }
 
-export async function getAllPosts(fields: string[] = []): Promise<Post[]> {
+export async function getAllArticles(): Promise<SerializedArticle[]> {
   const articles = await apiClient.articleApi.articlesGet({
     sort: 'publish_date:DESC',
   });
-  return articles.map((article) => getBlogPost(article, fields));
-}
-
-export function getAllVisiblePosts(fields: string[] = []): Promise<Post[]> {
-  return getAllPosts(fields);
+  return Promise.all(articles.map(getSerializableArticle));
 }

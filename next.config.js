@@ -10,4 +10,10 @@ module.exports = {
     locale: 'en-GB',
     assetPrefix,
   },
+  images: {
+    domains: ['assets.richardwillis.info'],
+    deviceSizes: [420, 640, 768, 1024, 1280],
+    imageSizes: [],
+    loader: 'custom',
+  },
 };

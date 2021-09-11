@@ -19,6 +19,7 @@
     "classnames": "^2.3.1",
     "modern-normalize": "^1.1.0",
     "next": "11.1.2",
+    "next-mdx-remote": "^3.0.4",
     "node-fetch": "^3.0.0",
     "prism-themes": "^1.8.0",
     "react": "17.0.2",
@@ -27,24 +28,18 @@
     "rehype-autolink-headings": "^6.1.0",
     "rehype-external-links": "^1.0.0",
     "rehype-slug": "^5.0.0",
-    "rehype-stringify": "^9.0.2",
-    "remark-parse": "^10.0.0",
-    "remark-rehype": "^9.0.0",
-    "replace-ext": "^2.0.0",
-    "sass": "^1.38.2",
-    "typescript": "4.4.2",
-    "unified": "^10.1.0"
+    "sass": "^1.39.2",
+    "typescript": "4.4.3"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.4.1",
-    "@types/node-fetch": "^2.5.12",
-    "@types/react": "17.0.19",
-    "@types/replace-ext": "^2.0.0",
+    "@openapitools/openapi-generator-cli": "^2.4.2",
+    "@types/node-fetch": "^3.0.2",
+    "@types/react": "17.0.20",
     "eslint": "^7.32.0",
     "eslint-config-next": "11.1.2",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.3.2",
+    "prettier": "^2.4.0",
     "rimraf": "^3.0.2"
   }
 }

@@ -1,20 +1,25 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
+
 import { Typography } from '../../layout/Typography/Typography';
+import { ResponsiveImage } from '../../layout/ResponsiveImage/ResponsiveImage';
 
 function isAnchorElement(target: EventTarget): target is HTMLAnchorElement {
   return target instanceof Element && target.nodeName === 'A';
 }
 
+const components = { ResponsiveImage };
+
 export type MarkdownContentProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
   HTMLDivElement
 > & {
-  content: string;
+  mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
 };
 
 export const MarkdownContent: React.FC<MarkdownContentProps> = ({
-  content,
+  mdxSource,
   ...props
 }) => {
   const router = useRouter();
@@ -33,12 +38,8 @@ export const MarkdownContent: React.FC<MarkdownContentProps> = ({
     }
   };
   return (
-    <Typography
-      as="div"
-      variant="prose"
-      onClick={handleClick}
-      dangerouslySetInnerHTML={{ __html: content }}
-      {...props}
-    />
+    <Typography as="div" variant="prose" onClick={handleClick} {...props}>
+      <MDXRemote {...mdxSource} components={components} />
+    </Typography>
   );
 };

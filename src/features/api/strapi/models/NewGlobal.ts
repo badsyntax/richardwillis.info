@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    GlobalDefaultSeo,
-    GlobalDefaultSeoFromJSON,
-    GlobalDefaultSeoFromJSONTyped,
-    GlobalDefaultSeoToJSON,
+    AboutpageSeo,
+    AboutpageSeoFromJSON,
+    AboutpageSeoFromJSONTyped,
+    AboutpageSeoToJSON,
 } from './';
 
 /**
@@ -34,10 +34,10 @@ export interface NewGlobal {
     siteName: string;
     /**
      * 
-     * @type {GlobalDefaultSeo}
+     * @type {AboutpageSeo}
      * @memberof NewGlobal
      */
-    defaultSeo: GlobalDefaultSeo;
+    defaultSeo: AboutpageSeo;
     /**
      * 
      * @type {string}
@@ -63,7 +63,7 @@ export function NewGlobalFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'siteName': json['siteName'],
-        'defaultSeo': GlobalDefaultSeoFromJSON(json['defaultSeo']),
+        'defaultSeo': AboutpageSeoFromJSON(json['defaultSeo']),
         'createdBy': !exists(json, 'created_by') ? undefined : json['created_by'],
         'updatedBy': !exists(json, 'updated_by') ? undefined : json['updated_by'],
     };
@@ -79,7 +79,7 @@ export function NewGlobalToJSON(value?: NewGlobal | null): any {
     return {
         
         'siteName': value.siteName,
-        'defaultSeo': GlobalDefaultSeoToJSON(value.defaultSeo),
+        'defaultSeo': AboutpageSeoToJSON(value.defaultSeo),
         'created_by': value.createdBy,
         'updated_by': value.updatedBy,
     };

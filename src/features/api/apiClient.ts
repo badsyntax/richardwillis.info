@@ -5,6 +5,7 @@ import {
   ConfigurationParameters,
   ProjectApi,
 } from './strapi';
+import { AboutpageApi } from './strapi/apis/AboutpageApi';
 
 const configParams: ConfigurationParameters = {
   basePath: process.env.STRAPI_ENDPOINT,
@@ -17,6 +18,7 @@ const apiConfig = new Configuration(configParams);
 export const apiClient = {
   articleApi: new ArticleApi(apiConfig),
   projectApi: new ProjectApi(apiConfig),
+  aboutpageApi: new AboutpageApi(apiConfig),
 };
 
 export type ApiClient = typeof apiClient;

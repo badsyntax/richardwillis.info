@@ -14,10 +14,10 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    GlobalDefaultSeo,
-    GlobalDefaultSeoFromJSON,
-    GlobalDefaultSeoFromJSONTyped,
-    GlobalDefaultSeoToJSON,
+    AboutpageSeo,
+    AboutpageSeoFromJSON,
+    AboutpageSeoFromJSONTyped,
+    AboutpageSeoToJSON,
     HomepageHero,
     HomepageHeroFromJSON,
     HomepageHeroFromJSONTyped,
@@ -38,10 +38,10 @@ export interface Homepage {
     id: string;
     /**
      * 
-     * @type {GlobalDefaultSeo}
+     * @type {AboutpageSeo}
      * @memberof Homepage
      */
-    seo?: GlobalDefaultSeo;
+    seo?: AboutpageSeo;
     /**
      * 
      * @type {HomepageHero}
@@ -61,7 +61,7 @@ export function HomepageFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     return {
         
         'id': json['id'],
-        'seo': !exists(json, 'seo') ? undefined : GlobalDefaultSeoFromJSON(json['seo']),
+        'seo': !exists(json, 'seo') ? undefined : AboutpageSeoFromJSON(json['seo']),
         'hero': HomepageHeroFromJSON(json['hero']),
     };
 }
@@ -76,7 +76,7 @@ export function HomepageToJSON(value?: Homepage | null): any {
     return {
         
         'id': value.id,
-        'seo': GlobalDefaultSeoToJSON(value.seo),
+        'seo': AboutpageSeoToJSON(value.seo),
         'hero': HomepageHeroToJSON(value.hero),
     };
 }
