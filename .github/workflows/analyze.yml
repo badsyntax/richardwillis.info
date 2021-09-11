@@ -25,11 +25,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build
-        run: npm run build
-        env:
-          STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
-          ASSET_PREFIX: /
+      # - name: Build
+      #   run: npm run build
+      #   env:
+      #     STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
+      #     ASSET_PREFIX: /
 
       # - name: Run Lighthouse against a static dist dir
       #   uses: treosh/lighthouse-ci-action@v8
