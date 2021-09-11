@@ -7,7 +7,6 @@ import { BlogPageProps } from '../../features/blog/BlogPage/BlogPage';
 
 export const getStaticProps: GetStaticProps<BlogPageProps> = async () => {
   const allArticles = await getAllArticles();
-  console.log('allArticles', allArticles);
   return {
     props: { allArticles },
   };
