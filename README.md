@@ -5,6 +5,8 @@
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+https://richardwillis.info/blog/how-i-use-next-js-strapi-and-docker-to-build-my-personal-website
+
 ## Getting Started
 
 Add the following to `.env.local`:
