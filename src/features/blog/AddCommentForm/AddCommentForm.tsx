@@ -32,9 +32,9 @@ function postComment(
   //     resolve(undefined);
   //   }, 2000);
   // });
-  // const url = `https://strapi.docker-box.richardwillis.info/articles/${articleId}/comment`;
+  const url = `https://strapi.docker-box.richardwillis.info/articles/${articleId}/comment`;
 
-  const url = 'http://localhost:1337/articles/22/comment';
+  // const url = 'http://localhost:1337/articles/22/comment';
   // @ts-ignore
   const searchParams = new URLSearchParams(comment);
   return makeRequest(url, {
