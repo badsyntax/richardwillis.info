@@ -1,0 +1,43 @@
+@import '../../../styles/theme';
+
+.root {
+  // @apply px-4
+  //   py-2
+  //   border
+  //   border-gray-100
+  //   rounded
+  //   flex
+  //   mb-4
+  //   items-center;
+  border: 1px solid #292929;
+  border-radius: 2px;
+  padding: $theme-spacing-sm;
+  animation-timing-function: ease;
+  animation-duration: 1s;
+  animation-name: fadeIn;
+}
+
+.variant-error {
+  // @apply text-red-700;
+}
+
+.variant-success {
+  // @apply text-green-700;
+}
+
+.icon {
+  margin-right: $theme-spacing-sm;
+  // @apply text-xl
+  //   mr-4
+  //   self-start;
+  // margin-top: 1px;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

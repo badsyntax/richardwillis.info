@@ -1,0 +1,10 @@
+@import '../../../styles/theme';
+
+.root {
+  margin-bottom: $theme-spacing-sm;
+  display: inline-block;
+}
+
+.hidden {
+  // composes: sr-hidden from '../../../styles/helpers.module.css';
+}
