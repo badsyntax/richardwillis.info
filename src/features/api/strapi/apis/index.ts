@@ -3,6 +3,7 @@
 export * from './AboutpageApi';
 export * from './ArticleApi';
 export * from './CategoryApi';
+export * from './CommentApi';
 export * from './GlobalApi';
 export * from './HomepageApi';
 export * from './ProjectApi';

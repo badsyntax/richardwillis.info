@@ -69,6 +69,12 @@ export interface NewArticle {
     publishDate: Date;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof NewArticle
+     */
+    comments?: Array<string>;
+    /**
+     * 
      * @type {Date}
      * @memberof NewArticle
      */
@@ -105,6 +111,7 @@ export function NewArticleFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'author': !exists(json, 'author') ? undefined : json['author'],
         'excerpt': !exists(json, 'excerpt') ? undefined : json['excerpt'],
         'publishDate': (new Date(json['publish_date'])),
+        'comments': !exists(json, 'comments') ? undefined : json['comments'],
         'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
         'createdBy': !exists(json, 'created_by') ? undefined : json['created_by'],
         'updatedBy': !exists(json, 'updated_by') ? undefined : json['updated_by'],
@@ -128,6 +135,7 @@ export function NewArticleToJSON(value?: NewArticle | null): any {
         'author': value.author,
         'excerpt': value.excerpt,
         'publish_date': (value.publishDate.toISOString().substr(0,10)),
+        'comments': value.comments,
         'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
         'created_by': value.createdBy,
         'updated_by': value.updatedBy,

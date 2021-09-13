@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    Comment,
+    CommentFromJSON,
+    CommentFromJSONTyped,
+    CommentToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -81,6 +88,12 @@ export interface Article {
     publishDate: Date;
     /**
      * 
+     * @type {Array<Comment>}
+     * @memberof Article
+     */
+    comments?: Array<Comment>;
+    /**
+     * 
      * @type {Date}
      * @memberof Article
      */
@@ -107,6 +120,7 @@ export function ArticleFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         'author': !exists(json, 'author') ? undefined : json['author'],
         'excerpt': !exists(json, 'excerpt') ? undefined : json['excerpt'],
         'publishDate': (new Date(json['publish_date'])),
+        'comments': !exists(json, 'comments') ? undefined : ((json['comments'] as Array<any>).map(CommentFromJSON)),
         'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
     };
 }
@@ -130,6 +144,7 @@ export function ArticleToJSON(value?: Article | null): any {
         'author': value.author,
         'excerpt': value.excerpt,
         'publish_date': (value.publishDate.toISOString().substr(0,10)),
+        'comments': value.comments === undefined ? undefined : ((value.comments as Array<any>).map(CommentToJSON)),
         'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
     };
 }

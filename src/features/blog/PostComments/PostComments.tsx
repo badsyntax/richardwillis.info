@@ -9,14 +9,12 @@ import { AddCommentForm } from '../AddCommentForm/AddCommentForm';
 
 import STYLES from './PostComments.module.scss';
 import { CommentBox } from '../CommentBox/CommentBox';
+import { Comment } from '../../api/strapi';
+import { CommentWithMdxSource } from '../types';
 const classes = classNames.bind(STYLES);
 
-type PostComment = {
-  author: string;
-};
-
 export interface PostCommentsProps {
-  comments: PostComment[];
+  comments: CommentWithMdxSource[];
   articleId: string;
 }
 
@@ -31,14 +29,9 @@ export const PostComments: React.FunctionComponent<PostCommentsProps> = ({
         Comments
       </Typography>
       <div className={classes('comments')}>
-        {/* {comments.map((comment) => (
-          <CommentBox
-            // key={comment.id}
-            name={comment.author}
-            // date={new Date(comment.date * 1000)}
-            // message={comment.messageHtml}
-          />
-        ))} */}
+        {comments.map((comment) => (
+          <CommentBox key={comment.id} comment={comment} />
+        ))}
         {!comments.length && (
           <CommentBox showHeader={false} className={classes('no-comments')}>
             {/* <FaInfo className={classes('icon')} /> */}

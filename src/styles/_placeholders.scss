@@ -29,6 +29,14 @@
   }
 }
 
+%theme-h4 {
+  @include header-spacing;
+  font-size: $theme-font-size-base;
+  @include respond-above(sm) {
+    font-size: $theme-font-size-md;
+  }
+}
+
 %theme-p {
   @include spacing;
   font-size: $theme-font-size-base;

@@ -12,7 +12,8 @@ https://richardwillis.info/blog/how-i-use-next-js-strapi-and-docker-to-build-my-
 Add the following to `.env.local`:
 
 ```bash
-STRAPI_ENDPOINT=https://strapi.docker-box.example.com
+STRAPI_ENDPOINT=https://strapi.docker-box.richardwillis.info
+NEXT_PUBLIC_STRAPI_ENDPOINT=https://strapi.docker-box.richardwillis.info
 ```
 
 Run the development server:

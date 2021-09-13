@@ -9,6 +9,8 @@ import { Alert, AlertSeverity } from '../../layout/Alert/Alert';
 import { Button } from '../../layout/Button/Button';
 import { Textarea } from '../../layout/Field/Textarea';
 
+const { NEXT_PUBLIC_STRAPI_ENDPOINT } = process.env;
+
 // import STYLES from './AddCommentForm.module.scss';
 // const classes = classNames.bind(STYLES);
 
@@ -27,14 +29,7 @@ function postComment(
   articleId: string,
   comment: FormData
 ): Promise<Response | void> {
-  // return new Promise((resolve, reject) => {
-  //   setTimeout(() => {
-  //     resolve(undefined);
-  //   }, 2000);
-  // });
-  const url = `https://strapi.docker-box.richardwillis.info/articles/${articleId}/comment`;
-
-  // const url = 'http://localhost:1337/articles/22/comment';
+  const url = `${NEXT_PUBLIC_STRAPI_ENDPOINT}/articles/${articleId}/comment`;
   // @ts-ignore
   const searchParams = new URLSearchParams(comment);
   return makeRequest(url, {
@@ -93,7 +88,7 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
       </FormRow>
       <FormRow>
         <Label htmlFor="comment-author" hidden>
-          Your name
+          Your Name
         </Label>
         <Input
           id="comment-author"
@@ -106,7 +101,7 @@ export const AddCommentForm: React.FunctionComponent<AddCommentFormProps> = ({
       </FormRow>
       <FormRow>
         <Label htmlFor="comment-body" hidden>
-          Your comment
+          Your Comment
         </Label>
         <Textarea
           id="comment-body"

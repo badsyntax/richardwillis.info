@@ -5,7 +5,7 @@ import { Box } from '../Box/Box';
 import STYLES from './Typography.module.scss';
 const classes = classNames.bind(STYLES);
 
-export type Variant = 'p' | 'h1' | 'h2' | 'h3' | 'prose';
+export type Variant = 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'prose';
 
 export type TypographyProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLElement>,
@@ -26,8 +26,7 @@ export const Typography: React.FC<TypographyProps> = ({
     <Box<HTMLElement>
       className={classes('root', `variant-${variant}`, className)}
       as={as}
-      {...rest}
-    >
+      {...rest}>
       {children}
     </Box>
     // <Project

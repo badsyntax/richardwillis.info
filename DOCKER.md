@@ -3,7 +3,7 @@
 ## Running the Next.js App with Docker
 
 ```console
-docker build -t registry.docker-box.richardwillis.info/badsyntax/richardwillis.info . --build-arg STRAPI_ENDPOINT=https://strapi.docker-box.richardwillis.info
+docker build -t registry.docker-box.richardwillis.info/badsyntax/richardwillis.info . --build-arg STRAPI_ENDPOINT=https://strapi.docker-box.richardwillis.info --build-arg NEXT_PUBLIC_STRAPI_ENDPOINT=https://strapi.docker-box.richardwillis.info
 docker run --publish 8000:80 registry.docker-box.richardwillis.info/badsyntax/richardwillis.info:latest
 ```
 

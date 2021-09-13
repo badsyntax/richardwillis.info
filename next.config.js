@@ -10,4 +10,5 @@ module.exports = {
     locale: 'en-GB',
     assetPrefix,
   },
+  experimental: { optimizeCss: true },
 };

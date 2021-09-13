@@ -30,8 +30,7 @@ export const PostPage: React.FC<PostPageProps> = ({ article }) => {
       />
       <Typography as="hr" className={classes('hr')} />
       {article.mdxSource && <PostBody mdxSource={article.mdxSource} />}
-      {/* <PostComments comments={post.comments} slug={post.slug} /> */}
-      <PostComments comments={[]} articleId={article.id} />
+      <PostComments comments={article.comments} articleId={article.id} />
     </PageShell>
   );
 };
