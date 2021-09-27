@@ -6,17 +6,10 @@
 }
 
 .nav-item {
-  // background-color: rgb(45, 45, 45);
   padding: $theme-spacing-sm $theme-spacing-lg;
-  // border-right: 1px solid rgb(37, 37, 38);
-  // border-top: 1px solid rgb(37, 37, 38);
-  &:first-child {
-    // border-left: 1px solid rgb(37, 37, 38);
-  }
   text-decoration: none;
 }
 
 .active {
-  background-color: rgb(30, 30, 30);
   color: rgb(115, 201, 145);
 }

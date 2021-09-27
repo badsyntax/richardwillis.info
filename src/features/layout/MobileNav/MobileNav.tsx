@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { MdClose, MdMenu } from 'react-icons/md';
 
@@ -26,7 +26,15 @@ const OpenMenuButton: React.FC<
 
 export const MobileNav: React.FC = () => {
   const [isMobileNavVisible, setIsMobileNavVisible] = useState<boolean>(false);
-  const onMenuButtonClick = () => setIsMobileNavVisible((value) => !value);
+  const onMenuButtonClick = () => {
+    document.documentElement.classList.toggle('mobile-nav-open');
+    setIsMobileNavVisible((value) => !value);
+  };
+  useEffect(() => {
+    return () => {
+      document.documentElement.classList.remove('mobile-nav-open');
+    };
+  }, []);
   return (
     <Fragment>
       <OpenMenuButton

@@ -10,11 +10,21 @@
   max-width: $theme-shell-width;
   margin-right: auto;
   margin-left: auto;
+  margin-top: 3.5rem;
+  @include respond-above(sm) {
+    margin-top: 4rem;
+  }
   /* FIXME */
   scroll-margin-top: 10rem;
   padding-left: $theme-spacing-lg;
   padding-right: $theme-spacing-lg;
-  padding-top: $theme-spacing-md * 6;
+  padding-top: $theme-spacing-lg;
   padding-bottom: $theme-spacing-xl;
-  // margin: $theme-spacing-lg;
+
+  transition-property: filter;
+  transition-duration: 0.1s;
+
+  :global(.mobile-nav-open) & {
+    filter: blur(4px);
+  }
 }

@@ -24,7 +24,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: $theme-spacing-md;
+  // padding-top: $theme-spacing-md;
+  // padding-bottom: $theme-spacing-md;
   cursor: pointer;
   &:hover {
     color: #ce9178;
