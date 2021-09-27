@@ -6,11 +6,14 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  height: 4rem;
   position: fixed;
   top: 0px;
   width: 100%;
   z-index: 10;
+  height: 3.5rem;
+  @include respond-above(sm) {
+    height: 4rem;
+  }
 }
 
 .body {

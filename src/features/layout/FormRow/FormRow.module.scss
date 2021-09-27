@@ -2,4 +2,7 @@
 
 .root {
   margin-bottom: $theme-spacing-lg;
+  &:last-child {
+    margin-bottom: 0;
+  }
 }

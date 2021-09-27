@@ -17,8 +17,11 @@ export type AboutPageProps = {
 export const AboutPage: React.FC<AboutPageProps> = ({ mdxSource }) => {
   return (
     <PageShell title="About" description="About Richard Willis">
-      <Typography as="h1">About</Typography>
-      <MarkdownContent mdxSource={mdxSource} />
+      <Typography as="div" variant="prose" className={classes('content')}>
+        <h1>About</h1>
+        <MarkdownContent mdxSource={mdxSource} />
+      </Typography>
+
       {/* <p>
           I&apos;m a front-end leaning full-stack developer with more than 10
           years of professional web development experience. I enjoy coding as a

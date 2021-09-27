@@ -16,7 +16,6 @@ export const BlogPage: React.FC<BlogPageProps> = ({ allArticles }) => {
     <PageShell title="Blog" description="Blog posts by Richard Willis">
       <Typography as="div" variant="prose">
         <h1>Blog</h1>
-        <p>General ramblings about code and stuff...</p>
       </Typography>
       <PostsIndex articles={allArticles} />
     </PageShell>

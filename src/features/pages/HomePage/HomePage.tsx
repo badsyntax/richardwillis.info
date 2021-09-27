@@ -28,7 +28,10 @@ export const HomePage: React.FC = () => {
     <main className={classes('root')}>
       <Head>
         <title>Richard Willis</title>
-        <meta name="description" content="Personal website of Richard Willis" />
+        <meta
+          name="description"
+          content="Personal website of Richard Willis, a Software Engineer in the UK with experience of TypeScript, JavaScript, Node.js, Java, Python, C# and many others."
+        />
       </Head>
       <Typography as="h1" className={classes('title')}>
         Richard Willis

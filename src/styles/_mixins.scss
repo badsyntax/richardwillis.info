@@ -53,9 +53,9 @@ $breakpoints: (
 }
 
 @mixin spacing {
-  margin-bottom: $theme-spacing-md;
+  margin-bottom: $theme-spacing-lg;
   @include respond-above(sm) {
-    margin-bottom: $theme-spacing-lg;
+    margin-bottom: $theme-spacing-xl;
   }
 }
 

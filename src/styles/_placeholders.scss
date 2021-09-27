@@ -8,32 +8,40 @@
 %theme-h1 {
   @include header-spacing;
   font-size: $theme-font-size-xl;
+  line-height: $theme-font-size-xxl;
   @include respond-above(sm) {
     font-size: $theme-font-size-xxl;
+    line-height: $theme-font-size-xl * 2;
   }
 }
 
 %theme-h2 {
   @include header-spacing;
   font-size: $theme-font-size-lg;
+  line-height: $theme-font-size-xl;
   @include respond-above(sm) {
     font-size: $theme-font-size-xl;
+    line-height: $theme-font-size-xxl;
   }
 }
 
 %theme-h3 {
   @include header-spacing;
   font-size: $theme-font-size-md;
+  line-height: $theme-font-size-lg;
   @include respond-above(sm) {
     font-size: $theme-font-size-lg;
+    line-height: $theme-font-size-xl;
   }
 }
 
 %theme-p {
   @include spacing;
   font-size: $theme-font-size-base;
+  line-height: $theme-line-height-base;
   @include respond-above(sm) {
     font-size: $theme-font-size-md;
+    line-height: $theme-line-height-md;
   }
 }
 
