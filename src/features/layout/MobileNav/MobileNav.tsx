@@ -30,10 +30,10 @@ export const MobileNav: React.FC = () => {
     document.documentElement.classList.toggle('mobile-nav-open');
     setIsMobileNavVisible((value) => !value);
   };
+  const reset = () =>
+    document.documentElement.classList.remove('mobile-nav-open');
   useEffect(() => {
-    return () => {
-      document.documentElement.classList.remove('mobile-nav-open');
-    };
+    return reset;
   }, []);
   return (
     <Fragment>
@@ -46,6 +46,7 @@ export const MobileNav: React.FC = () => {
           'mobile-nav',
           isMobileNavVisible && 'mobile-nav-visible'
         )}
+        onClick={reset}
       />
     </Fragment>
   );
