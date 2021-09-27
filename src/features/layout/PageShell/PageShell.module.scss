@@ -21,9 +21,6 @@
   padding-top: $theme-spacing-lg;
   padding-bottom: $theme-spacing-xl;
 
-  transition-property: filter;
-  transition-duration: 0.1s;
-
   :global(.mobile-nav-open) & {
     filter: blur(4px);
   }

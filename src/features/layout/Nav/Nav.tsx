@@ -10,13 +10,13 @@ export type NavProps = React.DetailedHTMLProps<
   HTMLElement
 >;
 
-export const Nav: React.FC<NavProps> = ({ className }) => {
+export const Nav: React.FC<NavProps> = ({ className, ...props }) => {
   const classNames = {
     className: classes('nav-item'),
     activeClassName: classes('active'),
   };
   return (
-    <nav className={classes('root', className)}>
+    <nav className={classes('root', className)} {...props}>
       <Link href="/projects" {...classNames}>
         Projects
       </Link>
