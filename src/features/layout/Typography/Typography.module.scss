@@ -74,6 +74,12 @@
     padding: 1px 4px;
   }
 
+  details {
+    summary {
+      cursor: pointer;
+    }
+  }
+
   pre {
     @include scrollbar;
     margin-top: $theme-spacing-lg;
