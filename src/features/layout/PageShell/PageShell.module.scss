@@ -23,5 +23,8 @@
 
   :global(.mobile-nav-open) & {
     filter: blur(4px);
+    @include respond-above(sm) {
+      filter: none;
+    }
   }
 }

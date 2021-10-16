@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 import classNames from 'classnames/bind';
 import { MdClose, MdMenu } from 'react-icons/md';
 
@@ -24,6 +25,20 @@ const OpenMenuButton: React.FC<
   );
 };
 
+const Portal: React.FC = ({ children }) => {
+  return ReactDOM.createPortal(children, document.body);
+};
+
+const Overlay: React.FC<
+  React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+> = ({ ...props }) => {
+  return (
+    <Portal>
+      <div className={classes('overlay')} {...props} />
+    </Portal>
+  );
+};
+
 export const MobileNav: React.FC = () => {
   const [isMobileNavVisible, setIsMobileNavVisible] = useState<boolean>(false);
   const onMenuButtonClick = () => {
@@ -32,11 +47,17 @@ export const MobileNav: React.FC = () => {
   };
   const reset = () =>
     document.documentElement.classList.remove('mobile-nav-open');
+  const handleOverlayClick = () => {
+    setIsMobileNavVisible(false);
+    reset();
+  };
   useEffect(() => {
     return reset;
   }, []);
+  console.log('isMobileNavVisible', isMobileNavVisible);
   return (
     <Fragment>
+      {isMobileNavVisible && <Overlay onClick={handleOverlayClick} />}
       <OpenMenuButton
         onClick={onMenuButtonClick}
         isVisible={isMobileNavVisible}
@@ -46,7 +67,6 @@ export const MobileNav: React.FC = () => {
           'mobile-nav',
           isMobileNavVisible && 'mobile-nav-visible'
         )}
-        onClick={reset}
       />
     </Fragment>
   );
