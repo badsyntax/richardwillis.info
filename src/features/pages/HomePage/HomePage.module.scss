@@ -12,6 +12,9 @@
   margin: 0;
   margin-bottom: $theme-spacing-xl;
   font-size: $theme-font-size-xxl;
+  animation: fadeInUp;
+  animation-duration: 1s;
+
   @include respond-above(sm) {
     font-size: $theme-font-size-2xl;
   }
@@ -22,12 +25,20 @@
   margin-bottom: $theme-spacing-xl;
   color: $theme-heading-color;
   font-size: $theme-font-size-lg;
+  animation: fadeInDown;
+  animation-duration: 1s;
+
   @include respond-above(sm) {
     font-size: $theme-font-size-xxl;
   }
 }
 
 .nav-grid {
+  opacity: 0;
+  animation: pulseFadeIn;
+  animation-duration: 1s;
+  animation-delay: 0.8s;
+  animation-fill-mode: forwards;
 }
 
 .nav-item {
@@ -40,10 +51,41 @@
   }
 }
 
-@screen sm {
-  .nav-item {
-    @apply w-auto
-      m-4;
-    flex-basis: 45%;
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes pulseFadeIn {
+  0% {
+    transform: scale3d(1, 1, 1);
+    opacity: 0;
+  }
+  50% {
+    transform: scale3d(1.05, 1.05, 1.05);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
   }
 }

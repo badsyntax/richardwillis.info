@@ -54,7 +54,6 @@ export const MobileNav: React.FC = () => {
   useEffect(() => {
     return reset;
   }, []);
-  console.log('isMobileNavVisible', isMobileNavVisible);
   return (
     <Fragment>
       {isMobileNavVisible && <Overlay onClick={handleOverlayClick} />}
