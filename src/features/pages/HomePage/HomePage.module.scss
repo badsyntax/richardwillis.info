@@ -10,26 +10,28 @@
 
 .title {
   margin: 0;
-  margin-bottom: $theme-spacing-xl;
-  font-size: $theme-font-size-xxl;
+  margin-bottom: $theme-spacing-xxl;
+  font-size: 14vw;
   animation: fadeInUp;
   animation-duration: 1s;
 
   @include respond-above(sm) {
     font-size: $theme-font-size-2xl;
+    margin-bottom: $theme-spacing-xl;
   }
 }
 
 .description {
   margin: 0;
-  margin-bottom: $theme-spacing-xl;
+  margin-bottom: $theme-spacing-xxl;
   color: $theme-heading-color;
-  font-size: $theme-font-size-lg;
+  font-size: 8vw;
   animation: fadeInDown;
   animation-duration: 1s;
 
   @include respond-above(sm) {
     font-size: $theme-font-size-xxl;
+    margin-bottom: $theme-spacing-xl;
   }
 }
 
@@ -42,12 +44,16 @@
 }
 
 .nav-item {
-  font-size: $theme-font-size-md;
+  font-size: $theme-font-size-lg;
+  &:not(:last-child) {
+    margin-right: $theme-spacing-md;
+  }
+
   @include respond-above(sm) {
     font-size: $theme-font-size-xl;
-  }
-  &:not(:last-child) {
-    margin-right: $theme-spacing-lg;
+    &:not(:last-child) {
+      margin-right: $theme-spacing-lg;
+    }
   }
 }
 
@@ -81,8 +87,11 @@
     opacity: 0;
   }
   50% {
-    transform: scale3d(1.05, 1.05, 1.05);
-    opacity: 0.5;
+    transform: scale3d(1.15, 1.15, 1.15);
+
+    @include respond-above(sm) {
+      transform: scale3d(1.25, 1.25, 1.25);
+    }
   }
   100% {
     transform: scale3d(1, 1, 1);
