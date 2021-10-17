@@ -8,6 +8,7 @@
   margin-right: auto;
   width: auto;
   max-width: 92%;
+
   @include respond-above(md) {
     max-width: 72%;
   }

@@ -5,6 +5,7 @@ import classNames from 'classnames/bind';
 import { SIZE } from './constants';
 import { SourceFormats } from './SourceFormats';
 import { getImageType, getImageSize, getResizedUrl } from './util';
+
 import STYLES from './ResponsiveImage.module.scss';
 const classes = classNames.bind(STYLES);
 
