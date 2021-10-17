@@ -8,7 +8,7 @@ import { getImageType, getImageSize, getResizedUrl } from './util';
 import STYLES from './ResponsiveImage.module.scss';
 const classes = classNames.bind(STYLES);
 
-export type ImageProps = Omit<
+export type ResponsiveImageProps = Omit<
   React.DetailedHTMLProps<
     React.ImgHTMLAttributes<HTMLImageElement>,
     HTMLImageElement
@@ -17,15 +17,20 @@ export type ImageProps = Omit<
 > & {
   onLoad?: () => void;
   size?: SIZE;
+  fullWidth?: boolean;
 };
 
-export const ResponsiveImage = React.forwardRef<HTMLImageElement, ImageProps>(
+export const ResponsiveImage = React.forwardRef<
+  HTMLImageElement,
+  ResponsiveImageProps
+>(
   (
     {
       src,
       width,
       alt,
       size = width ? getImageSize(Number(width)) : SIZE.MAX,
+      fullWidth = false,
       ...props
     },
     imageRef
@@ -38,7 +43,7 @@ export const ResponsiveImage = React.forwardRef<HTMLImageElement, ImageProps>(
     const resizedSrc = getResizedUrl(src, type, size);
 
     return (
-      <a href={src} className={classes('root')}>
+      <a href={src} className={classes('root', fullWidth && 'full-width')}>
         <picture>
           <SourceFormats src={src} size={size} origType={type} />
           <img
