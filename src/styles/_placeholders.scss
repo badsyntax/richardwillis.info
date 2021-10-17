@@ -1,5 +1,7 @@
 %theme-link {
   color: $theme-link-color;
+  transition-property: color, border-color;
+  transition-duration: 220ms;
   &:hover {
     color: #ce9178;
   }
