@@ -7,12 +7,12 @@ import { PostBody } from '../PostBody/PostBody';
 import { PostHeader } from '../PostHeader/PostHeader';
 
 import STYLES from './PostPage.module.scss';
-import { SerializedArticle } from '../api';
+import { SerializedArticle, SerializedArticleWithMdx } from '../api';
 import { PostComments } from '../PostComments/PostComments';
 const classes = classNames.bind(STYLES);
 
 export interface PostPageProps {
-  article?: SerializedArticle;
+  article?: SerializedArticleWithMdx;
 }
 
 export const PostPage: React.FC<PostPageProps> = ({ article }) => {
