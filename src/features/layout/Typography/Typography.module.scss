@@ -82,8 +82,7 @@
 
   pre {
     @include scrollbar;
-    margin-top: $theme-spacing-lg;
-    margin-bottom: $theme-spacing-lg;
+    @include spacing;
 
     code {
       background-color: transparent;
@@ -98,15 +97,20 @@
   pre[class*='language-'],
   code[class*='language-'] {
     font-size: $theme-font-size-base;
+    cursor: text;
   }
 
   pre[class*='language-'] {
     border-color: #333;
     border-width: 1px;
-    // border-radius: 10px;
     border-style: solid;
     padding: $theme-spacing-md;
     background: rgb(26, 26, 26);
+    transition-property: border-color;
+    transition-duration: 260ms;
+    &:hover {
+      border-color: #444;
+    }
   }
 
   img {

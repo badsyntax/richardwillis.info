@@ -24,6 +24,13 @@
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
   "cSpell.language": "en-GB",
-  "cSpell.words": ["Aboutpage", "govuk", "rehype", "richardwillis", "strapi"],
+  "cSpell.words": [
+    "Aboutpage",
+    "govuk",
+    "Projectspage",
+    "rehype",
+    "richardwillis",
+    "strapi"
+  ],
   "git.ignoreLimitWarning": true
 }

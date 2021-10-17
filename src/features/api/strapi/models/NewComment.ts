@@ -16,81 +16,67 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface NewProject
+ * @interface NewComment
  */
-export interface NewProject {
+export interface NewComment {
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewComment
      */
-    title: string;
+    author?: string;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewComment
      */
-    description: string;
+    body?: string;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewComment
      */
-    tags: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewProject
-     */
-    repoUrl: string;
+    article?: string;
     /**
      * 
      * @type {Date}
-     * @memberof NewProject
-     */
-    datePublished?: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof NewProject
+     * @memberof NewComment
      */
     publishedAt?: Date;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewComment
      */
     createdBy?: string;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewComment
      */
     updatedBy?: string;
 }
 
-export function NewProjectFromJSON(json: any): NewProject {
-    return NewProjectFromJSONTyped(json, false);
+export function NewCommentFromJSON(json: any): NewComment {
+    return NewCommentFromJSONTyped(json, false);
 }
 
-export function NewProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): NewProject {
+export function NewCommentFromJSONTyped(json: any, ignoreDiscriminator: boolean): NewComment {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'title': json['title'],
-        'description': json['description'],
-        'tags': json['tags'],
-        'repoUrl': json['repoUrl'],
-        'datePublished': !exists(json, 'datePublished') ? undefined : (new Date(json['datePublished'])),
+        'author': !exists(json, 'author') ? undefined : json['author'],
+        'body': !exists(json, 'body') ? undefined : json['body'],
+        'article': !exists(json, 'article') ? undefined : json['article'],
         'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
         'createdBy': !exists(json, 'created_by') ? undefined : json['created_by'],
         'updatedBy': !exists(json, 'updated_by') ? undefined : json['updated_by'],
     };
 }
 
-export function NewProjectToJSON(value?: NewProject | null): any {
+export function NewCommentToJSON(value?: NewComment | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -99,11 +85,9 @@ export function NewProjectToJSON(value?: NewProject | null): any {
     }
     return {
         
-        'title': value.title,
-        'description': value.description,
-        'tags': value.tags,
-        'repoUrl': value.repoUrl,
-        'datePublished': value.datePublished === undefined ? undefined : (value.datePublished.toISOString()),
+        'author': value.author,
+        'body': value.body,
+        'article': value.article,
         'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
         'created_by': value.createdBy,
         'updated_by': value.updatedBy,

@@ -15,21 +15,15 @@
 
 import * as runtime from '../runtime';
 import {
-    Article,
-    ArticleFromJSON,
-    ArticleToJSON,
     Comment,
     CommentFromJSON,
     CommentToJSON,
-    NewArticle,
-    NewArticleFromJSON,
-    NewArticleToJSON,
-    NewArticleComment,
-    NewArticleCommentFromJSON,
-    NewArticleCommentToJSON,
+    NewComment,
+    NewCommentFromJSON,
+    NewCommentToJSON,
 } from '../models';
 
-export interface ArticlesGetRequest {
+export interface CommentsGetRequest {
     limit?: number;
     sort?: string;
     start?: number;
@@ -44,36 +38,31 @@ export interface ArticlesGetRequest {
     nin?: Array<string>;
 }
 
-export interface ArticlesIdCommentPostRequest {
-    id: string;
-    newArticleComment: NewArticleComment;
-}
-
-export interface ArticlesIdDeleteRequest {
+export interface CommentsIdDeleteRequest {
     id: string;
 }
 
-export interface ArticlesIdPutRequest {
+export interface CommentsIdGetRequest {
     id: string;
-    newArticle: NewArticle;
 }
 
-export interface ArticlesPostRequest {
-    newArticle: NewArticle;
+export interface CommentsIdPutRequest {
+    id: string;
+    newComment: NewComment;
 }
 
-export interface ArticlesSlugGetRequest {
-    slug: string;
+export interface CommentsPostRequest {
+    newComment: NewComment;
 }
 
 /**
  * 
  */
-export class ArticleApi extends runtime.BaseAPI {
+export class CommentApi extends runtime.BaseAPI {
 
     /**
      */
-    async articlesCountGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<object>> {
+    async commentsCountGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<object>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -87,7 +76,7 @@ export class ArticleApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/articles/count`,
+            path: `/comments/count`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -98,14 +87,14 @@ export class ArticleApi extends runtime.BaseAPI {
 
     /**
      */
-    async articlesCountGet(initOverrides?: RequestInit): Promise<object> {
-        const response = await this.articlesCountGetRaw(initOverrides);
+    async commentsCountGet(initOverrides?: RequestInit): Promise<object> {
+        const response = await this.commentsCountGetRaw(initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async articlesGetRaw(requestParameters: ArticlesGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Array<Article>>> {
+    async commentsGetRaw(requestParameters: CommentsGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Array<Comment>>> {
         const queryParameters: any = {};
 
         if (requestParameters.limit !== undefined) {
@@ -167,73 +156,28 @@ export class ArticleApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/articles`,
+            path: `/comments`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ArticleFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(CommentFromJSON));
     }
 
     /**
      */
-    async articlesGet(requestParameters: ArticlesGetRequest, initOverrides?: RequestInit): Promise<Array<Article>> {
-        const response = await this.articlesGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Create a new record
-     */
-    async articlesIdCommentPostRaw(requestParameters: ArticlesIdCommentPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Comment>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling articlesIdCommentPost.');
-        }
-
-        if (requestParameters.newArticleComment === null || requestParameters.newArticleComment === undefined) {
-            throw new runtime.RequiredError('newArticleComment','Required parameter requestParameters.newArticleComment was null or undefined when calling articlesIdCommentPost.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/articles/{id}/comment`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: NewArticleCommentToJSON(requestParameters.newArticleComment),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a new record
-     */
-    async articlesIdCommentPost(requestParameters: ArticlesIdCommentPostRequest, initOverrides?: RequestInit): Promise<Comment> {
-        const response = await this.articlesIdCommentPostRaw(requestParameters, initOverrides);
+    async commentsGet(requestParameters: CommentsGetRequest, initOverrides?: RequestInit): Promise<Array<Comment>> {
+        const response = await this.commentsGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      * Delete a record
      */
-    async articlesIdDeleteRaw(requestParameters: ArticlesIdDeleteRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<number>> {
+    async commentsIdDeleteRaw(requestParameters: CommentsIdDeleteRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<number>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling articlesIdDelete.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling commentsIdDelete.');
         }
 
         const queryParameters: any = {};
@@ -249,7 +193,7 @@ export class ArticleApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/articles/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            path: `/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -261,102 +205,16 @@ export class ArticleApi extends runtime.BaseAPI {
     /**
      * Delete a record
      */
-    async articlesIdDelete(requestParameters: ArticlesIdDeleteRequest, initOverrides?: RequestInit): Promise<number> {
-        const response = await this.articlesIdDeleteRaw(requestParameters, initOverrides);
+    async commentsIdDelete(requestParameters: CommentsIdDeleteRequest, initOverrides?: RequestInit): Promise<number> {
+        const response = await this.commentsIdDeleteRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Update a record
      */
-    async articlesIdPutRaw(requestParameters: ArticlesIdPutRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Article>> {
+    async commentsIdGetRaw(requestParameters: CommentsIdGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Comment>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling articlesIdPut.');
-        }
-
-        if (requestParameters.newArticle === null || requestParameters.newArticle === undefined) {
-            throw new runtime.RequiredError('newArticle','Required parameter requestParameters.newArticle was null or undefined when calling articlesIdPut.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/articles/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
-            method: 'PUT',
-            headers: headerParameters,
-            query: queryParameters,
-            body: NewArticleToJSON(requestParameters.newArticle),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ArticleFromJSON(jsonValue));
-    }
-
-    /**
-     * Update a record
-     */
-    async articlesIdPut(requestParameters: ArticlesIdPutRequest, initOverrides?: RequestInit): Promise<Article> {
-        const response = await this.articlesIdPutRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Create a new record
-     */
-    async articlesPostRaw(requestParameters: ArticlesPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Article>> {
-        if (requestParameters.newArticle === null || requestParameters.newArticle === undefined) {
-            throw new runtime.RequiredError('newArticle','Required parameter requestParameters.newArticle was null or undefined when calling articlesPost.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("bearerAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/articles`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: NewArticleToJSON(requestParameters.newArticle),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ArticleFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a new record
-     */
-    async articlesPost(requestParameters: ArticlesPostRequest, initOverrides?: RequestInit): Promise<Article> {
-        const response = await this.articlesPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async articlesSlugGetRaw(requestParameters: ArticlesSlugGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Article>> {
-        if (requestParameters.slug === null || requestParameters.slug === undefined) {
-            throw new runtime.RequiredError('slug','Required parameter requestParameters.slug was null or undefined when calling articlesSlugGet.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling commentsIdGet.');
         }
 
         const queryParameters: any = {};
@@ -372,19 +230,105 @@ export class ArticleApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/articles/{slug}`.replace(`{${"slug"}}`, encodeURIComponent(String(requestParameters.slug))),
+            path: `/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ArticleFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
     }
 
     /**
      */
-    async articlesSlugGet(requestParameters: ArticlesSlugGetRequest, initOverrides?: RequestInit): Promise<Article> {
-        const response = await this.articlesSlugGetRaw(requestParameters, initOverrides);
+    async commentsIdGet(requestParameters: CommentsIdGetRequest, initOverrides?: RequestInit): Promise<Comment> {
+        const response = await this.commentsIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Update a record
+     */
+    async commentsIdPutRaw(requestParameters: CommentsIdPutRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Comment>> {
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling commentsIdPut.');
+        }
+
+        if (requestParameters.newComment === null || requestParameters.newComment === undefined) {
+            throw new runtime.RequiredError('newComment','Required parameter requestParameters.newComment was null or undefined when calling commentsIdPut.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/comments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NewCommentToJSON(requestParameters.newComment),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
+    }
+
+    /**
+     * Update a record
+     */
+    async commentsIdPut(requestParameters: CommentsIdPutRequest, initOverrides?: RequestInit): Promise<Comment> {
+        const response = await this.commentsIdPutRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Create a new record
+     */
+    async commentsPostRaw(requestParameters: CommentsPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<Comment>> {
+        if (requestParameters.newComment === null || requestParameters.newComment === undefined) {
+            throw new runtime.RequiredError('newComment','Required parameter requestParameters.newComment was null or undefined when calling commentsPost.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("bearerAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/comments`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: NewCommentToJSON(requestParameters.newComment),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentFromJSON(jsonValue));
+    }
+
+    /**
+     * Create a new record
+     */
+    async commentsPost(requestParameters: CommentsPostRequest, initOverrides?: RequestInit): Promise<Comment> {
+        const response = await this.commentsPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
