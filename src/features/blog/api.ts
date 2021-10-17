@@ -6,17 +6,26 @@ import rehypeSlug from 'rehype-slug';
 import rehypeExternalLinks from 'rehype-external-links';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
-// @ts-ignore
+// @ts-expect-error
 import rehypePrism from '@mapbox/rehype-prism';
 
 export type SerializedArticle = Omit<
   Article,
-  'author' | 'category' | 'publishDate' | 'publishedAt'
+  | 'author'
+  | 'category'
+  | 'publishDate'
+  | 'publishedAt'
+  | 'content'
+  | 'image'
+  | 'excerpt'
 > & {
   author: Article['author'] | null;
   category: Article['category'] | null;
   publishDate: string;
   publishedAt?: string;
+};
+
+export type SerializedArticleWithMdx = SerializedArticle & {
   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
 };
 
@@ -51,15 +60,31 @@ function getMdxSource(
   });
 }
 
-async function getSerializableArticle(
-  article: Article
-): Promise<SerializedArticle> {
+async function getSerializableArticle({
+  id,
+  description,
+  slug,
+  publishDate,
+  publishedAt,
+  title,
+}: Article): Promise<SerializedArticle> {
   return {
-    ...article,
     category: null,
     author: null,
-    publishDate: article.publishDate?.toISOString(),
-    publishedAt: article.publishedAt?.toISOString(),
+    id,
+    description,
+    title,
+    slug,
+    publishDate: publishDate?.toISOString(),
+    publishedAt: publishedAt?.toISOString(),
+  };
+}
+
+async function getSerializableArticleWithMdx(
+  article: Article
+): Promise<SerializedArticleWithMdx> {
+  return {
+    ...(await getSerializableArticle(article)),
     mdxSource: await getMdxSource(article.content || ''),
   };
 }
@@ -71,7 +96,7 @@ export async function getArticleBySlug(
   const article = await apiClient.articleApi.articlesSlugGet({
     slug,
   });
-  return getSerializableArticle(article);
+  return getSerializableArticleWithMdx(article);
 }
 
 export async function getAllArticles(): Promise<SerializedArticle[]> {

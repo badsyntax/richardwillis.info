@@ -1,12 +1,8 @@
 import React from 'react';
-import { Article } from '../../api/strapi';
-
 import { PageShell } from '../../layout/PageShell/PageShell';
 import { Typography } from '../../layout/Typography/Typography';
 import { SerializedArticle } from '../api';
 import { PostsIndex } from '../PostsIndex/PostsIndex';
-// import { Post } from '../types';
-
 export interface BlogPageProps {
   allArticles: SerializedArticle[];
 }

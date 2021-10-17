@@ -18,12 +18,11 @@ export const PostsIndex: React.FC<PostsIndexProps> = ({ articles }) => {
         return (
           <BlogPostCard
             title={article.title}
-            excerpt={article.excerpt}
+            excerpt={article.description}
             date={article.publishDate}
             href={`/blog/${article.slug}`}
             key={article.slug}
-            className={classes('post')}
-          ></BlogPostCard>
+            className={classes('post')}></BlogPostCard>
         );
       })}
     </nav>
