@@ -1,7 +1,9 @@
 @import '../../../styles/theme';
 
 .root {
-  margin-top: $theme-spacing-xl;
+  & > :first-child {
+    margin-top: 0;
+  }
 }
 
 .post {

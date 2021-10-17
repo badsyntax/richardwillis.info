@@ -9,6 +9,8 @@ import STYLES from './ContactPage.module.scss';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { AboutpageSeo } from '../../api/strapi';
 import { MarkdownContent } from '../../blog/MarkdownContent/MarkdownContent';
+import { AddCommentForm } from '../../blog/AddCommentForm/AddCommentForm';
+import { EmailForm } from '../../blog/EmailForm/EmailForm';
 const classes = classNames.bind(STYLES);
 
 export type ContactPageProps = {
@@ -50,6 +52,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ seo, mdxSource }) => {
             </a>
           </li>
         </ul>
+
+        <hr />
+
+        <p>Or send me an email below:</p>
+
+        <EmailForm articleId={'2'} />
       </Typography>
     </PageShell>
   );
