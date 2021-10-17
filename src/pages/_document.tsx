@@ -33,8 +33,7 @@ export default class MyDocument extends Document {
           <script
             defer
             data-domain="richardwillis.info"
-            src="https://plausible.docker-box.richardwillis.info/js/plausible.js"
-          ></script>
+            src="https://plausible.docker-box.richardwillis.info/js/plausible.js"></script>
         </Head>
         <body>
           <Main />
