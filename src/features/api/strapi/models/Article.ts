@@ -81,6 +81,12 @@ export interface Article {
     publishDate: Date;
     /**
      * 
+     * @type {Array<object>}
+     * @memberof Article
+     */
+    comments?: Array<object>;
+    /**
+     * 
      * @type {Date}
      * @memberof Article
      */
@@ -107,6 +113,7 @@ export function ArticleFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         'author': !exists(json, 'author') ? undefined : json['author'],
         'excerpt': !exists(json, 'excerpt') ? undefined : json['excerpt'],
         'publishDate': (new Date(json['publish_date'])),
+        'comments': !exists(json, 'comments') ? undefined : json['comments'],
         'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
     };
 }
@@ -130,6 +137,7 @@ export function ArticleToJSON(value?: Article | null): any {
         'author': value.author,
         'excerpt': value.excerpt,
         'publish_date': (value.publishDate.toISOString().substr(0,10)),
+        'comments': value.comments,
         'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
     };
 }

@@ -13,84 +13,70 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    AboutpageSeo,
+    AboutpageSeoFromJSON,
+    AboutpageSeoFromJSONTyped,
+    AboutpageSeoToJSON,
+} from './';
+
 /**
  * 
  * @export
- * @interface NewProject
+ * @interface NewProjectspage
  */
-export interface NewProject {
+export interface NewProjectspage {
+    /**
+     * 
+     * @type {AboutpageSeo}
+     * @memberof NewProjectspage
+     */
+    seo?: AboutpageSeo;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewProjectspage
      */
-    title: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewProject
-     */
-    description: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewProject
-     */
-    tags: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewProject
-     */
-    repoUrl: string;
+    body?: string;
     /**
      * 
      * @type {Date}
-     * @memberof NewProject
-     */
-    datePublished?: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof NewProject
+     * @memberof NewProjectspage
      */
     publishedAt?: Date;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewProjectspage
      */
     createdBy?: string;
     /**
      * 
      * @type {string}
-     * @memberof NewProject
+     * @memberof NewProjectspage
      */
     updatedBy?: string;
 }
 
-export function NewProjectFromJSON(json: any): NewProject {
-    return NewProjectFromJSONTyped(json, false);
+export function NewProjectspageFromJSON(json: any): NewProjectspage {
+    return NewProjectspageFromJSONTyped(json, false);
 }
 
-export function NewProjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): NewProject {
+export function NewProjectspageFromJSONTyped(json: any, ignoreDiscriminator: boolean): NewProjectspage {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'title': json['title'],
-        'description': json['description'],
-        'tags': json['tags'],
-        'repoUrl': json['repoUrl'],
-        'datePublished': !exists(json, 'datePublished') ? undefined : (new Date(json['datePublished'])),
+        'seo': !exists(json, 'seo') ? undefined : AboutpageSeoFromJSON(json['seo']),
+        'body': !exists(json, 'body') ? undefined : json['body'],
         'publishedAt': !exists(json, 'published_at') ? undefined : (new Date(json['published_at'])),
         'createdBy': !exists(json, 'created_by') ? undefined : json['created_by'],
         'updatedBy': !exists(json, 'updated_by') ? undefined : json['updated_by'],
     };
 }
 
-export function NewProjectToJSON(value?: NewProject | null): any {
+export function NewProjectspageToJSON(value?: NewProjectspage | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -99,11 +85,8 @@ export function NewProjectToJSON(value?: NewProject | null): any {
     }
     return {
         
-        'title': value.title,
-        'description': value.description,
-        'tags': value.tags,
-        'repoUrl': value.repoUrl,
-        'datePublished': value.datePublished === undefined ? undefined : (value.datePublished.toISOString()),
+        'seo': AboutpageSeoToJSON(value.seo),
+        'body': value.body,
         'published_at': value.publishedAt === undefined ? undefined : (value.publishedAt.toISOString()),
         'created_by': value.createdBy,
         'updated_by': value.updatedBy,
