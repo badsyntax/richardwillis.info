@@ -3,6 +3,7 @@ apis/AboutpageApi.ts
 apis/ArticleApi.ts
 apis/CategoryApi.ts
 apis/CommentApi.ts
+apis/ContactpageApi.ts
 apis/GlobalApi.ts
 apis/HomepageApi.ts
 apis/ProjectApi.ts
@@ -15,6 +16,7 @@ models/AboutpageSeo.ts
 models/Article.ts
 models/Category.ts
 models/Comment.ts
+models/Contactpage.ts
 models/Global.ts
 models/Homepage.ts
 models/HomepageHero.ts
@@ -24,6 +26,7 @@ models/NewArticle.ts
 models/NewArticleComment.ts
 models/NewCategory.ts
 models/NewComment.ts
+models/NewContactpage.ts
 models/NewGlobal.ts
 models/NewHomepage.ts
 models/NewProject.ts

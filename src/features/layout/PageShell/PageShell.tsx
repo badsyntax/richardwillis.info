@@ -21,7 +21,7 @@ export const PageShell: React.FC<PageShellProps> = ({
   return (
     <Fragment>
       <Head>
-        <title>{title} - Richard Willis</title>
+        <title>Richard Willis - {title}</title>
         <meta name="description" content={description} />
       </Head>
       <div className={classes('root')}>

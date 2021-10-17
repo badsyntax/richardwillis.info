@@ -5,12 +5,13 @@ import { PageShell } from '../../layout/PageShell/PageShell';
 import { ProjectsList } from '../ProjectsList/ProjectsList';
 import { AboutpageSeo, Project } from '../../api/strapi';
 import { MarkdownContent } from '../../blog/MarkdownContent/MarkdownContent';
+import { Typography } from '../../layout/Typography/Typography';
 
-export interface ProjectsPageProps {
+export type ProjectsPageProps = {
   allProjects: Project[];
   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
   seo: AboutpageSeo;
-}
+};
 
 export const ProjectsPage: React.FC<ProjectsPageProps> = ({
   allProjects,
@@ -19,8 +20,10 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
 }) => {
   return (
     <PageShell title={seo.metaTitle} description={seo.metaDescription}>
-      <h1>{seo.metaTitle}</h1>
-      <MarkdownContent mdxSource={mdxSource} />
+      <Typography as="div" variant="prose">
+        <h1>{seo.metaTitle}</h1>
+        <MarkdownContent mdxSource={mdxSource} />
+      </Typography>
       <ProjectsList projects={allProjects} />
     </PageShell>
   );
