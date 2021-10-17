@@ -8,9 +8,6 @@
   margin-right: auto;
   width: auto;
   max-width: 92%;
-  @include respond-above(sm) {
-    max-width: 82%;
-  }
   @include respond-above(md) {
     max-width: 72%;
   }
@@ -21,5 +18,12 @@
 
   img {
     max-width: 100%;
+  }
+
+  &.full-width {
+    max-width: 100%;
+    @include respond-above(md) {
+      max-width: 100%;
+    }
   }
 }
