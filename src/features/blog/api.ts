@@ -92,7 +92,7 @@ async function getSerializableArticleWithMdx(
 export async function getArticleBySlug(
   slug: string,
   fields: string[] = []
-): Promise<SerializedArticle> {
+): Promise<SerializedArticleWithMdx> {
   const article = await apiClient.articleApi.articlesSlugGet({
     slug,
   });
