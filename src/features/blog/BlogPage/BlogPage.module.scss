@@ -1,1 +1,10 @@
 @import '../../../styles/theme';
+
+.posts-index {
+  flex-grow: 1;
+  margin-right: $theme-spacing-xl;
+}
+
+.sidebar {
+  width: 340px;
+}

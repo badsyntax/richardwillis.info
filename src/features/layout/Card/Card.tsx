@@ -5,7 +5,9 @@ import { Link, LinkProps } from '../Link/Link';
 import { Typography, TypographyProps } from '../Typography/Typography';
 
 import STYLES from './Card.module.scss';
+import PANEL_STYLES from '../Panel/Panel.module.scss';
 const classes = classNames.bind(STYLES);
+const panelClasses = classNames.bind(PANEL_STYLES);
 
 export type CardTitleType = React.FC<TypographyProps>;
 
@@ -37,10 +39,9 @@ export type CardType = React.FC<CardProps> & {
 export const Card: CardType = ({ children, className, ...props }) => {
   return (
     <Link
-      className={classes('card', className)}
+      className={classes('card', panelClasses('root'), className)}
       variant="card-button"
-      {...props}
-    >
+      {...props}>
       {children}
     </Link>
   );

@@ -1,0 +1,13 @@
+@import '../../../styles/theme';
+
+.root {
+  display: flex;
+
+  &.direction-row {
+    flex-direction: row;
+  }
+
+  &.direction-column {
+    flex-direction: row;
+  }
+}
