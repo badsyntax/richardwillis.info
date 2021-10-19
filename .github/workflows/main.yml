@@ -1,4 +1,4 @@
-name: Deploy Static Web App
+name: Lint, Build & Deploy
 
 on:
   push:
@@ -10,12 +10,17 @@ on:
       - master
 
 jobs:
-  build_and_deploy_job:
+  lint_build_deploy:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-20.04
     name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v2
+
+      - name: Lint app dockerfile
+        uses: brpaz/hadolint-action@v1.5.0
+        with:
+          dockerfile: Dockerfile
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.4.1
@@ -27,6 +32,9 @@ jobs:
         env:
           NPM_CONFIG_FUND: false
           NPM_CONFIG_AUDIT: false
+
+      - name: Lint
+        run: npm run lint
 
       - name: Cache .next
         uses: actions/cache@v2
@@ -60,7 +68,7 @@ jobs:
           skip_app_build: true
           app_location: out
 
-  close_pull_request_job:
+  close_pull_request:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-20.04
     name: Close Pull Request Job
