@@ -3,25 +3,25 @@
     {
       "route": "/_next/static/*",
       "headers": {
-        "cache-control": "public,max-age=31536000,immutable"
+        "Cache-Control": "public,max-age=31536000,immutable"
       }
     },
     {
       "route": "/_next/data/*",
       "headers": {
-        "cache-control": "public,max-age=31536000,immutable"
+        "Cache-Control": "public,max-age=31536000,immutable"
       }
     },
     {
       "route": "/",
       "headers": {
-        "cache-control": "no-cache"
+        "Cache-Control": "no-cache"
       }
     },
     {
       "route": "/*",
       "headers": {
-        "cache-control": "no-cache"
+        "Cache-Control": "no-cache"
       }
     }
   ]

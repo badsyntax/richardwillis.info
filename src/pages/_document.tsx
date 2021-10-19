@@ -10,6 +10,7 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <meta charSet="UTF-8" />
           <link rel="shortcut icon" href={`${siteAssets}favicon.ico`} />
           <link rel="icon" href={`${siteAssets}favicon.ico`} />
           <link
