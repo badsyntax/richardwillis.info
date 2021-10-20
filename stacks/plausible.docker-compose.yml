@@ -35,27 +35,27 @@ services:
       labels:
         - 'traefik.enable=false'
 
-  plausible_geoip:
-    image: maxmindinc/geoipupdate
-    environment:
-      - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
-      - GEOIPUPDATE_FREQUENCY=168 # update every 7 days
-    volumes:
-      - plausible-geoip:/usr/share/GeoIP
-    secrets:
-      - plausible-geoupdate-account-id
-      - plausible-geoupdate-license-key
-    entrypoint:
-      [
-        '/bin/sh',
-        '-c',
-        'export GEOIPUPDATE_ACCOUNT_ID=$$(cat /run/secrets/plausible-geoupdate-account-id); export GEOIPUPDATE_LICENSE_KEY=$$(cat /run/secrets/plausible-geoupdate-license-key); source /usr/bin/entry.sh',
-      ]
-    deploy:
-      mode: replicated
-      replicas: 1
-      labels:
-        - 'traefik.enable=false'
+  # plausible_geoip:
+  #   image: maxmindinc/geoipupdate
+  #   environment:
+  #     - GEOIPUPDATE_EDITION_IDS=GeoLite2-Country
+  #     - GEOIPUPDATE_FREQUENCY=168 # update every 7 days
+  #   volumes:
+  #     - plausible-geoip:/usr/share/GeoIP
+  #   secrets:
+  #     - plausible-geoupdate-account-id
+  #     - plausible-geoupdate-license-key
+  #   entrypoint:
+  #     [
+  #       '/bin/sh',
+  #       '-c',
+  #       'export GEOIPUPDATE_ACCOUNT_ID=$$(cat /run/secrets/plausible-geoupdate-account-id); export GEOIPUPDATE_LICENSE_KEY=$$(cat /run/secrets/plausible-geoupdate-license-key); source /usr/bin/entry.sh',
+  #     ]
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #     labels:
+  #       - 'traefik.enable=false'
 
   plausible:
     image: plausible/analytics:master@sha256:adfc5f693e8d70d48b04fc17b009b2871b9ee23d9a349e606eab708e964d2a60
@@ -65,11 +65,11 @@ services:
       - traefik-public
     environment:
       - CONFIG_DIR=/run/secrets
-      - GEOLITE2_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb
+      # - GEOLITE2_COUNTRY_DB=/geoip/GeoLite2-Country.mmdb
       # - SMTP_HOST_SSL_ENABLED=true
       - SMTP_HOST_PORT=587
-    volumes:
-      - plausible-geoip:/geoip:ro
+    # volumes:
+    #   - plausible-geoip:/geoip:ro
     healthcheck:
       test:
         ['CMD', 'wget', '-q', '--tries=1', '--spider', 'http://localhost:8000']
@@ -94,6 +94,10 @@ services:
         target: /run/secrets/SMTP_USER_NAME
       - source: plausible-smtp-user-pwd
         target: /run/secrets/SMTP_USER_PWD
+      - source: plausible-google-client-id
+        target: /run/secrets/GOOGLE_CLIENT_ID
+      - source: plausible-google-client-secret
+        target: /run/secrets/GOOGLE_CLIENT_SECRET
     deploy:
       mode: replicated
       replicas: 1
@@ -146,9 +150,12 @@ secrets:
     external: true
   plausible-smtp-user-pwd:
     external: true
+  plausible-google-client-id:
+    external: true
+  plausible-google-client-secret:
+    external: true
 
 volumes:
   plausible-db-data:
   plausible-event-data:
   plausible-etc-clickhouse-server:
-  plausible-geoip:
