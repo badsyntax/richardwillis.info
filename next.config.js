@@ -1,13 +1,16 @@
+const { createVanillaExtractPlugin } = require('@vanilla-extract/next-plugin');
+const withVanillaExtract = createVanillaExtractPlugin();
+
 const { ASSET_PREFIX, NODE_ENV } = process.env;
 const isProd = NODE_ENV === 'production';
 const assetPrefix =
   ASSET_PREFIX || (isProd ? 'https://assets.richardwillis.info/' : '/');
 
-module.exports = {
+module.exports = withVanillaExtract({
   poweredByHeader: false,
   assetPrefix,
   publicRuntimeConfig: {
     locale: 'en-GB',
     assetPrefix,
   },
-};
+});

@@ -4,7 +4,10 @@ import classNames from 'classnames/bind';
 import { Header } from '../Header/Header';
 
 import STYLES from './PageShell.module.scss';
+import { main } from './PageShell.css';
 const classes = classNames.bind(STYLES);
+
+console.log('main', main);
 
 export interface PageShellProps {
   title: string;
