@@ -1,11 +1,10 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 
 import React from 'react';
-import classNames from 'classnames/bind';
-
-import STYLES from './Label.module.scss';
+import classNames from 'classnames';
 import { Typography } from '../Typography/Typography';
-const classes = classNames.bind(STYLES);
+import { screenReaderOnly } from '../../../styles/util.css';
+import * as styles from './Label.css';
 
 export type LabelProps = React.DetailedHTMLProps<
   React.LabelHTMLAttributes<HTMLLabelElement>,
@@ -23,7 +22,11 @@ export const Label: React.FunctionComponent<LabelProps> = ({
     <div>
       <Typography
         as="label"
-        className={classes('root', hidden && 'hidden', className)}
+        className={classNames(
+          styles.root,
+          hidden && screenReaderOnly,
+          className
+        )}
         {...props}
       />
     </div>

@@ -1,31 +1,26 @@
-// import DateFormatter from '../components/date-formatter';
-import React, { Fragment } from 'react';
-import classNames from 'classnames/bind';
-import { PostTitle } from '../PostTitle/PostTitle';
+import React from 'react';
 import { getFormattedDateLong } from '../../dates/getFormattedDate';
 import { Link } from '../../layout/Link/Link';
 import { Typography } from '../../layout/Typography/Typography';
 
-import STYLES from './PostHeader.module.scss';
-const classes = classNames.bind(STYLES);
+import * as styles from './PostHeader.css';
 
 interface PostHeaderProps {
   title: string;
   date: string;
-  // author: Author;
 }
 
 export const PostHeader: React.FC<PostHeaderProps> = ({ title, date }) => {
   return (
     <>
-      <Typography as="h1" className={classes('title')}>
+      <Typography as="h1" className={styles.title}>
         {title}
       </Typography>
-      <Typography as="div" className={classes('date')}>
+      <Typography as="div" className={styles.date}>
         Posted on: {getFormattedDateLong(new Date(date))}
       </Typography>
       <Typography as="div">
-        <Link href="/blog" className={classes('back-link')}>
+        <Link href="/blog" className={styles.backLink}>
           &larr;&nbsp;Back to the Blog
         </Link>
       </Typography>

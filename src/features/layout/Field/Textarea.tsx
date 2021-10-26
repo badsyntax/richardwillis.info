@@ -1,9 +1,8 @@
 import React from 'react';
-import classNames from 'classnames/bind';
+import classNames from 'classnames';
 
 import { FieldProps } from './types';
-import STYLES from './Styles.module.scss';
-const classes = classNames.bind(STYLES);
+import * as styles from './Input.css';
 
 export type TextareaProps = React.DetailedHTMLProps<
   React.TextareaHTMLAttributes<HTMLTextAreaElement>,
@@ -18,8 +17,12 @@ export const Textarea: React.FunctionComponent<TextareaProps> = ({
 }) => {
   return (
     <textarea
-      className={classes('text-field', fullWidth && 'full-width', className)}
+      className={classNames(
+        styles.input,
+        fullWidth && styles.fullWidth,
+        className
+      )}
       {...props}
-    ></textarea>
+    />
   );
 };
