@@ -1,29 +1,27 @@
 import { style, composeStyles } from '@vanilla-extract/css';
-import { atoms, space } from '../../../styles/sprinkles.css';
-export const container = atoms({
-  display: 'flex',
-  paddingX: 'sm',
+import { themeStyle, tokens } from '../../../styles/theme.css';
+export const root = themeStyle({});
 
-  // Conditional atoms:
-  // flexDirection: {
-  // mobile: 'column',
-  // desktop: 'row',
-  // },
-});
-
-export const main = style({
-  marginRight: 'auto',
-  marginLeft: 'auto',
-  paddingLeft: space.lg,
-  paddingRight: space.lg,
-  paddingTop: space.md,
-  paddingBottom: space.xl,
-  // margin-right: auto;
-  // margin-left: auto;
-  // /* FIXME */
-  // scroll-margin-top: 10rem;
-  // padding-left: $theme-spacing-lg;
-  // padding-right: $theme-spacing-lg;
-  // padding-top: $theme-spacing-md * 6;
-  // padding-bottom: $theme-spacing-xl;
-});
+export const main = style([
+  themeStyle({
+    paddingLeft: 'lg',
+    paddingRight: 'lg',
+    paddingTop: 'lg',
+    paddingBottom: 'xl',
+    marginTop: {
+      mobile: 'pageShellMarginTopMobile',
+      desktop: 'pageShellMarginTopDesktop',
+    },
+    filter: {
+      mobile: 'blur',
+      desktop: 'none',
+    },
+    // /* FIXME */
+    // scroll-margin-top: 10rem;
+  }),
+  {
+    marginRight: 'auto',
+    marginLeft: 'auto',
+    maxWidth: tokens.pageShell.maxWidth,
+  },
+]);

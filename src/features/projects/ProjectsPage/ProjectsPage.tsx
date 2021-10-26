@@ -20,7 +20,7 @@ export const ProjectsPage: React.FC<ProjectsPageProps> = ({
 }) => {
   return (
     <PageShell title={seo.metaTitle} description={seo.metaDescription}>
-      <Typography as="div" variant="prose">
+      <Typography as="div" variant="prose" addChildClasses>
         <h1>{seo.metaTitle}</h1>
         <MarkdownContent mdxSource={mdxSource} />
       </Typography>

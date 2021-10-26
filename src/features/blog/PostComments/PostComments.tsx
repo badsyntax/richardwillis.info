@@ -7,9 +7,12 @@ import { AddCommentForm } from '../AddCommentForm/AddCommentForm';
 // import { FaInfo } from 'react-icons/fa';
 // import { InfoIcon } from '../../layout/Icons/InfoIcon';
 
-import STYLES from './PostComments.module.scss';
 import { CommentBox } from '../CommentBox/CommentBox';
-const classes = classNames.bind(STYLES);
+
+// @ts-expect-error
+function classes(...args) {
+  return '';
+}
 
 type PostComment = {
   author: string;

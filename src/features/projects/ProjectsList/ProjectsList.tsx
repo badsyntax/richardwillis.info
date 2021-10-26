@@ -1,13 +1,7 @@
 import React, { Fragment } from 'react';
-import classNames from 'classnames/bind';
-// import { FaGithub, FaRegStar } from 'react-icons/fa';
-// import { Project } from '../types';
 import { Card } from '../../layout/Card/Card';
-
-import STYLES from './ProjectsList.module.scss';
 import { Project } from '../../api/strapi';
-// import { useEnrichProjectsWithStars } from '../../../hooks/useEnrichProjectsWithStars';
-const classes = classNames.bind(STYLES);
+import * as styles from './ProjectsList.css';
 
 export type ProjectsListProps = {
   projects: Project[];
@@ -16,22 +10,18 @@ export type ProjectsListProps = {
 export const ProjectsList: React.FC<ProjectsListProps> = ({ projects }) => {
   // const projectsWithStars = useEnrichProjectsWithStars(projects);
   return (
-    <nav className={classes('root')}>
+    <nav className={styles.root}>
       {projects.map((project, i) => {
         const tags = (project.tags || '').split(', ');
         return (
-          <Card
-            href={project.repoUrl || '#'}
-            className={classes('card')}
-            key={i}
-          >
-            <Card.Title className={classes('title')}>
+          <Card href={project.repoUrl || '#'} className={styles.card} key={i}>
+            <Card.Title className={styles.title}>
               {/* <FaGithub className={classes('github-icon')} /> */}
               {project.title}
             </Card.Title>
             <Card.Content>{project.description}</Card.Content>
-            <div className={classes('footer')}>
-              <Card.Content className={classes('tags')}>
+            <div className={styles.footer}>
+              <Card.Content className={styles.tags}>
                 {tags.map((tag, i) => (
                   <span key={tag}>
                     {tag}
@@ -39,7 +29,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ projects }) => {
                   </span>
                 ))}
               </Card.Content>
-              <div className={classes('stars')}>
+              <div className={styles.stars}>
                 {/* {project.stars !== undefined && (
                   <Fragment>
                     <FaRegStar className={classes('star-icon')} />

@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-// import classNames from 'classnames/bind';
 
 import { Typography } from '../../layout/Typography/Typography';
 import { FormRow } from '../../layout/FormRow/FormRow';
@@ -8,9 +7,6 @@ import { Input } from '../../layout/Field/Input';
 import { Alert, AlertSeverity } from '../../layout/Alert/Alert';
 import { Button } from '../../layout/Button/Button';
 import { Textarea } from '../../layout/Field/Textarea';
-
-// import STYLES from './AddCommentForm.module.scss';
-// const classes = classNames.bind(STYLES);
 
 async function makeRequest(
   url: string,
@@ -27,15 +23,10 @@ function postComment(
   articleId: string,
   comment: FormData
 ): Promise<Response | void> {
-  // return new Promise((resolve, reject) => {
-  //   setTimeout(() => {
-  //     resolve(undefined);
-  //   }, 2000);
-  // });
   const url = `https://strapi.docker-box.richardwillis.info/articles/${articleId}/comment`;
 
   // const url = 'http://localhost:1337/articles/22/comment';
-  // @ts-ignore
+  // @ts-expect-error
   const searchParams = new URLSearchParams(comment);
   return makeRequest(url, {
     body: searchParams,

@@ -1,21 +1,17 @@
 import React from 'react';
-import classNames from 'classnames/bind';
 import { Link } from '../Link/Link';
-import { Typography } from '../Typography/Typography';
 import { MobileNav } from '../MobileNav/MobileNav';
-
-import STYLES from './Header.module.scss';
 import { Nav } from '../Nav/Nav';
-const classes = classNames.bind(STYLES);
+import * as styles from './Header.css';
 
 export const Header: React.FC = () => {
   return (
-    <header className={classes('root')}>
-      <div className={classes('body')}>
-        <Link href="/" className={classes('title')}>
+    <header className={styles.root}>
+      <div className={styles.body}>
+        <Link href="/" className={styles.title}>
           Richard Willis
         </Link>
-        <Nav className={classes('nav')} />
+        <Nav className={styles.nav} />
       </div>
       <MobileNav />
     </header>

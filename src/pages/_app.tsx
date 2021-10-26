@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react';
-import { Meta } from '../features/layout/Meta/Meta';
+import 'prism-themes/themes/prism-vsc-dark-plus.css';
+import '../styles/globals.css.ts';
 
-import '../styles/globals.scss';
-import '../styles/prism.scss';
+import { Meta } from '../features/layout/Meta/Meta';
 
 export interface MyAppProps {
   Component: React.FC | React.ComponentClass;
@@ -19,3 +19,24 @@ const MyApp: React.FC<MyAppProps> = ({ Component, pageProps }) => {
 };
 
 export default MyApp;
+
+// import React, { Fragment } from 'react';
+// import { Meta } from '../features/layout/Meta/Meta';
+
+// import '../styles/globals.css.ts';
+// import 'prism-themes/themes/prism-vsc-dark-plus.css';
+// export interface MyAppProps {
+//   Component: React.FC | React.ComponentClass;
+//   pageProps: Record<string, unknown>;
+// }
+
+// const MyApp: React.FC<MyAppProps> = ({ Component, pageProps }) => {
+//   return (
+//     <Fragment>
+//       <Meta />
+//       <Component {...pageProps} />
+//     </Fragment>
+//   );
+// };
+
+// export default MyApp;

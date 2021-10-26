@@ -1,9 +1,8 @@
 import { default as NextLink, LinkProps as NextLinkProps } from 'next/link';
-import classNames from 'classnames/bind';
+import classNames from 'classnames';
 import { useRouter } from 'next/router';
 
-import STYLES from './Link.module.scss';
-const classes = classNames.bind(STYLES);
+import * as styles from './Link.css';
 
 export type LinkVariant = 'card-button' | 'normal';
 
@@ -46,8 +45,8 @@ export const Link: React.FC<LinkProps> = ({
   const anchor = (
     <a
       {...anchorProps}
-      className={classes(
-        'root',
+      className={classNames(
+        styles.root,
         className,
         hrefInPath(router.asPath, href) && activeClassName,
         variant && `variant-${variant}`

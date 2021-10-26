@@ -1,7 +1,7 @@
 import { GetStaticProps } from 'next';
-import { serialize } from 'next-mdx-remote/serialize';
 import { getSanitisedResponse } from '../features/api/apiClient';
 import { AboutpageSeo } from '../features/api/strapi';
+import { getMdxSource } from '../features/mdx/util';
 
 export { ProjectsPage as default } from '../features/projects/ProjectsPage/ProjectsPage';
 
@@ -12,7 +12,7 @@ export const getStaticProps: GetStaticProps<ProjectsPageProps> = async () => {
   const allProjects = await getAllProjects();
   const projectsPage = await getProjectsPage();
   const { body = '', seo } = projectsPage;
-  const mdxSource = await serialize(body);
+  const mdxSource = await getMdxSource(body);
   return {
     props: {
       allProjects,

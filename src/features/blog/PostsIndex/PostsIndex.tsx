@@ -1,11 +1,8 @@
 import React from 'react';
-import classNames from 'classnames/bind';
-import { BlogPostCard } from '../BlogPostCard/BlogPostCard';
 
-import STYLES from './PostsIndex.module.scss';
-import { Article } from '../../api/strapi';
+import { BlogPostCard } from '../BlogPostCard/BlogPostCard';
 import { SerializedArticle } from '../api';
-const classes = classNames.bind(STYLES);
+import * as styles from './PostsIndex.css';
 
 export interface PostsIndexProps {
   articles: SerializedArticle[];
@@ -13,7 +10,7 @@ export interface PostsIndexProps {
 
 export const PostsIndex: React.FC<PostsIndexProps> = ({ articles }) => {
   return (
-    <nav className={classes('root')}>
+    <nav className={styles.root}>
       {articles.map((article) => {
         return (
           <BlogPostCard
@@ -22,7 +19,7 @@ export const PostsIndex: React.FC<PostsIndexProps> = ({ articles }) => {
             date={article.publishDate}
             href={`/blog/${article.slug}`}
             key={article.slug}
-            className={classes('post')}></BlogPostCard>
+          />
         );
       })}
     </nav>

@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import classNames from 'classnames/bind';
+import classNames from 'classnames';
 import { MdClose, MdMenu } from 'react-icons/md';
 
 import { Nav } from '../Nav/Nav';
 
-import STYLES from './MobileNav.module.scss';
-import { Fragment } from 'react';
-const classes = classNames.bind(STYLES);
+import * as styles from './MobileNav.css';
 
 const OpenMenuButton: React.FC<
   React.DetailedHTMLProps<
@@ -18,8 +16,8 @@ const OpenMenuButton: React.FC<
   }
 > = ({ isVisible, ...props }) => {
   return (
-    <button className={classes('menu-button')} aria-expanded="false" {...props}>
-      <span className={classes('menu-button-label')}>Open main menu</span>
+    <button className={styles.menuButton} aria-expanded="false" {...props}>
+      <span className={styles.menuButtonLabel}>Open main menu</span>
       {isVisible ? <MdClose /> : <MdMenu />}
     </button>
   );
@@ -34,7 +32,7 @@ const Overlay: React.FC<
 > = ({ ...props }) => {
   return (
     <Portal>
-      <div className={classes('overlay')} {...props} />
+      <div className={styles.overlay} {...props} />
     </Portal>
   );
 };
@@ -62,9 +60,9 @@ export const MobileNav: React.FC = () => {
         isVisible={isMobileNavVisible}
       />
       <Nav
-        className={classes(
-          'mobile-nav',
-          isMobileNavVisible && 'mobile-nav-visible'
+        className={classNames(
+          styles.mobileNav,
+          isMobileNavVisible && styles.mobileNavVisible
         )}
       />
     </Fragment>

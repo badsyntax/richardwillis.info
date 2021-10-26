@@ -1,10 +1,10 @@
 import React from 'react';
-import classNames from 'classnames/bind';
+import classNames from 'classnames';
 
 import { VscSync } from 'react-icons/vsc';
 
-import STYLES from './Button.module.scss';
-const classes = classNames.bind(STYLES);
+import * as styles from './Button.css';
+import { capitalizeFirstLetter } from '../../util/capitalizeFirstLetter';
 
 export type ButtonProps = React.DetailedHTMLProps<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -23,10 +23,15 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
 }) => {
   return (
     <button
-      className={classes('root', `variant-${variant}`, className)}
+      className={classNames(
+        styles.root,
+        // @ts-ignore
+        styles[`variant${capitalizeFirstLetter(variant)}`],
+        className
+      )}
       {...props}>
       {children}
-      {isLoading && <VscSync className={classes('loading-icon')} />}
+      {isLoading && <VscSync className={classNames('loading-icon')} />}
     </button>
   );
 };

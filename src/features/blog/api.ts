@@ -1,13 +1,7 @@
 import { apiClient } from '../api/apiClient';
 import { Article } from '../api/strapi';
-import { serialize } from 'next-mdx-remote/serialize';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
-import rehypeSlug from 'rehype-slug';
-import rehypeExternalLinks from 'rehype-external-links';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
-
-// @ts-expect-error
-import rehypePrism from '@mapbox/rehype-prism';
+import { getMdxSource } from '../mdx/util';
 
 export type SerializedArticle = Omit<
   Article,
@@ -28,37 +22,6 @@ export type SerializedArticle = Omit<
 export type SerializedArticleWithMdx = SerializedArticle & {
   mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
 };
-
-function getMdxSource(
-  markdown: string
-): Promise<MDXRemoteSerializeResult<Record<string, unknown>>> {
-  return serialize(markdown, {
-    mdxOptions: {
-      rehypePlugins: [
-        rehypeSlug,
-        rehypeExternalLinks,
-        rehypePrism,
-        [
-          rehypeAutolinkHeadings,
-          {
-            properties: {
-              className: 'anchor',
-              ariaHidden: 'true',
-              ariaLabel: 'Heading anchor',
-              tabIndex: -1,
-            },
-            content: {
-              type: 'element',
-              tagName: 'span',
-              properties: { className: ['icon'] },
-              children: [],
-            },
-          },
-        ],
-      ],
-    },
-  });
-}
 
 async function getSerializableArticle({
   id,
