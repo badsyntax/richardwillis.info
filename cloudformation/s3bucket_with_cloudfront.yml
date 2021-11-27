@@ -6,10 +6,6 @@ Parameters:
     Type: String
     Default: richard-willis-assets
     Description: Used for creating resource names
-  Version:
-    Type: String
-    Default: '1-0-0'
-    Description: A unique identifier to allow multiple deployments of the CloudFormation stack
   S3BucketName:
     Type: String
     Default: assets.richardwillis.info-us-east-1
@@ -116,10 +112,6 @@ Resources:
             MinTTL: 0
             TargetOriginId: !Sub 's3-origin-${S3Bucket}'
             ViewerProtocolPolicy: 'redirect-to-https'
-            LambdaFunctionAssociations:
-              - EventType: origin-response
-                LambdaFunctionARN: !GetAtt CFLambdaVersion.FunctionArn
-                IncludeBody: false
         DefaultCacheBehavior:
           AllowedMethods:
             - 'HEAD'
@@ -163,123 +155,6 @@ Resources:
     Properties:
       CloudFrontOriginAccessIdentityConfig:
         Comment: 'Access S3 bucket content only through CloudFront'
-
-  CFLambda:
-    Type: AWS::Lambda::Function
-    Properties:
-      Role: !GetAtt CFLambdaRole.Arn
-      Runtime: nodejs12.x
-      Handler: index.handler
-      Code:
-        ZipFile: |
-          // response headers *should* be key value pairs but can also contain comma delimited values,
-          // so we normalise them into a consistent key/value structure.
-          function getNormalisedHeaders(headers = []) {
-            return headers.reduce((previousValue, currentValue) => {
-              const values = currentValue.value.split(",");
-              values.forEach((value) => {
-                previousValue.push({
-                  key: currentValue.key,
-                  value: value.trim(),
-                });
-              });
-              return previousValue;
-            }, []);
-          }
-
-          function addHeaders(existingHeaders, newHeaders) {
-            newHeaders.forEach((newHeader) => {
-              const hasExistingHeader = !!existingHeaders.find((existingHeader) => {
-                return (
-                  existingHeader.key.toLowerCase() === newHeader.key.toLowerCase() &&
-                  existingHeader.value.toLowerCase() === newHeader.value.toLowerCase()
-                );
-              });
-              if (!hasExistingHeader) {
-                existingHeaders.push(newHeader);
-              }
-            });
-          }
-
-          // Always return 'Vary' headers to prevent browsers caching response
-          // headers when 'Origin' changes.
-          // See: https://richardwillis.info/blog/setup-s3-cloudfront-cdn
-          exports.handler = (event, context, callback) => {
-            const response = event.Records[0].cf.response;
-            const headers = response.headers;
-            headers["vary"] = getNormalisedHeaders(headers["vary"]);
-            addHeaders(headers["vary"], [
-              { key: "Vary", value: "Access-Control-Request-Headers" },
-              { key: "Vary", value: "Access-Control-Request-Method" },
-              { key: "Vary", value: "Origin" },
-            ]);
-            callback(null, response);
-          };
-
-  CFLambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-                - edgelambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
-  CFLambdaVersion:
-    Type: Custom::LatestLambdaVersion
-    Properties:
-      ServiceToken: !GetAtt PublishLambdaVersion.Arn
-      FunctionName: !Ref CFLambda
-      Version: !Ref Version
-
-  PublishLambdaVersion:
-    Type: AWS::Lambda::Function
-    Properties:
-      Handler: index.handler
-      Runtime: nodejs12.x
-      Role: !GetAtt PublishLambdaVersionRole.Arn
-      Code:
-        ZipFile: |
-
-          const {Lambda} = require('aws-sdk')
-          const {send, SUCCESS, FAILED} = require('cfn-response')
-          const lambda = new Lambda()
-          exports.handler = (event, context) => {
-            const {RequestType, ResourceProperties: {FunctionName}} = event
-            if (RequestType == 'Delete') return send(event, context, SUCCESS)
-            lambda.publishVersion({FunctionName}, (err, {FunctionArn}) => {
-              err
-                ? send(event, context, FAILED, err)
-                : send(event, context, SUCCESS, {FunctionArn})
-            })
-          }
-
-  PublishLambdaVersionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-      Policies:
-        - PolicyName: PublishVersion
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action: lambda:PublishVersion
-                Resource: '*'
 
 Outputs:
   S3BucketName:
