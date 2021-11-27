@@ -1,9 +1,0 @@
-node_modules
-npm-debug.log
-.next
-.vscode
-.git
-.gitignore
-.github
-/cloudformation
-docker-compose.yml

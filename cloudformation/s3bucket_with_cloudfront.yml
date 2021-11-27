@@ -16,11 +16,11 @@ Parameters:
     Description: Name of S3 bucket to create (ending with the region name)
   S3AllowedOrigins:
     Type: CommaDelimitedList
-    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.dokku.proxima-web.com, https://richardwillis.docker-box.richardwillis.info
+    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.docker-box.richardwillis.info
     Description: A list of allowed domains to request resources from CloudFront
-  RootDomain:
+  RootDomains:
     Type: CommaDelimitedList
-    Default: assets.richardwillis.info
+    Default: assets.richardwillis.info, richardwillis.info
     Description: A list of root hosts assigned to the CloudFront distribution
   CachePathPattern:
     Type: String
@@ -51,7 +51,7 @@ Resources:
   S3BucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Metadata:
-      Comment: 'Bucket policy to allow CloudFront to access the data'
+      Comment: 'Bucket policy to allow CloudFront & Public access'
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
@@ -111,6 +111,9 @@ Resources:
               Headers:
                 - 'Origin'
               QueryString: false
+            DefaultTTL: 86400
+            MaxTTL: 31536000
+            MinTTL: 0
             TargetOriginId: !Sub 's3-origin-${S3Bucket}'
             ViewerProtocolPolicy: 'redirect-to-https'
             LambdaFunctionAssociations:
@@ -124,7 +127,7 @@ Resources:
           CachedMethods:
             - 'HEAD'
             - 'GET'
-          Compress: false
+          Compress: true
           ForwardedValues:
             Cookies:
               Forward: 'none'
@@ -136,10 +139,6 @@ Resources:
           MinTTL: 0
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
-          LambdaFunctionAssociations:
-            - EventType: origin-response
-              LambdaFunctionARN: !GetAtt CFLambdaVersion.FunctionArn
-              IncludeBody: false
         DefaultRootObject: 'index.html'
         Enabled: true
         HttpVersion: 'http2'
@@ -151,10 +150,10 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
         PriceClass: 'PriceClass_All'
-        Aliases: !Ref RootDomain
+        Aliases: !Ref RootDomains
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateARN
-          MinimumProtocolVersion: 'TLSv1.2_2019'
+          MinimumProtocolVersion: 'TLSv1.2_2021'
           SslSupportMethod: 'sni-only'
 
   CFOriginAccessIdentity:
@@ -204,6 +203,7 @@ Resources:
 
           // Always return 'Vary' headers to prevent browsers caching response
           // headers when 'Origin' changes.
+          // See: https://richardwillis.info/blog/setup-s3-cloudfront-cdn
           exports.handler = (event, context, callback) => {
             const response = event.Records[0].cf.response;
             const headers = response.headers;
