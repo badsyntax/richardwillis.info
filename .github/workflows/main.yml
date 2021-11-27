@@ -10,22 +10,32 @@ on:
     branches:
       - master
   pull_request:
-    types: [opened, synchronize, reopened, closed]
     branches:
       - master
 
 jobs:
   lint_build_deploy:
-    if: github.event_name == 'push' || github.event_name == 'repository_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-20.04
     name: Build and Deploy
     steps:
       - uses: actions/checkout@v2
 
-      - name: Lint app dockerfile
-        uses: brpaz/hadolint-action@v1.5.0
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          dockerfile: Dockerfile
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Create AWS Stack
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: cloudfront-s3-richardwillis-info
+          template: cloudformation/s3bucket_with_cloudfront.yml
+          no-fail-on-empty-changeset: '1'
+          parameter-overrides: >-
+            Version=1-0-${{ github.run_number }},
+            CertificateARN=${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.4.1
@@ -52,34 +62,33 @@ jobs:
         env:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Sync to S3
+      - name: Sync assets to S3
+        # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html#ExpirationDownloadDist
         run: |
-          aws s3 sync .next/static s3://${{ secrets.AWS_S3_BUCKET }}/_next/static --cache-control public,max-age=31536000,immutable --size-only
-          aws s3 sync public/site-assets s3://${{ secrets.AWS_S3_BUCKET }}/site-assets --cache-control public,max-age=31536000,immutable --size-only
+          aws s3 sync out/_next s3://${{ secrets.AWS_S3_BUCKET }}/_next --cache-control public,max-age=31536000,immutable --size-only
+          aws s3 sync out/site-assets s3://${{ secrets.AWS_S3_BUCKET }}/site-assets --cache-control public,max-age=31536000,immutable --size-only
+          aws s3 sync out s3://${{ secrets.AWS_S3_BUCKET }} --cache-control public,max-age=0,s-maxage=31536000,must-revalidate --size-only --exclude "*" --include "*.html"
 
-      - name: Upload to Azure Static Web App
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BUSH_000508303 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: upload
-          skip_app_build: true
-          app_location: out
+  #           aws cloudfront create-invalidation \
+  # > --distribution-id EJTSI59795I2L \
+  # > --paths /index.html /
 
-  close_pull_request:
-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-    runs-on: ubuntu-20.04
-    name: Close Pull Request
-    steps:
-      - name: Close Pull Request
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BUSH_000508303 }}
-          action: 'close'
+  # - name: Upload to Azure Static Web App
+  #   uses: Azure/static-web-apps-deploy@v1
+  #   with:
+  #     azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BUSH_000508303 }}
+  #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+  #     action: upload
+  #     skip_app_build: true
+  #     app_location: out
+
+  # close_pull_request:
+  #   if: github.event_name == 'pull_request' && github.event.action == 'closed'
+  #   runs-on: ubuntu-20.04
+  #   name: Close Pull Request
+  #   steps:
+  #     - name: Close Pull Request
+  #       uses: Azure/static-web-apps-deploy@v1
+  #       with:
+  #         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BUSH_000508303 }}
+  #         action: 'close'

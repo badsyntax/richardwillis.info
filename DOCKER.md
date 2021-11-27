@@ -1,13 +1,6 @@
 # Docker
 
-## Running the Next.js App with Docker
-
-```console
-docker build -t registry.docker-box.richardwillis.info/badsyntax/richardwillis.info . --build-arg STRAPI_ENDPOINT=https://strapi.docker-box.richardwillis.info
-docker run --publish 8000:80 registry.docker-box.richardwillis.info/badsyntax/richardwillis.info:latest
-```
-
-### Running the Stack With Docker Swarm
+## Running the Stack With Docker Swarm
 
 ```console
 docker swarm init
