@@ -22,21 +22,33 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Set execute changeset
+        if: github.event_name != 'repository_dispatch'
+        id: changeset
+        run: |
+          if [[ "$REF" == "refs/heads/master" ]] && [[ "$EVENT_NAME" == "push" ]]; then
+             echo "::set-output name=executechangeset::0"
+           else
+             echo "::set-output name=executechangeset::1"
+           fi
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+
       - name: Create AWS Stack
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: aws-actions/aws-cloudformation-github-deploy@v1
+        if: github.event_name != 'repository_dispatch'
         with:
           name: cloudfront-s3-richardwillis-info
           template: cloudformation/s3bucket_with_cloudfront.yml
           no-fail-on-empty-changeset: '1'
+          no-execute-changeset: ${{ steps.changeset.outputs.executechangeset }}
           parameter-overrides: >-
-            Version=1-0-${{ github.run_number }},
             CertificateARN=${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
 
       - name: Set up Node.js
@@ -88,5 +100,4 @@ jobs:
       - name: Cache HTML files
         if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
         run: |
-          node scripts/ping-path-urls.js
           node scripts/ping-path-urls.js

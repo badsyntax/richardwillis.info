@@ -43,6 +43,7 @@ function getRequest(url, tryTime = 1) {
           path: pathname,
           method: 'GET',
           headers: {
+            origin: 'https://richardwillis.info',
             accept: 'text/html,application/xhtml+xml,application/xml',
             'accept-encoding': 'gzip, deflate, br',
             'cache-control': 'no-cache',
