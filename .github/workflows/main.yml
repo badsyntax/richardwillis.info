@@ -22,12 +22,14 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
       - name: Create AWS Stack
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: cloudfront-s3-richardwillis-info
@@ -49,6 +51,7 @@ jobs:
           NPM_CONFIG_AUDIT: false
 
       - name: Lint
+        if: github.event_name != 'repository_dispatch'
         run: npm run lint
 
       - name: Cache .next
@@ -63,32 +66,27 @@ jobs:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
 
       - name: Sync assets to S3
-        # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html#ExpirationDownloadDist
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
         run: |
           aws s3 sync out/_next s3://${{ secrets.AWS_S3_BUCKET }}/_next --cache-control public,max-age=31536000,immutable --size-only
           aws s3 sync out/site-assets s3://${{ secrets.AWS_S3_BUCKET }}/site-assets --cache-control public,max-age=31536000,immutable --size-only
-          aws s3 sync out s3://${{ secrets.AWS_S3_BUCKET }} --cache-control public,max-age=0,s-maxage=31536000,must-revalidate --size-only --exclude "*" --include "*.html"
+          aws s3 sync out s3://${{ secrets.AWS_S3_BUCKET }} --cache-control public,max-age=0,s-maxage=31536000,must-revalidate --exclude "*" --include "*.html"
 
-  #           aws cloudfront create-invalidation \
-  # > --distribution-id EJTSI59795I2L \
-  # > --paths /index.html /
+      - name: Rename HTML files
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
+        run: |
+          ./scripts/copy-s3-html-files.sh out ${{ secrets.AWS_S3_BUCKET }}
 
-  # - name: Upload to Azure Static Web App
-  #   uses: Azure/static-web-apps-deploy@v1
-  #   with:
-  #     azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BUSH_000508303 }}
-  #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-  #     action: upload
-  #     skip_app_build: true
-  #     app_location: out
+      - name: Invalidate Cloudfront Cache
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
+        run: |
+          node scripts/generate-html-paths-cloudfront-invalidate.js > invalidate-batch.json
+          cat invalidate-batch.json
+          id=$(aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --invalidation-batch file://invalidate-batch.json | jq -r '.Invalidation.Id')
+          aws cloudfront wait invalidation-completed --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --id "$id"
 
-  # close_pull_request:
-  #   if: github.event_name == 'pull_request' && github.event.action == 'closed'
-  #   runs-on: ubuntu-20.04
-  #   name: Close Pull Request
-  #   steps:
-  #     - name: Close Pull Request
-  #       uses: Azure/static-web-apps-deploy@v1
-  #       with:
-  #         azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_BUSH_000508303 }}
-  #         action: 'close'
+      - name: Cache HTML files
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
+        run: |
+          node scripts/ping-path-urls.js
+          node scripts/ping-path-urls.js
