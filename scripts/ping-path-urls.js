@@ -51,8 +51,14 @@ function getRequest(url) {
           },
         },
         (res) => {
-          console.log(`${url} ${res.statusCode}`);
-          resolve();
+          const xCache = res.headers['x-cache'];
+          console.log(`${url} ${res.statusCode} ${xCache}`);
+          if (xCache !== 'Hit from cloudfront') {
+            console.log(`Retrying...`);
+            return getRequest(url).then(resolve);
+          } else {
+            resolve();
+          }
         }
       )
       .end();
