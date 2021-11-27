@@ -32,7 +32,7 @@ async function processFiles(err, files) {
   }
 }
 
-function getRequest(url) {
+function getRequest(url, tryTime = 1) {
   return new Promise((resolve) => {
     const { hostname, port, pathname } = new URL(url);
     https
@@ -54,8 +54,13 @@ function getRequest(url) {
           const xCache = res.headers['x-cache'];
           console.log(`${url} ${res.statusCode} ${xCache}`);
           if (xCache !== 'Hit from cloudfront') {
-            console.log(`Retrying...`);
-            return getRequest(url).then(resolve);
+            if (tryTime === 5) {
+              console.error('Tried 5 times, aborting...');
+              resolve();
+            } else {
+              console.log(`Retrying ${tryTime + 1} of 5`);
+              getRequest(url, tryTime + 1).then(resolve);
+            }
           } else {
             resolve();
           }
