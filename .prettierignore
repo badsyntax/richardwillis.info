@@ -1,3 +1,4 @@
 .next
 package-lock.json
 out/_next
+out/site-assets/plausible.js
