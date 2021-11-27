@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react';
 import 'prism-themes/themes/prism-vsc-dark-plus.css';
-import '../styles/globals.css.ts';
+// import '../styles/globals.css.ts';
 
 import { Meta } from '../features/layout/Meta/Meta';
+import { globalStyles } from '../styles/globals.css.stiches';
 
 export interface MyAppProps {
   Component: React.FC | React.ComponentClass;
@@ -10,6 +11,7 @@ export interface MyAppProps {
 }
 
 const MyApp: React.FC<MyAppProps> = ({ Component, pageProps }) => {
+  globalStyles();
   return (
     <Fragment>
       <Meta />

@@ -1,6 +1,7 @@
 import React from 'react';
 import Document, { Html, Main, NextScript, Head } from 'next/document';
 import getConfig from 'next/config';
+import { getCssText, theme } from '../styles/stitches.config';
 const { publicRuntimeConfig } = getConfig();
 
 const siteAssets = `${publicRuntimeConfig.assetPrefix}site-assets/`;
@@ -8,7 +9,7 @@ const siteAssets = `${publicRuntimeConfig.assetPrefix}site-assets/`;
 export default class MyDocument extends Document {
   render(): React.ReactElement {
     return (
-      <Html lang="en">
+      <Html lang="en" className={theme}>
         <Head>
           <meta charSet="UTF-8" />
           <link rel="shortcut icon" href={`${siteAssets}favicon.ico`} />
@@ -35,6 +36,10 @@ export default class MyDocument extends Document {
             defer
             data-domain="richardwillis.info"
             src="https://plausible.docker-box.richardwillis.info/js/plausible.js"></script>
+          <style
+            id="stitches"
+            dangerouslySetInnerHTML={{ __html: getCssText() }}
+          />
         </Head>
         <body>
           <Main />

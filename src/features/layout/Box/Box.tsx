@@ -1,5 +1,7 @@
+import { CssComponent } from '@stitches/react/types/styled-component';
 import classNames from 'classnames';
 import React from 'react';
+import { CSS } from '../../../styles/stitches.config';
 
 export type BoxChildClasses = {
   [elementType: string]: string;

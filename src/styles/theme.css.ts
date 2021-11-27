@@ -22,7 +22,7 @@ export const tokens = {
     header: 'rgb(51, 51, 51)',
     gray: '#333333', // FIXME
     link: '#569cd6',
-    white: 'white', // FIXME
+    white: 'white', // FIX``ME
     tags: '#73c991',
   },
   filter: {
