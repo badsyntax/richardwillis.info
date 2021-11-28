@@ -96,8 +96,3 @@ jobs:
           cat invalidate-batch.json
           id=$(aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --invalidation-batch file://invalidate-batch.json | jq -r '.Invalidation.Id')
           aws cloudfront wait invalidation-completed --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --id "$id"
-
-      - name: Cache HTML files
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
-        run: |
-          node scripts/ping-path-urls.js
