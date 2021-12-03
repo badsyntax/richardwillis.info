@@ -15,6 +15,8 @@
   },
   "type": "commonjs",
   "dependencies": {
+    "@emotion/react": "^11.7.0",
+    "@emotion/styled": "^11.6.0",
     "@mapbox/rehype-prism": "^0.8.0",
     "@next/bundle-analyzer": "^12.0.4",
     "classnames": "^2.3.1",
@@ -34,6 +36,8 @@
     "typescript": "4.4.4"
   },
   "devDependencies": {
+    "@emotion/babel-plugin": "^11.3.0",
+    "@emotion/babel-preset-css-prop": "^11.2.0",
     "@openapitools/openapi-generator-cli": "^2.4.12",
     "@types/react": "17.0.30",
     "@types/react-dom": "^17.0.9",

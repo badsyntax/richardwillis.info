@@ -1,9 +1,10 @@
-const { ASSET_PREFIX, NODE_ENV } = process.env;
+const { ASSET_PREFIX, NODE_ENV, ANALYZE } = process.env;
 const isProd = NODE_ENV === 'production';
 const assetPrefix = ASSET_PREFIX || (isProd ? '/' : '/');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
+  enabled: ANALYZE === 'true',
 });
+
 module.exports = withBundleAnalyzer({
   poweredByHeader: false,
   assetPrefix,
