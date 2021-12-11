@@ -96,8 +96,12 @@
 
   pre[class*='language-'],
   code[class*='language-'] {
-    font-size: $theme-font-size-base;
+    font-size: 0.7rem;
     cursor: text;
+
+    @include respond-above(sm) {
+      font-size: $theme-font-size-base;
+    }
   }
 
   pre[class*='language-'] {
