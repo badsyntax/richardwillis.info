@@ -1,4 +1,5 @@
 name: Main
+
 concurrency:
   group: prod_deploy
   cancel-in-progress: false
@@ -19,37 +20,6 @@ jobs:
     name: Build and Deploy
     steps:
       - uses: actions/checkout@v2
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Set execute changeset
-        if: github.event_name != 'repository_dispatch'
-        id: changeset
-        run: |
-          if [[ "$REF" == "refs/heads/master" ]] && [[ "$EVENT_NAME" == "push" ]]; then
-             echo "::set-output name=executechangeset::0"
-           else
-             echo "::set-output name=executechangeset::1"
-           fi
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          REF: ${{ github.ref }}
-
-      - name: Create AWS Stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        if: github.event_name != 'repository_dispatch'
-        with:
-          name: cloudfront-s3-richardwillis-info
-          template: cloudformation/s3bucket_with_cloudfront.yml
-          no-fail-on-empty-changeset: '1'
-          no-execute-changeset: ${{ steps.changeset.outputs.executechangeset }}
-          parameter-overrides: >-
-            CertificateARN=${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.4.1
@@ -77,22 +47,58 @@ jobs:
         env:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
 
-      - name: Sync assets to S3
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
-        run: |
-          aws s3 sync out/_next s3://${{ secrets.AWS_S3_BUCKET }}/root/_next --cache-control public,max-age=31536000,immutable --size-only
-          aws s3 sync out/site-assets s3://${{ secrets.AWS_S3_BUCKET }}/root/site-assets --cache-control public,max-age=31536000,immutable --size-only
-          aws s3 sync out s3://${{ secrets.AWS_S3_BUCKET }}/root --cache-control public,max-age=0,s-maxage=31536000,must-revalidate --exclude "*" --include "*.html"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-      - name: Rename HTML files
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
-        run: |
-          ./scripts/copy-s3-html-files.sh out "${{ secrets.AWS_S3_BUCKET }}/root"
+      - name: AWS Static Stack
+        uses: badsyntax/github-action-aws-static-stack@e35d878e7377fe7709560e10e9507583d044ce11
+        with:
+          outDir: './out'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          lambdaVersion: '1.0.0'
+          cfStackName: 'cloudfront-s3-richardwillis-info'
+          s3BucketName: 'assets.richardwillis.info-us-east-1'
+          s3AllowedOrigins: 'https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.docker-box.richardwillis.info'
+          rootCloudFrontHosts: 'assets.richardwillis.info, richardwillis.info'
+          previewCloudFrontHosts: '*.preview.richardwillis.info'
+          previewUrlHost: 'preview.richardwillis.info'
+          cacheCorsPathPattern: '/_next/*'
+          certificateARN: ${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
+          removeExtensionFromHtmlFiles: true
+          createStack: true
+          deletePreviewSiteOnPRClose: true
 
-      - name: Invalidate Cloudfront Cache
-        if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
-        run: |
-          node scripts/generate-html-paths-cloudfront-invalidate.js > invalidate-batch.json
-          cat invalidate-batch.json
-          id=$(aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --invalidation-batch file://invalidate-batch.json | jq -r '.Invalidation.Id')
-          aws cloudfront wait invalidation-completed --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --id "$id"
+      # - name: Create AWS Stack
+      #   uses: aws-actions/aws-cloudformation-github-deploy@v1
+      #   if: github.event_name != 'repository_dispatch'
+      #   with:
+      #     name: cloudfront-s3-richardwillis-info
+      #     template: cloudformation/s3bucket_with_cloudfront.yml
+      #     no-fail-on-empty-changeset: '1'
+      #     no-execute-changeset: ${{ steps.changeset.outputs.executechangeset }}
+      #     parameter-overrides: >-
+      #       CertificateARN=${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
+
+      # - name: Sync assets to S3
+      #   if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
+      #   run: |
+      #     aws s3 sync out/_next s3://${{ secrets.AWS_S3_BUCKET }}/_next --cache-control public,max-age=31536000,immutable --size-only
+      #     aws s3 sync out/site-assets s3://${{ secrets.AWS_S3_BUCKET }}/site-assets --cache-control public,max-age=31536000,immutable --size-only
+      #     aws s3 sync out s3://${{ secrets.AWS_S3_BUCKET }} --cache-control public,max-age=0,s-maxage=31536000,must-revalidate --exclude "*" --include "*.html"
+
+      # - name: Rename HTML files
+      #   if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
+      #   run: |
+      #     ./scripts/copy-s3-html-files.sh out ${{ secrets.AWS_S3_BUCKET }}
+
+      # - name: Invalidate Cloudfront Cache
+      #   if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'repository_dispatch'
+      #   run: |
+      #     node scripts/generate-html-paths-cloudfront-invalidate.js > invalidate-batch.json
+      #     cat invalidate-batch.json
+      #     id=$(aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --invalidation-batch file://invalidate-batch.json | jq -r '.Invalidation.Id')
+      #     aws cloudfront wait invalidation-completed --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --id "$id"

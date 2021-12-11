@@ -4,27 +4,36 @@ Description: 'CloudFront distribution with an S3 origin'
 Parameters:
   ProjectName:
     Type: String
-    Default: richard-willis-assets
+    Default: example-com-static-cloudformation-stack
     Description: Used for creating resource names
   S3BucketName:
     Type: String
-    Default: assets.richardwillis.info-us-east-1
+    Default: example.com-us-east-1
     Description: Name of S3 bucket to create (ending with the region name)
   S3AllowedOrigins:
     Type: CommaDelimitedList
-    Default: https://richardwillis.info, https://assets.richardwillis.info, https://richardwillis.docker-box.richardwillis.info
-    Description: A list of allowed domains to request resources from CloudFront
-  RootDomains:
+    Description: A list of allowed domains to request resources from S3
+  RootCloudFrontHosts:
     Type: CommaDelimitedList
-    Default: assets.richardwillis.info, richardwillis.info
-    Description: A list of root hosts assigned to the CloudFront distribution
-  CachePathPattern:
+    Description: A list of hosts assigned to the Root CloudFront distribution
+  PreviewCloudFrontHosts:
+    Type: CommaDelimitedList
+    Description: A list of hosts assigned to the Preview CloudFront distribution
+  CacheCorsPathPattern:
     Type: String
     Default: '/_next/*'
     Description: The path pattern for which you want to apply the caching & CORS policy (cannot be root)
   CertificateARN:
     Type: String
-    Description: ARN of the certificate for the root domain
+    Description: ARN of the certificate for the root and preview domains
+  LambdaVersion:
+    Type: String
+    Default: '1-0-0'
+    Description: A unique identifier to allow multiple deployments of the CloudFormation stack
+  CloudFrontDefaultRootObject:
+    Type: String
+    Default: 'index.html'
+    Description: The cloudfront default root object. Typically either index.html or index
 
 Resources:
   S3Bucket:
@@ -87,13 +96,24 @@ Resources:
   CFDistribution:
     Type: 'AWS::CloudFront::Distribution'
     Metadata:
-      Comment: 'A CloudFront distribution with an S3 origin'
+      Comment: 'A Root CloudFront distribution with an S3 origin'
     Properties:
       DistributionConfig:
-        Comment: 'CDN for all static assets'
+        Comment: 'CDN for all root static assets'
+        Aliases: !Ref RootCloudFrontHosts
+        DefaultRootObject: !Ref CloudFrontDefaultRootObject
+        Enabled: true
+        HttpVersion: 'http2'
+        IPV6Enabled: false
+        Origins:
+          - DomainName: !GetAtt S3Bucket.DomainName
+            Id: !Sub 's3-origin-${S3Bucket}'
+            OriginPath: '/root'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
         CacheBehaviors:
           - CachePolicyId: !Ref CFStaticCachePolicy
-            PathPattern: !Ref CachePathPattern
+            PathPattern: !Ref CacheCorsPathPattern
             AllowedMethods:
               - 'HEAD'
               - 'GET'
@@ -131,18 +151,54 @@ Resources:
           MinTTL: 0
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
-        DefaultRootObject: 'index.html'
+        PriceClass: 'PriceClass_All'
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateARN
+          MinimumProtocolVersion: 'TLSv1.2_2021'
+          SslSupportMethod: 'sni-only'
+
+  CFDistributionPreview:
+    Type: 'AWS::CloudFront::Distribution'
+    Metadata:
+      Comment: 'A Preview CloudFront distribution with an S3 origin'
+    Properties:
+      DistributionConfig:
+        Comment: 'CDN for all preview static assets'
+        Aliases: !Ref PreviewCloudFrontHosts
+        DefaultRootObject: !Ref CloudFrontDefaultRootObject
         Enabled: true
         HttpVersion: 'http2'
         IPV6Enabled: false
         Origins:
           - DomainName: !GetAtt S3Bucket.DomainName
             Id: !Sub 's3-origin-${S3Bucket}'
-            OriginPath: ''
+            OriginPath: '/preview'
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - 'HEAD'
+            - 'GET'
+          CachedMethods:
+            - 'HEAD'
+            - 'GET'
+          Compress: true
+          ForwardedValues:
+            Cookies:
+              Forward: 'none'
+            Headers:
+              - 'Origin'
+            QueryString: false
+          DefaultTTL: 86400
+          MaxTTL: 31536000
+          MinTTL: 0
+          TargetOriginId: !Sub 's3-origin-${S3Bucket}'
+          ViewerProtocolPolicy: 'redirect-to-https'
+          LambdaFunctionAssociations:
+            - EventType: viewer-request
+              LambdaFunctionARN: !GetAtt CFLambdaVersionPreviewUrl.FunctionArn
+              IncludeBody: false
         PriceClass: 'PriceClass_All'
-        Aliases: !Ref RootDomains
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateARN
           MinimumProtocolVersion: 'TLSv1.2_2021'
@@ -156,13 +212,113 @@ Resources:
       CloudFrontOriginAccessIdentityConfig:
         Comment: 'Access S3 bucket content only through CloudFront'
 
+  CFLambdaPreviewUrl:
+    Type: AWS::Lambda::Function
+    Properties:
+      Role: !GetAtt CFLambdaRole.Arn
+      Runtime: nodejs14.x
+      Handler: index.handler
+      Code:
+        ZipFile: !Sub
+          - |
+            function getBranchName(request) {
+              const hostItem = request.headers.host.find(item => item.key === 'Host');
+              const [branchName, preview] = hostItem.value.split('.');
+              if (preview !== 'preview') {
+                return undefined;
+              }
+              return branchName;
+            }
+
+            exports.handler = (event, context, callback) => {
+              const request = event.Records[0].cf.request;
+              const branchName = getBranchName(request);
+              if (branchName) {
+                const path = request.uri === '/' ? ('/' + '${RootObject}') : request.uri;
+                // Note we're already forwarding to /preview via OriginPath
+                request.uri = '/' + branchName + path;
+              }
+              callback(null, request);
+            };
+          - { RootObject: !Ref CloudFrontDefaultRootObject }
+
+  CFLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - edgelambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  CFLambdaVersionPreviewUrl:
+    Type: Custom::LatestLambdaVersion
+    Properties:
+      ServiceToken: !GetAtt PublishLambdaVersion.Arn
+      FunctionName: !Ref CFLambdaPreviewUrl
+      Version: !Ref LambdaVersion
+
+  PublishLambdaVersion:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs14.x
+      Role: !GetAtt PublishLambdaVersionRole.Arn
+      Code:
+        ZipFile: |
+          const {Lambda} = require('aws-sdk')
+          const {send, SUCCESS, FAILED} = require('cfn-response')
+          const lambda = new Lambda()
+          exports.handler = (event, context) => {
+            const {RequestType, ResourceProperties: {FunctionName}} = event
+            if (RequestType == 'Delete') return send(event, context, SUCCESS)
+            lambda.publishVersion({FunctionName}, (err, {FunctionArn}) => {
+              err
+                ? send(event, context, FAILED, err)
+                : send(event, context, SUCCESS, {FunctionArn})
+            })
+          }
+
+  PublishLambdaVersionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: PublishVersion
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:PublishVersion
+                Resource: '*'
+
 Outputs:
   S3BucketName:
     Description: 'Bucket name'
     Value: !Ref S3Bucket
   CFDistributionId:
-    Description: 'Id of the CloudFront distribution'
+    Description: 'Id of the Root CloudFront distribution'
     Value: !Ref CFDistribution
   CFDistributionDomainName:
-    Description: 'Domain of the CloudFront distribution'
+    Description: 'Domain of the Root CloudFront distribution'
     Value: !GetAtt CFDistribution.DomainName
+  CFDistributionPreviewId:
+    Description: 'Id of the Preview CloudFront distribution'
+    Value: !Ref CFDistributionPreview
+  CFDistributionPreviewDomainName:
+    Description: 'Domain of the Preview CloudFront distribution'
+    Value: !GetAtt CFDistributionPreview.DomainName
