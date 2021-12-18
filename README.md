@@ -1,10 +1,10 @@
 # RichardWillis.info
 
-[![Main](https://github.com/badsyntax/richardwillis.info/actions/workflows/main.yml/badge.svg)](https://github.com/badsyntax/richardwillis.info/actions/workflows/main.yml)
+[![Build, Test & Deploy](https://github.com/badsyntax/richardwillis.info/actions/workflows/build-test-deploy.yml/badge.svg?branch=master)](https://github.com/badsyntax/richardwillis.info/actions/workflows/build-test-deploy.yml)
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-https://richardwillis.info/blog/how-i-use-next-js-strapi-and-docker-to-build-my-personal-website
+<https://richardwillis.info/blog/how-i-use-next-js-strapi-and-docker-to-build-my-personal-website>
 
 ## Getting Started
 
