@@ -73,6 +73,6 @@ jobs:
           certificate-arn: ${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
           src-dir: './out'
           static-files-glob: '_next/**/*'
-          lambda-version: '1.0.2'
+          lambda-version: '1.0.3'
           delete-preview-site-on-pr-close: true
           comment-template: '.github/pr-comment-template.hbs'

@@ -31,7 +31,7 @@ Parameters:
 Resources:
   S3Bucket:
     Type: 'AWS::S3::Bucket'
-    DeletionPolicy: 'Delete'
+    DeletionPolicy: Retain
     Metadata:
       Comment: 'Bucket to store all assets to be served over the CDN'
     Properties:
