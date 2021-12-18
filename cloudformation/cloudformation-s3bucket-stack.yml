@@ -2,33 +2,26 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFront distribution with an S3 origin'
 
 Parameters:
-  ProjectName:
+  StackName:
     Type: String
-    Default: example-com-static-cloudformation-stack
     Description: Used for creating resource names
   S3BucketName:
     Type: String
-    Default: example.com-us-east-1
     Description: Name of S3 bucket to create (ending with the region name)
   S3AllowedOrigins:
     Type: CommaDelimitedList
     Description: A list of allowed domains to request resources from S3
-  RootCloudFrontHosts:
+  CloudFrontRootHosts:
     Type: CommaDelimitedList
     Description: A list of hosts assigned to the Root CloudFront distribution
-  PreviewCloudFrontHosts:
+  CloudFrontPreviewHosts:
     Type: CommaDelimitedList
     Description: A list of hosts assigned to the Preview CloudFront distribution
-  CacheCorsPathPattern:
-    Type: String
-    Default: '/_next/*'
-    Description: The path pattern for which you want to apply the caching & CORS policy (cannot be root)
   CertificateARN:
     Type: String
     Description: ARN of the certificate for the root and preview domains
   LambdaVersion:
     Type: String
-    Default: '1-0-0'
     Description: A unique identifier to allow multiple deployments of the CloudFormation stack
   CloudFrontDefaultRootObject:
     Type: String
@@ -78,7 +71,7 @@ Resources:
         DefaultTTL: 86400
         MaxTTL: 31536000
         MinTTL: 0
-        Name: !Sub '${ProjectName}-cf-static-cache-policy'
+        Name: !Sub '${StackName}-cf-static-cache-policy'
         ParametersInCacheKeyAndForwardedToOrigin:
           EnableAcceptEncodingGzip: true
           EnableAcceptEncodingBrotli: true
@@ -93,14 +86,14 @@ Resources:
               - Access-Control-Request-Method
               - Origin
 
-  CFDistribution:
+  CFDistributionRoot:
     Type: 'AWS::CloudFront::Distribution'
     Metadata:
       Comment: 'A Root CloudFront distribution with an S3 origin'
     Properties:
       DistributionConfig:
         Comment: 'CDN for all root static assets'
-        Aliases: !Ref RootCloudFrontHosts
+        Aliases: !Ref CloudFrontRootHosts
         DefaultRootObject: !Ref CloudFrontDefaultRootObject
         Enabled: true
         HttpVersion: 'http2'
@@ -111,28 +104,8 @@ Resources:
             OriginPath: '/root'
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
-        CacheBehaviors:
-          - CachePolicyId: !Ref CFStaticCachePolicy
-            PathPattern: !Ref CacheCorsPathPattern
-            AllowedMethods:
-              - 'HEAD'
-              - 'GET'
-            CachedMethods:
-              - 'HEAD'
-              - 'GET'
-            Compress: true
-            ForwardedValues:
-              Cookies:
-                Forward: 'none'
-              Headers:
-                - 'Origin'
-              QueryString: false
-            DefaultTTL: 86400
-            MaxTTL: 31536000
-            MinTTL: 0
-            TargetOriginId: !Sub 's3-origin-${S3Bucket}'
-            ViewerProtocolPolicy: 'redirect-to-https'
         DefaultCacheBehavior:
+          CachePolicyId: !Ref CFStaticCachePolicy
           AllowedMethods:
             - 'HEAD'
             - 'GET'
@@ -140,15 +113,6 @@ Resources:
             - 'HEAD'
             - 'GET'
           Compress: true
-          ForwardedValues:
-            Cookies:
-              Forward: 'none'
-            Headers:
-              - 'Origin'
-            QueryString: false
-          DefaultTTL: 86400
-          MaxTTL: 31536000
-          MinTTL: 0
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
         PriceClass: 'PriceClass_All'
@@ -164,7 +128,7 @@ Resources:
     Properties:
       DistributionConfig:
         Comment: 'CDN for all preview static assets'
-        Aliases: !Ref PreviewCloudFrontHosts
+        Aliases: !Ref CloudFrontPreviewHosts
         DefaultRootObject: !Ref CloudFrontDefaultRootObject
         Enabled: true
         HttpVersion: 'http2'
@@ -172,10 +136,11 @@ Resources:
         Origins:
           - DomainName: !GetAtt S3Bucket.DomainName
             Id: !Sub 's3-origin-${S3Bucket}'
-            OriginPath: '/preview'
+            OriginPath: ''
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${CFOriginAccessIdentity}'
         DefaultCacheBehavior:
+          CachePolicyId: !Ref CFStaticCachePolicy
           AllowedMethods:
             - 'HEAD'
             - 'GET'
@@ -183,15 +148,6 @@ Resources:
             - 'HEAD'
             - 'GET'
           Compress: true
-          ForwardedValues:
-            Cookies:
-              Forward: 'none'
-            Headers:
-              - 'Origin'
-            QueryString: false
-          DefaultTTL: 86400
-          MaxTTL: 31536000
-          MinTTL: 0
           TargetOriginId: !Sub 's3-origin-${S3Bucket}'
           ViewerProtocolPolicy: 'redirect-to-https'
           LambdaFunctionAssociations:
@@ -235,8 +191,7 @@ Resources:
               const branchName = getBranchName(request);
               if (branchName) {
                 const path = request.uri === '/' ? ('/' + '${RootObject}') : request.uri;
-                // Note we're already forwarding to /preview via OriginPath
-                request.uri = '/' + branchName + path;
+                request.uri = '/preview/' + branchName + path;
               }
               callback(null, request);
             };
@@ -310,12 +265,12 @@ Outputs:
   S3BucketName:
     Description: 'Bucket name'
     Value: !Ref S3Bucket
-  CFDistributionId:
+  CFDistributionRootId:
     Description: 'Id of the Root CloudFront distribution'
-    Value: !Ref CFDistribution
-  CFDistributionDomainName:
+    Value: !Ref CFDistributionRoot
+  CFDistributionRootDomainName:
     Description: 'Domain of the Root CloudFront distribution'
-    Value: !GetAtt CFDistribution.DomainName
+    Value: !GetAtt CFDistributionRoot.DomainName
   CFDistributionPreviewId:
     Description: 'Id of the Preview CloudFront distribution'
     Value: !Ref CFDistributionPreview

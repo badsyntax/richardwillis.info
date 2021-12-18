@@ -1,0 +1,78 @@
+name: Build, Test & Deploy
+
+concurrency:
+  group: prod_deploy
+  cancel-in-progress: false
+
+on:
+  repository_dispatch:
+    types: [strapi_updated]
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - master
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-20.04
+    name: Build and Deploy
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: 16
+
+      - name: Install NPM Packages
+        run: npm ci
+        env:
+          NPM_CONFIG_FUND: false
+          NPM_CONFIG_AUDIT: false
+
+      - name: Lint
+        if: github.event_name != 'repository_dispatch'
+        run: npm run lint
+
+      - name: Cache .next
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Build
+        run: npm run build
+        env:
+          STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        if: github.actor != 'dependabot[bot]'
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: AWS Static Stack
+        uses: badsyntax/github-action-aws-static-stack@v0.0.6
+        if: github.actor != 'dependabot[bot]'
+        with:
+          cf-stack-name: 'cloudfront-s3-richardwillis-info'
+          cf-template: './cloudformation/cloudformation-s3bucket-stack.yml'
+          cf-apply-change-set: ${{ github.event_name != 'repository_dispatch' }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          aws-region: 'us-east-1'
+          s3-bucket-name: 'assets.richardwillis.info-us-east-1'
+          s3-allowed-origins: 'https://richardwillis.info, https://assets.richardwillis.inf'
+          cloudfront-root-hosts: 'assets.richardwillis.info, richardwillis.info'
+          cloudfront-preview-hosts: '*.preview.richardwillis.info'
+          cloudfront-default-root-object: 'index'
+          certificate-arn: ${{ secrets.ROOT_DOMAIN_CERTIFICATE_ARN }}
+          src-dir: './out'
+          static-files-glob: '_next/**/*'
+          lambda-version: '1.0.2'
+          delete-preview-site-on-pr-close: true
+          comment-template: '.github/pr-comment-template.hbs'
