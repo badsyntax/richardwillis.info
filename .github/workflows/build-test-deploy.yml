@@ -61,7 +61,7 @@ jobs:
           aws-region: us-east-1
 
       - name: AWS Static Stack
-        uses: badsyntax/github-action-aws-static-stack@v0.0.8
+        uses: badsyntax/github-action-aws-static-stack@v0.0.9
         if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         with:
           cf-stack-name: 'richardwillis-info-cloudfront-s3'
