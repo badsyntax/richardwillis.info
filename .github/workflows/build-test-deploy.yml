@@ -1,7 +1,7 @@
 name: Build, Test & Deploy
 
 concurrency:
-  group: prod_deploy
+  group: deploy-${{ github.head_ref }}
   cancel-in-progress: false
 
 on:
@@ -11,7 +11,7 @@ on:
     branches:
       - master
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, closed]
     branches:
       - master
 
@@ -21,36 +21,41 @@ jobs:
     name: Build and Deploy
     steps:
       - uses: actions/checkout@v2
+        if: github.event.action != 'closed'
 
       - name: Set up Node.js
         uses: actions/setup-node@v2.4.1
+        if: github.event.action != 'closed'
         with:
           node-version: 16
 
       - name: Install NPM Packages
         run: npm ci
+        if: github.event.action != 'closed'
         env:
           NPM_CONFIG_FUND: false
           NPM_CONFIG_AUDIT: false
 
       - name: Lint
-        if: github.event_name != 'repository_dispatch'
+        if: github.event_name != 'repository_dispatch' && github.event.action != 'closed'
         run: npm run lint
 
       - name: Cache .next
         uses: actions/cache@v2
+        if: github.event.action != 'closed'
         with:
           path: ${{ github.workspace }}/.next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}
 
       - name: Build
         run: npm run build
+        if: github.event.action != 'closed' && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         env:
           STRAPI_ENDPOINT: ${{ secrets.STRAPI_ENDPOINT }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -58,7 +63,7 @@ jobs:
 
       - name: AWS Static Stack
         uses: badsyntax/github-action-aws-static-stack@v0.0.8
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         with:
           cf-stack-name: 'richardwillis-info-cloudfront-s3'
           cf-template: './cloudformation/cloudformation-s3bucket-stack.yml'
