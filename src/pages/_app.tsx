@@ -1,8 +1,7 @@
 import React, { Fragment } from 'react';
 import { Meta } from '../features/layout/Meta/Meta';
 
-import '../styles/globals.scss';
-import '../styles/prism.scss';
+import { ThemeProvider } from '../features/theme/ThemeProvider/ThemeProvider';
 
 export interface MyAppProps {
   Component: React.FC | React.ComponentClass;
@@ -11,10 +10,10 @@ export interface MyAppProps {
 
 const MyApp: React.FC<MyAppProps> = ({ Component, pageProps }) => {
   return (
-    <Fragment>
+    <ThemeProvider>
       <Meta />
       <Component {...pageProps} />
-    </Fragment>
+    </ThemeProvider>
   );
 };
 

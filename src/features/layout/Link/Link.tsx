@@ -1,25 +1,26 @@
+import styled from '@emotion/styled';
 import { default as NextLink, LinkProps as NextLinkProps } from 'next/link';
-import classNames from 'classnames/bind';
 import { useRouter } from 'next/router';
+import classNames from 'classnames';
 
-import STYLES from './Link.module.scss';
-const classes = classNames.bind(STYLES);
+import * as styles from './styles';
 
 export type LinkVariant = 'card-button' | 'normal';
-
-export type LinkProps = React.DetailedHTMLProps<
-  React.AnchorHTMLAttributes<HTMLAnchorElement>,
-  HTMLAnchorElement
-> &
-  NextLinkProps & {
-    activeClassName?: string;
-    variant?: LinkVariant;
-  };
 
 const hrefInPath = (pathname: string, href: string): boolean => {
   const pathSplit = pathname.split('/');
   return href.split('/').every((part, i) => pathSplit[i] === part);
 };
+
+const Anchor = styled.a`
+  ${styles.anchor}
+`;
+
+export type LinkProps = React.ComponentProps<typeof Anchor> &
+  NextLinkProps & {
+    activeClassName?: string;
+    variant?: LinkVariant;
+  };
 
 export const Link: React.FC<LinkProps> = ({
   href,
@@ -40,24 +41,20 @@ export const Link: React.FC<LinkProps> = ({
     ...(isExternal && {
       rel: 'nofollow',
     }),
+    className: classNames(
+      className,
+      hrefInPath(router.asPath, href) && activeClassName
+    ),
   };
 
-  /* eslint-disable jsx-a11y/anchor-has-content */
-  const anchor = (
-    <a
-      {...anchorProps}
-      className={classes(
-        'root',
-        className,
-        hrefInPath(router.asPath, href) && activeClassName,
-        variant && `variant-${variant}`
-      )}
-    />
-  );
+  const anchor = <Anchor {...anchorProps} />;
 
   return isInPage || isExternal ? (
     anchor
   ) : (
-    <NextLink href={href}>{anchor}</NextLink>
+    <NextLink href={href} passHref>
+      {anchor}
+    </NextLink>
   );
 };
+``;

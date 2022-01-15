@@ -1,11 +1,30 @@
 import React from 'react';
 import Document, { Html, Main, NextScript, Head } from 'next/document';
 import getConfig from 'next/config';
+// import { renderStatic } from '../features/renderer';
 const { publicRuntimeConfig } = getConfig();
 
 const siteAssets = `${publicRuntimeConfig.assetPrefix}site-assets`;
 
 export default class MyDocument extends Document {
+  // static async getInitialProps(ctx: any) {
+  //   const page = await ctx.renderPage();
+  //   const { css, ids } = await renderStatic(page.html);
+  //   const initialProps = await Document.getInitialProps(ctx);
+  //   return {
+  //     ...initialProps,
+  //     styles: (
+  //       <React.Fragment>
+  //         {initialProps.styles}
+  //         <style
+  //           data-foo="fooooooo"
+  //           data-emotion={`css ${ids.join(' ')}`}
+  //           dangerouslySetInnerHTML={{ __html: css }}
+  //         />
+  //       </React.Fragment>
+  //     ),
+  //   };
+  // }
   render(): React.ReactElement {
     return (
       <Html lang="en">
